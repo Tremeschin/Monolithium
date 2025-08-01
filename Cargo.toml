@@ -1,0 +1,11 @@
+[package]
+name = "monolithic"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+path = "monolithic/main.rs"
+name = "monolithic"
+
+[dependencies]
+java-rand = "0.2.0"
