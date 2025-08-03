@@ -1,11 +1,26 @@
 [package]
-name = "monolithic"
+name = "monolithium"
 version = "0.1.0"
 edition = "2024"
 
+[lib]
+name = "monolithium"
+path = "monolithium/lib.rs"
+
 [[bin]]
-path = "monolithic/main.rs"
-name = "monolithic"
+path = "monolithium/main.rs"
+name = "monolithium"
 
 [dependencies]
-java-rand = "0.2.0"
+ahash      = "0.8.12"
+java-rand  = "0.2.0"
+microbench = "0.5.0"
+png        = "0.17.16"
+rayon      = "1.10.0"
+
+[profile.dev]
+strip = true
+
+[profile.release]
+panic = "abort"
+lto = true
