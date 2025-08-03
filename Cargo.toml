@@ -24,5 +24,7 @@ smart-default = "0.7.1"
 strip = true
 
 [profile.release]
+codegen-units = 1
+opt-level = 3
 panic = "abort"
-lto = true
+lto = "fat"

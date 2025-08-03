@@ -55,7 +55,7 @@ fn biggest_spawn_monoliths() {
 }
 
 fn whole_world_monoliths() {
-    let world = World::new(617);
+    let world = World::new(851328);
 
     let mut monoliths = world.find_monoliths(
         &FindOptions::default().wraps().spacing(256));
@@ -91,4 +91,5 @@ fn main() {
     // benchmark();
     // biggest_spawn_monoliths();
     whole_world_monoliths();
+    // find_low_entropy_seeds();
 }

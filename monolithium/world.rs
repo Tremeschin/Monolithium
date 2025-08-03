@@ -64,13 +64,17 @@ impl World {
             // Check neighbors with step 4 per hill/depth scaling
             let mut neighbors = vec!((0, 4), (4, 0), (0, -4), (-4, 0));
 
-            // Occasionally check for disjoints
+            // Occasionally check for nearby and far disjoints
             if (x % 32 == 0) && (z % 32 == 0) {
-                let n = 64;
-                neighbors.extend(vec!(
-                    ( n,  n), ( n, -n),
-                    (-n,  n), (-n, -n),
-                ))
+                for factor in [1, 4] {
+                    let n = 64*factor;
+                    neighbors.extend(vec!(
+                        ( n,  n), ( n, -n),
+                        (-n,  n), (-n, -n),
+                        ( n,  0), ( 0,  n),
+                        (-n,  0), ( 0, -n),
+                    ))
+                }
             }
 
             for (dx, dz) in neighbors {
