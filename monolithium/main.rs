@@ -12,9 +12,8 @@ fn world_png() {
     {
         let mut index = 0;
         for x in (minx..maxx).step_by(4) {
-            println!("Processing x = {}", x);
             for z in (minz..maxz).step_by(4) {
-                if world.is_monolith(x as i64, z as i64) {
+                if world.is_monolith(x as i64, z as i64, true) {
                     pixels[index as usize] = 255;
                 }
                 if (x % 250 == 0) || (z % 250 == 0) {
@@ -31,16 +30,21 @@ fn world_png() {
 }
 
 fn biggest_spawn_monoliths() {
+    let seeds = 200_000_000;
+
+    let progress = ProgressBar::new(seeds)
+        .with_style(utils::progress("Searching"));
 
     // Iterate seeds to find monoliths near spawn
     let mut monoliths: Vec<Monolith> =
-        (0..=1_000_000)
+        (0..seeds)
         .into_par_iter()
+        .progress_with(progress)
         .map(|seed| {
             let world = World::new(seed);
             let monoliths = world.find_monoliths(
                 &FindOptions::default()
-                    .spawn(200).spacing(64).limit(1)
+                    .spawn(100).spacing(50).limit(1)
             );
             monoliths
         }).flatten()
@@ -48,23 +52,23 @@ fn biggest_spawn_monoliths() {
 
     monoliths.sort();
 
-    for mono in monoliths {
+    for lith in monoliths {
         println!("Monolith (Area: {:>7}) at ({:>5}, {:>5}) with seed {}",
-            mono.area, mono.center_x(), mono.center_z(), mono.seed);
+            lith.area, lith.center_x(), lith.center_z(), lith.seed);
     }
 }
 
 fn whole_world_monoliths() {
-    let world = World::new(851328);
+    let world = World::new(26829160);
 
     let mut monoliths = world.find_monoliths(
         &FindOptions::default().wraps().spacing(256));
 
     monoliths.sort();
 
-    for mono in &monoliths {
+    for lith in &monoliths {
         println!("Monolith (Area: {:>7}) at ({:>5}, {:>5}) with seed {}",
-            mono.area, mono.center_x(), mono.center_z(), mono.seed);
+            lith.area, lith.center_x(), lith.center_z(), lith.seed);
     }
 
     println!("Found {} monoliths", monoliths.len());
@@ -80,7 +84,7 @@ fn benchmark() {
     microbench::bench(&options, "is_monolith", || {
         for x in -1000..1000 {
             for z in -1000..1000 {
-                black_box(world.is_monolith(x, z));
+                black_box(world.is_monolith(x, z, true));
             }
         }
     });
@@ -89,7 +93,7 @@ fn benchmark() {
 fn main() {
     // world_png();
     // benchmark();
-    // biggest_spawn_monoliths();
-    whole_world_monoliths();
+    biggest_spawn_monoliths();
+    // whole_world_monoliths();
     // find_low_entropy_seeds();
 }

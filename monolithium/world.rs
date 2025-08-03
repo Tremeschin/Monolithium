@@ -11,7 +11,15 @@ impl World {
         let mut rng = Random::new(seed);
 
         // Skip 48 generators priorly used elsewhere
-        for _ in 0..48 {PerlinNoise::new(&mut rng);}
+        // Note: Must follow PerlinNoise::new order
+        for _ in 0..48 {
+            for i in 0..3   {
+                rng.next_f64();
+            }
+            for i in 0..256 {
+                rng.next_i32_bound(256 - i as i32);
+            }
+        }
 
         World {
             seed:  seed,
@@ -21,29 +29,36 @@ impl World {
     }
 
     // Check if a given coordinate is part of a monolith
-    pub fn is_monolith(&self, x: i64, z: i64) -> bool {
+    pub fn is_monolith(&self,
+        x: i64, z: i64,
+        precise: bool
+    ) -> bool {
         self.depth.sample(
             ((x/4) as f64) * 100.0, 0.0,
-            ((z/4) as f64) * 100.0
+            ((z/4) as f64) * 100.0,
+            precise
         ).abs() > 8000.0
         &&
         self.hill.sample(
             ((x/4) as f64) * 1.0, 0.0,
-            ((z/4) as f64) * 1.0
+            ((z/4) as f64) * 1.0,
+            precise
         ) < -512.0
     }
 
     /// Get a Monolith at a given coordinate, compute properties
     pub fn get_monolith(&self, x: i64, z: i64) -> Option<Monolith> {
-        let x = utils::nearest(x, 4);
-        let z = utils::nearest(z, 4);
 
-        if !self.is_monolith(x, z) {
+        // Most blocks are not monoliths
+        if !self.is_monolith(x, z, false) {
             return None;
         }
 
+        let x = utils::nearest(x, 4);
+        let z = utils::nearest(z, 4);
+
         // Start with current block
-        let mut mono = Monolith {
+        let mut lith = Monolith {
             minx: x, minz: z,
             maxx: x, maxz: z,
             seed: self.seed,
@@ -55,11 +70,15 @@ impl World {
         let mut queue   = VecDeque::from([(x, z)]);
 
         while let Some((x, z)) = queue.pop_front() {
-            mono.minx = min(mono.minx, x);
-            mono.maxx = max(mono.maxx, x);
-            mono.minz = min(mono.minz, z);
-            mono.maxz = max(mono.maxz, z);
-            mono.area += 16;
+            lith.area += 16;
+
+            // Occasionally update coordinates
+            if (x % 32 == 0) && (z % 32 == 0) {
+                lith.minx = min(lith.minx, x);
+                lith.maxx = max(lith.maxx, x);
+                lith.minz = min(lith.minz, z);
+                lith.maxz = max(lith.maxz, z);
+            }
 
             // Check neighbors with step 4 per hill/depth scaling
             let mut neighbors = vec!((0, 4), (4, 0), (0, -4), (-4, 0));
@@ -84,14 +103,14 @@ impl World {
                     continue;
                 }
 
-                if self.is_monolith(nx, nz) {
+                if self.is_monolith(nx, nz, true) {
                     visited.insert((nx, nz));
                     queue.push_back((nx, nz));
                 }
             }
         }
 
-        Some(mono)
+        Some(lith)
     }
 
     pub fn find_monoliths(&self, query: &FindOptions) -> Vec<Monolith> {
@@ -125,11 +144,8 @@ impl World {
             let monoliths = Arc::new(Mutex::new(AHashSet::new()));
 
             // Nice to have an estimative of the progress yknow..
-            let progress = ProgressBar::new(xrange.len() as u64).with_style(
-                ProgressStyle::default_bar()
-                    .template("Searching ({elapsed_precise} • ETA {eta}) {wide_bar:.cyan/blue} ({percent}%) • {pos}/{len}")
-                    .unwrap()
-            );
+            let progress = ProgressBar::new(xrange.len() as u64)
+                .with_style(utils::progress("Searching"));
 
             xrange.clone()
                 .into_par_iter()

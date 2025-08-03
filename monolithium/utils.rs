@@ -1,3 +1,4 @@
+use crate::*;
 
 // Round an integer to a nearest multiple of another
 pub fn nearest(num: i64, mul: i64) -> i64 {
@@ -27,4 +28,11 @@ pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
     let u = if h & 1 == 0 {u} else {-u};
     let v = if h & 2 == 0 {v} else {-v};
     return u + v;
+}
+
+/// Common progress bar style
+pub fn progress(message: &str) -> ProgressStyle {
+    ProgressStyle::default_bar().template(
+        &format!("{message} ({{elapsed_precise}} • ETA {{eta_precise}}) {{wide_bar:.cyan/blue}} ({{percent_precise}}%) • {{pos}}/{{len}} ({{per_sec}})"))
+        .unwrap()
 }

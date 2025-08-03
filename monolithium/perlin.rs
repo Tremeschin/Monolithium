@@ -110,8 +110,8 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     }
 
     /// Sample the fractal noise at a given coordinate
-    pub fn sample(&self, x: f64, y: f64, z: f64) -> f64 {
-        (0..OCTAVES).map(|i| {
+    pub fn sample(&self, x: f64, y: f64, z: f64, precise: bool) -> f64 {
+        (0..if precise {OCTAVES} else {3}).map(|i| {
             let i = OCTAVES - 1 - i;
             let s = (1 << i) as f64;
             self.noise[i].sample(x/s, y/s, z/s) * s
