@@ -90,20 +90,21 @@ impl World {
         Some(mono)
     }
 
-    pub fn find_monoliths(&self,
-        minx: i64, minz: i64,
-        maxx: i64, maxz: i64,
-        spacing: usize
-    ) -> Vec<Monolith> {
+    pub fn find_monoliths(&self, query: &FindOptions) -> Vec<Monolith> {
 
         // Use non-threaded approach for small areas
-        if (maxx - minx) < 1000 {
+        if (query.maxx - query.minx).abs() < 1000 {
             let mut monoliths = AHashSet::new();
 
-            for x in (minx..=maxx).step_by(spacing) {
-                for z in (minz..=maxz).step_by(spacing) {
+            'a: for x in (query.minx..=query.maxx).step_by(query.spacing) {
+                for z in (query.minz..=query.maxz).step_by(query.spacing) {
                     if let Some(mono) = self.get_monolith(x, z) {
                         monoliths.insert(mono);
+                        if let Some(many) = query.limit {
+                            if monoliths.len() >= many as usize {
+                                break 'a;
+                            }
+                        }
                     }
                 }
             }
@@ -114,12 +115,12 @@ impl World {
         } else {
             let monoliths = Arc::new(Mutex::new(AHashSet::new()));
 
-            (minx..=maxx)
-                .step_by(spacing)
+            (query.minx..=query.maxx)
+                .step_by(query.spacing)
                 .collect::<Vec<i64>>()
                 .into_par_iter()
                 .for_each(|x| {
-                    for z in (minz..=maxz).step_by(spacing) {
+                    for z in (query.minz..=query.maxz).step_by(query.spacing) {
                         if let Some(mono) = self.get_monolith(x, z) {
                             monoliths.lock().unwrap().insert(mono);
                         }
@@ -130,5 +131,59 @@ impl World {
                 .lock().unwrap().clone()
                 .into_iter().collect();
         }
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
+#[derive(SmartDefault)]
+pub struct FindOptions {
+    pub minx: i64,
+    pub maxx: i64,
+    pub minz: i64,
+    pub maxz: i64,
+
+    #[default(32)]
+    pub spacing: usize,
+
+    /// How many monoliths to find
+    pub limit: Option<u64>,
+}
+
+impl FindOptions {
+
+    pub fn spacing(&mut self, spacing: usize) -> &mut Self {
+        self.spacing = spacing;
+        return self;
+    }
+
+    pub fn limit(&mut self, many: u64) -> &mut Self {
+        self.limit = Some(many);
+        return self;
+    }
+
+    // Defining regions
+
+    /// Search around a given coordinate at most `radius` manhattan blocks away
+    pub fn around(&mut self, x: i64, z: i64, radius: i64) -> &mut Self {
+        self.minx = x - radius;
+        self.maxx = x + radius;
+        self.minz = z - radius;
+        self.maxz = z + radius;
+        return self;
+    }
+
+    /// Search around spawn at most `radius` manhattan blocks away
+    pub fn spawn(&mut self, radius: i64) -> &mut Self {
+        self.around(0, 0, radius)
+    }
+
+    /// Search all blocks before the Far Lands
+    pub fn world(&mut self) -> &mut Self {
+        self.minx = -FARLANDS;
+        self.maxx =  FARLANDS;
+        self.minz = -FARLANDS;
+        self.maxz =  FARLANDS;
+        return self;
     }
 }

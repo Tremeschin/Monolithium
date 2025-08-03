@@ -10,6 +10,8 @@ pub struct Monolith {
     pub seed: u64,
 }
 
+/* -------------------------------------------------------------------------- */
+
 impl Monolith {
     pub fn center_x(&self) -> i64 {
         (self.minx + self.maxx) / 2

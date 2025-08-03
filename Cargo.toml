@@ -1,6 +1,6 @@
 [package]
 name = "monolithium"
-version = "0.1.0"
+version = "1.0.0"
 edition = "2024"
 
 [lib]
@@ -12,11 +12,12 @@ path = "monolithium/main.rs"
 name = "monolithium"
 
 [dependencies]
-ahash      = "0.8.12"
-java-rand  = "0.2.0"
-microbench = "0.5.0"
-png        = "0.17.16"
-rayon      = "1.10.0"
+ahash         = "0.8.12"
+java-rand     = "0.2.0"
+microbench    = "0.5.0"
+png           = "0.17.16"
+rayon         = "1.10.0"
+smart-default = "0.7.1"
 
 [profile.dev]
 strip = true

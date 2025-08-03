@@ -38,7 +38,10 @@ fn biggest_spawn_monoliths() {
         .into_par_iter()
         .map(|seed| {
             let world = World::new(seed);
-            let monoliths = world.find_monoliths(0, 0, 0, 0, 1);
+            let monoliths = world.find_monoliths(
+                &FindOptions::default()
+                    .spawn(200).spacing(64).limit(1)
+            );
             monoliths
         }).flatten()
         .collect();
@@ -53,11 +56,17 @@ fn biggest_spawn_monoliths() {
 
 fn whole_world_monoliths() {
     let world = World::new(617);
-    let monoliths = world.find_monoliths(
-       -FARLANDS, -FARLANDS,
-        FARLANDS,  FARLANDS,
-        64
-    );
+
+    let mut monoliths = world.find_monoliths(
+        &FindOptions::default().world().spacing(128));
+
+    monoliths.sort();
+
+    for mono in &monoliths {
+        println!("Monolith (Area: {:>7}) at ({:>5}, {:>5}) with seed {}",
+            mono.area, mono.center_x(), mono.center_z(), mono.seed);
+    }
+
     println!("Found {} monoliths", monoliths.len());
 }
 

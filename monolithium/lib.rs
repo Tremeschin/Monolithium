@@ -10,6 +10,7 @@ pub use std::sync::Mutex;
 pub use ahash::AHashSet;
 pub use java_rand::Random;
 pub use rayon::prelude::*;
+pub use smart_default::SmartDefault;
 
 pub mod monolith;
 pub use monolith::*;

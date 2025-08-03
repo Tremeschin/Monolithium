@@ -9,6 +9,8 @@ pub struct PerlinNoise {
     zoff: f64,
 }
 
+/* -------------------------------------------------------------------------- */
+
 impl PerlinNoise {
     pub fn new(rng: &mut Random) -> Self {
         let xoff = rng.next_f64() * 256.0;
