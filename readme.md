@@ -15,8 +15,10 @@
   <br>
 </div>
 
-<b>Seed:</b> 26829160 • (x: 0, y: 0) • Area: 1,044,848 blocks squared
-<br><sup><b>Using</b> [Moderner Beta](https://modrinth.com/moderner-beta) Alpha v1.1.2_01 Terrain on MC 1.21 • [Distant Horizons](https://modrinth.com/mod/distant-horizons) • [Bliss Shaders](https://github.com/X0nk/Bliss-Shader/)</sup>
+<img width="2473" height="1262" alt="Monolith" src="https://github.com/user-attachments/assets/cfa62e8f-6367-4768-9e62-c8879aba16b8"/>
+
+<b>Seed:</b> 26829160 • (x: 0, y: 0) • Area: 1,044,848 blocks squared • _Most Aesthetic_
+<br><sup><b>Using</b> [Moderner Beta](https://modrinth.com/mod/moderner-beta) Alpha v1.1.2_01 Terrain on MC 1.21 • [Distant Horizons](https://modrinth.com/mod/distant-horizons) • [Bliss Shaders](https://github.com/X0nk/Bliss-Shader/)</sup>
 
 ## 🔥 Description
 
