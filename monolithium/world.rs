@@ -91,15 +91,19 @@ impl World {
     }
 
     pub fn find_monoliths(&self, query: &FindOptions) -> Vec<Monolith> {
+        let xrange: Vec<i64> = (query.minx..=query.maxx).step_by(query.spacing).collect();
+        let zrange: Vec<i64> = (query.minz..=query.maxz).step_by(query.spacing).collect();
 
-        // Use non-threaded approach for small areas
+        // Use non-threaded approach for small areas (lower latency)
         if (query.maxx - query.minx).abs() < 1000 {
             let mut monoliths = AHashSet::new();
 
-            'a: for x in (query.minx..=query.maxx).step_by(query.spacing) {
-                for z in (query.minz..=query.maxz).step_by(query.spacing) {
+            'a: for x in xrange.clone() {
+                for z in zrange.clone() {
                     if let Some(mono) = self.get_monolith(x, z) {
                         monoliths.insert(mono);
+
+                        // Early break if limit is reached
                         if let Some(many) = query.limit {
                             if monoliths.len() >= many as usize {
                                 break 'a;
@@ -112,17 +116,25 @@ impl World {
                 .into_iter().collect();
 
         // Shred the cpu.
+        // Why bother breaking after a limit?
         } else {
             let monoliths = Arc::new(Mutex::new(AHashSet::new()));
 
-            (query.minx..=query.maxx)
-                .step_by(query.spacing)
-                .collect::<Vec<i64>>()
+            // Nice to have an estimative of the progress yknow..
+            let progress = ProgressBar::new(xrange.len() as u64).with_style(
+                ProgressStyle::default_bar()
+                    .template("Searching ({elapsed_precise} • ETA {eta}) {wide_bar:.cyan/blue} ({percent}%) • {pos}/{len}")
+                    .unwrap()
+            );
+
+            xrange.clone()
                 .into_par_iter()
+                .progress_with(progress)
                 .for_each(|x| {
-                    for z in (query.minz..=query.maxz).step_by(query.spacing) {
+                    for z in zrange.clone() {
                         if let Some(mono) = self.get_monolith(x, z) {
-                            monoliths.lock().unwrap().insert(mono);
+                            let mut monoliths = monoliths.lock().unwrap();
+                            monoliths.insert(mono);
                         }
                     }
                 });
@@ -179,11 +191,19 @@ impl FindOptions {
     }
 
     /// Search all blocks before the Far Lands
-    pub fn world(&mut self) -> &mut Self {
+    pub fn inbounds(&mut self) -> &mut Self {
         self.minx = -FARLANDS;
         self.maxx =  FARLANDS;
         self.minz = -FARLANDS;
         self.maxz =  FARLANDS;
+        return self;
+    }
+
+    pub fn wraps(&mut self) -> &mut Self {
+        self.minx = 0;
+        self.maxx = WORLD_WRAP;
+        self.minz = 0;
+        self.maxz = WORLD_WRAP;
         return self;
     }
 }

@@ -13,6 +13,7 @@ name = "monolithium"
 
 [dependencies]
 ahash         = "0.8.12"
+indicatif     = {version="0.18.0", features=["rayon"]}
 java-rand     = "0.2.0"
 microbench    = "0.5.0"
 png           = "0.17.16"

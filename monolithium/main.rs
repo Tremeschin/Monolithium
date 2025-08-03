@@ -58,7 +58,7 @@ fn whole_world_monoliths() {
     let world = World::new(617);
 
     let mut monoliths = world.find_monoliths(
-        &FindOptions::default().world().spacing(128));
+        &FindOptions::default().wraps().spacing(256));
 
     monoliths.sort();
 
@@ -89,6 +89,6 @@ fn benchmark() {
 fn main() {
     // world_png();
     // benchmark();
-    biggest_spawn_monoliths();
-    // whole_world_monoliths();
+    // biggest_spawn_monoliths();
+    whole_world_monoliths();
 }

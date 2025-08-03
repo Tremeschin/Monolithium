@@ -1,5 +1,5 @@
 
-// Python: multiple*round(value/multiple))
+// Round an integer to a nearest multiple of another
 pub fn nearest(num: i64, mul: i64) -> i64 {
     (num + mul/2) / mul * mul
 }

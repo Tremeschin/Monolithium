@@ -11,6 +11,9 @@ pub use ahash::AHashSet;
 pub use java_rand::Random;
 pub use rayon::prelude::*;
 pub use smart_default::SmartDefault;
+pub use indicatif::ParallelProgressIterator;
+pub use indicatif::ProgressBar;
+pub use indicatif::ProgressStyle;
 
 pub mod monolith;
 pub use monolith::*;
@@ -22,3 +25,8 @@ pub use world::*;
 
 pub const FARLANDS:   i64 = 12_550_824;
 pub const WORLD_SIZE: i64 = 2*FARLANDS + 1;
+
+/// It was found experimentally that the perlin noise and
+/// monoliths wraps around every 2**23 blocks, drastically
+/// reducing the practical search space!
+pub const WORLD_WRAP: i64 = 2_i64.pow(23);
