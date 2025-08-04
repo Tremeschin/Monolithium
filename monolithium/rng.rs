@@ -23,15 +23,18 @@ impl JavaRNG {
 	}
 
 	/// Roll the state, same effect as ignoring a `next`` call
+    #[inline(always)]
 	pub fn step(&mut self) {
 		self.state = (self.state * A + C) & M;
 	}
 
+    #[inline(always)]
 	pub fn next(&mut self, bits: u8) -> i32 {
 		self.step();
 		((self.state.0 as u64) >> (48 - bits)) as i32
 	}
 
+    #[inline(always)]
 	pub fn next_i32_bound(&mut self, max: i32) -> i32 {
 		if (max as u32).is_power_of_two() {
 			(((max as i64).wrapping_mul(self.next(31) as i64)) >> 31) as i32

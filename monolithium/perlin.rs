@@ -25,14 +25,16 @@ impl PerlinNoise {
 
         // Shuffle the first half
         for a in 0..256 {
-            let b = rng.next_i32_bound(256 - a as i32) as usize + a;
+            let b = a + rng.next_i32_bound((256 - a) as i32) as usize;
             map.swap(a, b);
         }
 
-        // Mirror to the second half
-        for i in 0..256 {
-            map[i + 256] = map[i];
-        }
+        // Mirror to the second half (faster than for loop)
+        unsafe {std::ptr::copy_nonoverlapping(
+            map.as_ptr(),
+            map.as_mut_ptr().add(256),
+            256
+        )};
 
         PerlinNoise {
             map: map,

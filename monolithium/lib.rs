@@ -8,11 +8,11 @@ pub use std::sync::Arc;
 pub use std::sync::Mutex;
 
 pub use ahash::AHashSet;
-pub use rayon::prelude::*;
-pub use smart_default::SmartDefault;
 pub use indicatif::ParallelProgressIterator;
 pub use indicatif::ProgressBar;
 pub use indicatif::ProgressStyle;
+pub use rayon::prelude::*;
+pub use smart_default::SmartDefault;
 
 pub mod monolith;
 pub use monolith::*;
@@ -24,10 +24,18 @@ pub mod utils;
 pub mod world;
 pub use world::*;
 
-pub const FARLANDS:   i64 = 12_550_824;
+/// Coordinate at which the Far Lands start
+pub const FARLANDS: i64 = 12_550_824;
+
+/// Lateral size of the inbounds worlds within the Far Lands
 pub const WORLD_SIZE: i64 = 2*FARLANDS + 1;
 
 /// It was found experimentally that the perlin noise and
 /// monoliths wraps around every 2**23 blocks, drastically
 /// reducing the practical search space!
 pub const WORLD_WRAP: i64 = 2_i64.pow(23);
+
+/// Java uses a 48-bit Linear Congruential Generator for its RNG,
+/// which continuously masks the state's (1 << 48) - 1 lower bits,
+/// meaning there's effectively only 2**48 unique seeds!
+pub const TOTAL_SEEDS: u64 = 2_u64.pow(48);

@@ -30,7 +30,8 @@ fn world_png() {
 }
 
 fn biggest_spawn_monoliths() {
-    let seeds = 200_000_000;
+    let seeds = 1_000_000;
+    // let seeds = TOTAL_SEEDS;
 
     let progress = ProgressBar::new(seeds)
         .with_style(utils::progress("Searching"));
@@ -90,10 +91,42 @@ fn benchmark() {
     });
 }
 
+
+fn perlinpng() {
+    let world = World::new(617);
+
+    let octaves = 10;
+    let maxval = 2.0f64.powi(octaves as i32 - 1);
+    let repeat = 16.0 * 2f64.powi(octaves - 1);
+
+    let (width, height) = (2048, 2048);
+    let (min_x, min_z)  = (-repeat, -repeat);
+    let (max_x, max_z)  = ( repeat,  repeat);
+
+    let mut pixels = vec![0u8; (width * height) as usize];
+
+    for x in 0..width {
+        for z in 0..height {
+            let index = (x + z * width) as usize;
+            let x = utils::lerp(x as f64 / width  as f64, min_x, max_x);
+            let z = utils::lerp(z as f64 / height as f64, min_z, max_z);
+            let value = world.hill.sample(x, 0.0, z, true).abs();
+
+            let pixel = ((value / world.hill.maxval()) * 255.0) as u8;
+            pixels[index] = pixel;
+        }
+    }
+
+    png::Encoder::new(std::fs::File::create("perlin.png").unwrap(), width, height)
+        .write_header().unwrap()
+        .write_image_data(&pixels).unwrap();
+}
+
 fn main() {
     // world_png();
     // benchmark();
     biggest_spawn_monoliths();
     // whole_world_monoliths();
     // find_low_entropy_seeds();
+    // perlinpng();
 }
