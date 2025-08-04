@@ -12,7 +12,7 @@ pub struct PerlinNoise {
 /* -------------------------------------------------------------------------- */
 
 impl PerlinNoise {
-    pub fn new(rng: &mut Random) -> Self {
+    pub fn new(rng: &mut JavaRNG) -> Self {
         let xoff = rng.next_f64() * 256.0;
         let yoff = rng.next_f64() * 256.0;
         let zoff = rng.next_f64() * 256.0;
@@ -92,6 +92,41 @@ impl PerlinNoise {
             )),
         );
     }
+
+    /// Roll the generator state that would have created a PerlinNoise
+    /// - Fast way around without as many memory operations
+    pub fn discard(rng: &mut JavaRNG, many: usize) {
+        for _ in 0..many {
+
+            // Coordinates f64 offsets
+            for _ in 0..3 {
+                if cfg!(feature="strict") {
+                    rng.next_f64();
+                } else {
+                    rng.step();
+                    rng.step();
+                }
+            }
+
+            // Permutations swapping
+            for max in (1..=256).rev() {
+                if cfg!(feature="strict") {
+                    rng.next_i32_bound(max as i32);
+                } else {
+                    if (max as u32).is_power_of_two() {
+                        rng.step()
+                    } else {
+                        let mut next = rng.next(31);
+                        let mut take = next % max;
+                        while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
+                            next = rng.next(31);
+                            take = next % max;
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -102,8 +137,7 @@ pub struct FractalPerlin<const OCTAVES: usize> {
 }
 
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
-
-    pub fn new(rng: &mut Random) -> Self {
+    pub fn new(rng: &mut JavaRNG) -> Self {
         FractalPerlin {
             noise: std::array::from_fn(|_| PerlinNoise::new(rng))
         }
@@ -111,10 +145,35 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     /// Sample the fractal noise at a given coordinate
     pub fn sample(&self, x: f64, y: f64, z: f64, precise: bool) -> f64 {
-        (0..if precise {OCTAVES} else {3}).map(|i| {
+        (0..if precise {OCTAVES} else {4}).map(|i| {
             let i = OCTAVES - 1 - i;
             let s = (1 << i) as f64;
             self.noise[i].sample(x/s, y/s, z/s) * s
+        }).sum()
+    }
+
+    /// Value at which the noise wraps around and repeats.
+    /// - For Perlin noise, this value is 16 without any scaling
+    /// - Each octave halves the frequency, so 16 * 2**(N-1)
+    pub fn wraps(&self) -> usize {
+        16 * 2usize.pow(OCTAVES as u32 - 1)
+    }
+
+    /// The maximum value a given octave can produce
+    pub fn octave_maxval(&self, octave: usize) -> f64 {
+        2.0f64.powi(octave as i32 - 1)
+    }
+
+    // Usual maximum value of the noise
+    pub fn maxval(&self) -> f64 {
+       self.octave_maxval(OCTAVES)
+    }
+
+    // When all stars align, you get a girlfriend
+    // and a really big perlin noise value
+    pub fn tmaxval(&self) -> f64 {
+        (0..OCTAVES).map(|n| {
+            self.octave_maxval(n)
         }).sum()
     }
 }

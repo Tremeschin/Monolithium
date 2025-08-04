@@ -2,9 +2,9 @@
 use monolithium::*;
 
 fn world_png() {
-    let world = World::new(8306587);
-    let (minx, minz): (i64, i64) = (-1000, -1000);
-    let (maxx, maxz): (i64, i64) = ( 1000,  1000);
+    let world = World::new(2527251);
+    let (minx, minz): (i64, i64) = (-2000, -2000);
+    let (maxx, maxz): (i64, i64) = ( 2000,  2000);
     let width  = ((maxx - minx) as u32)/4;
     let height = ((maxz - minz) as u32)/4;
 
@@ -44,7 +44,7 @@ fn biggest_spawn_monoliths() {
             let world = World::new(seed);
             let monoliths = world.find_monoliths(
                 &FindOptions::default()
-                    .spawn(100).spacing(50).limit(1)
+                    .spawn(51).spacing(50).limit(1)
             );
             monoliths
         }).flatten()

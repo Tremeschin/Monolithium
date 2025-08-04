@@ -8,7 +8,6 @@ pub use std::sync::Arc;
 pub use std::sync::Mutex;
 
 pub use ahash::AHashSet;
-pub use java_rand::Random;
 pub use rayon::prelude::*;
 pub use smart_default::SmartDefault;
 pub use indicatif::ParallelProgressIterator;
@@ -19,6 +18,8 @@ pub mod monolith;
 pub use monolith::*;
 pub mod perlin;
 pub use perlin::*;
+pub mod rng;
+pub use rng::JavaRNG;
 pub mod utils;
 pub mod world;
 pub use world::*;

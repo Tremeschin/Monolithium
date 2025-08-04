@@ -8,18 +8,10 @@ pub struct World {
 
 impl World {
     pub fn new(seed: u64) -> Self {
-        let mut rng = Random::new(seed);
+        let mut rng = JavaRNG::new(seed);
 
         // Skip 48 generators priorly used elsewhere
-        // Note: Must follow PerlinNoise::new order
-        for _ in 0..48 {
-            for i in 0..3   {
-                rng.next_f64();
-            }
-            for i in 0..256 {
-                rng.next_i32_bound(256 - i as i32);
-            }
-        }
+        PerlinNoise::discard(&mut rng, 48);
 
         World {
             seed:  seed,

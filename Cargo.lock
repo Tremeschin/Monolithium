@@ -150,12 +150,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "java-rand"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2007b51b83dc078bc08617dab8f41d7abd61bce0e7732f79e1d01219bf0add80"
-
-[[package]]
 name = "js-sys"
 version = "0.3.77"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -199,7 +193,6 @@ version = "1.0.0"
 dependencies = [
  "ahash",
  "indicatif",
- "java-rand",
  "microbench",
  "png",
  "rayon",
