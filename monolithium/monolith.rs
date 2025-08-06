@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Clone, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct Monolith {
     // Position in the world
     pub minx: i64, pub maxx: i64,

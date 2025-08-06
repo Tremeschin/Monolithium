@@ -45,7 +45,7 @@ fn biggest_spawn_monoliths() {
             let world = World::new(seed);
             let monoliths = world.find_monoliths(
                 &FindOptions::default()
-                    .spawn(51).spacing(50).limit(1)
+                    .spawn(202).spacing(100).limit(1)
             );
             monoliths
         }).flatten()
@@ -93,11 +93,8 @@ fn benchmark() {
 
 
 fn perlinpng() {
-    let world = World::new(617);
-
-    let octaves = 10;
-    let maxval = 2.0f64.powi(octaves as i32 - 1);
-    let repeat = 16.0 * 2f64.powi(octaves - 1);
+    let world  = World::new(617);
+    let repeat = world.hill.repeats() as f64;
 
     let (width, height) = (2048, 2048);
     let (min_x, min_z)  = (-repeat, -repeat);

@@ -39,44 +39,56 @@ impl World {
     }
 
     /// Get a Monolith at a given coordinate, compute properties
-    pub fn get_monolith(&self, x: i64, z: i64) -> Option<Monolith> {
+    pub fn get_monolith(&self, x: i64, z: i64, precise: bool) -> Option<Monolith> {
 
         // Most blocks are not monoliths
-        if !self.is_monolith(x, z, false) {
+        if !self.is_monolith(x, z, precise) {
             return None;
         }
 
         let x = utils::nearest(x, 4);
         let z = utils::nearest(z, 4);
+        let o = 32; // "Occasionally"
 
         // Start with current block
         let mut lith = Monolith {
-            minx: x, minz: z,
-            maxx: x, maxz: z,
+            minx: (x+o), minz: (z+o),
+            maxx: (x-o), maxz: (z-o),
             seed: self.seed,
             area: 0,
         };
 
         // Using a Breadth First Search like approach
-        let mut visited = AHashSet::from([(x, z)]);
+        let mut visited = AHashSet::new();
         let mut queue   = VecDeque::from([(x, z)]);
 
-        while let Some((x, z)) = queue.pop_front() {
-            lith.area += 16;
-
-            // Occasionally update coordinates
-            if (x % 32 == 0) && (z % 32 == 0) {
-                lith.minx = min(lith.minx, x);
-                lith.maxx = max(lith.maxx, x);
-                lith.minz = min(lith.minz, z);
-                lith.maxz = max(lith.maxz, z);
+        // Search around the block
+        let far: i64 = 256;
+        for dx in (-far..=far).step_by(16) {
+            for dz in (-far..=far).step_by(16) {
+                if (dx*dx + dz*dz) < far*far {
+                    queue.push_back((x+dx, z+dz));
+                }
             }
+        }
+
+        while let Some((x, z)) = queue.pop_front() {
+            if !visited.insert((x, z)) {
+                continue;
+            }
+            if !self.is_monolith(x, z, true) {
+                continue;
+            }
+
+            lith.area += 16;
 
             // Check neighbors with step 4 per hill/depth scaling
             let mut neighbors = vec!((0, 4), (4, 0), (0, -4), (-4, 0));
 
-            // Occasionally check for nearby and far disjoints
-            if (x % 32 == 0) && (z % 32 == 0) {
+            // Occasional more expensive stuff
+            if (x % o == 0) && (z % o == 0) {
+
+                // Check for nearby disjoints
                 for factor in [1, 4] {
                     let n = 64*factor;
                     neighbors.extend(vec!(
@@ -86,19 +98,16 @@ impl World {
                         (-n,  0), ( 0, -n),
                     ))
                 }
+
+                // Update coordinates
+                lith.minx = min(lith.minx, x);
+                lith.maxx = max(lith.maxx, x);
+                lith.minz = min(lith.minz, z);
+                lith.maxz = max(lith.maxz, z);
             }
 
             for (dx, dz) in neighbors {
-                let (nx, nz) = (x+dx, z+dz);
-
-                if visited.contains(&(nx, nz)) {
-                    continue;
-                }
-
-                if self.is_monolith(nx, nz, true) {
-                    visited.insert((nx, nz));
-                    queue.push_back((nx, nz));
-                }
+                queue.push_back((x+dx, z+dz));
             }
         }
 
@@ -115,7 +124,7 @@ impl World {
 
             'a: for x in xrange.clone() {
                 for z in zrange.clone() {
-                    if let Some(mono) = self.get_monolith(x, z) {
+                    if let Some(mono) = self.get_monolith(x, z, query.precise) {
                         monoliths.insert(mono);
 
                         // Early break if limit is reached
@@ -144,7 +153,7 @@ impl World {
                 .progress_with(progress)
                 .for_each(|x| {
                     for z in zrange.clone() {
-                        if let Some(mono) = self.get_monolith(x, z) {
+                        if let Some(mono) = self.get_monolith(x, z, query.precise) {
                             let mut monoliths = monoliths.lock().unwrap();
                             monoliths.insert(mono);
                         }
@@ -172,6 +181,10 @@ pub struct FindOptions {
 
     /// How many monoliths to find
     pub limit: Option<u64>,
+
+    /// Use all octaves of the perlin noise
+    #[default(true)]
+    pub precise: bool,
 }
 
 impl FindOptions {
@@ -183,6 +196,16 @@ impl FindOptions {
 
     pub fn limit(&mut self, many: u64) -> &mut Self {
         self.limit = Some(many);
+        return self;
+    }
+
+    pub fn precise(&mut self) -> &mut Self {
+        self.precise = true;
+        return self;
+    }
+
+    pub fn imprecise(&mut self) -> &mut Self {
+        self.precise = false;
         return self;
     }
 

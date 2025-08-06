@@ -157,7 +157,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     /// Value at which the noise wraps around and repeats.
     /// - For Perlin noise, this value is 16 without any scaling
     /// - Each octave halves the frequency, so 16 * 2**(N-1)
-    pub fn wraps(&self) -> usize {
+    pub fn repeats(&self) -> usize {
         16 * 2usize.pow(OCTAVES as u32 - 1)
     }
 

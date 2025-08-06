@@ -33,6 +33,6 @@ pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
 /// Common progress bar style
 pub fn progress(message: &str) -> ProgressStyle {
     ProgressStyle::default_bar().template(
-        &format!("{message} ({{elapsed_precise}} • ETA {{eta_precise}}) {{wide_bar:.cyan/blue}} ({{percent_precise}}%) • {{pos}}/{{len}} ({{per_sec}})"))
+        &format!("{message} ({{elapsed_precise}} • ETA {{eta_precise}}) {{wide_bar:.cyan/blue}} ({{percent_precise}}%) • {{pos}}/{{len}} ({{per_sec:0.}})"))
         .unwrap()
 }
