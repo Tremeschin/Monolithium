@@ -30,49 +30,41 @@ fn world_png() {
 }
 
 fn biggest_spawn_monoliths() {
-    let seeds = 1_000_000;
-    // let seeds = TOTAL_SEEDS;
+    let _seeds = SeedFactory::Linear{start: 0, count: 1_000_000_000}.values();
+    let _seeds = SeedFactory::Random{total: 1_000_000}.values();
 
-    let progress = ProgressBar::new(seeds)
+    let progress = ProgressBar::new(_seeds.len() as u64)
         .with_style(utils::progress("Searching"));
 
     // Iterate seeds to find monoliths near spawn
     let mut monoliths: Vec<Monolith> =
-        (0..seeds)
+        _seeds
         .into_par_iter()
         .progress_with(progress)
         .map(|seed| {
             let world = World::new(seed);
             let monoliths = world.find_monoliths(
                 &FindOptions::default()
-                    .spawn(202).spacing(100).limit(1)
+                    .spawn(202).spacing(200).limit(1)
             );
             monoliths
         }).flatten()
         .collect();
 
     monoliths.sort();
-
-    for lith in monoliths {
-        println!("Monolith (Area: {:>7}) at ({:>5}, {:>5}) with seed {}",
-            lith.area, lith.center_x(), lith.center_z(), lith.seed);
-    }
+    monoliths.iter().for_each(|x| println!("{:?}", x));
 }
 
 fn whole_world_monoliths() {
-    let world = World::new(26829160);
+    let world = World::new(617);
 
     let mut monoliths = world.find_monoliths(
-        &FindOptions::default().wraps().spacing(256));
+        // &FindOptions::default().wraps().spacing(256));
+        &FindOptions::default().spawn(500).spacing(4));
 
     monoliths.sort();
-
-    for lith in &monoliths {
-        println!("Monolith (Area: {:>7}) at ({:>5}, {:>5}) with seed {}",
-            lith.area, lith.center_x(), lith.center_z(), lith.seed);
-    }
-
-    println!("Found {} monoliths", monoliths.len());
+    monoliths.iter().for_each(|x| println!("{:?}", x));
+    println!("Found {} Monoliths", monoliths.len());
 }
 
 fn benchmark() {

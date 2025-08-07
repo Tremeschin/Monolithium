@@ -2,12 +2,12 @@ use crate::*;
 
 #[derive(Clone, Debug, Eq)]
 pub struct Monolith {
+    pub area: u64,
+    pub seed: u64,
+
     // Position in the world
     pub minx: i64, pub maxx: i64,
     pub minz: i64, pub maxz: i64,
-
-    pub area: u64,
-    pub seed: u64,
 }
 
 /* -------------------------------------------------------------------------- */

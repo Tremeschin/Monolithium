@@ -1,6 +1,7 @@
 pub use std::cmp::max;
 pub use std::cmp::min;
 pub use std::cmp::Ordering;
+pub use std::collections::HashSet;
 pub use std::collections::VecDeque;
 pub use std::hash::Hash;
 pub use std::hash::Hasher;
@@ -20,6 +21,8 @@ pub mod perlin;
 pub use perlin::*;
 pub mod rng;
 pub use rng::JavaRNG;
+pub mod seeds;
+pub use seeds::*;
 pub mod utils;
 pub mod world;
 pub use world::*;
