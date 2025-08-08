@@ -11,9 +11,13 @@
 //
 // Compiling and running:
 // - Install CUDA from your package manager (nvcc), have it on path, good luck
-// - Run: `meson setup --buildtype release ./build --reconfigure`
-// - Run: `ninja -C ./build`
-// - Run: `./build/monolithium`
+//
+// Either manually:
+//   - Run: `meson setup --buildtype release ./build --reconfigure`
+//   - Run: `ninja -C ./build`
+//   - Run: `./build/monolithium`
+// Or install [uv](https://docs.astral.sh/uv/):
+//   - Run: `uv run cuda`
 /* -------------------------------------------------------------------------- */
 
 #include <cmath>

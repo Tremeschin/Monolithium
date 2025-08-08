@@ -9,13 +9,19 @@ version     = "1.0.0"
 readme      = "readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "meson~=1.8.3",
+    "ninja~=1.11.1.4",
+]
 
 [dependency-groups]
 dev = [
     "mkdocs~=1.6.1",
     "mkdocs-material~=9.6.16",
 ]
+
+[project.scripts]
+cuda = "monolithium.__main__:cuda"
 
 [build-system]
 requires = ["hatchling"]

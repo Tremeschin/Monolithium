@@ -38,7 +38,7 @@ There are multiple subcommands available, you can run `cargo run --release -- (s
 
 ### Find all Monoliths in a world
 
-This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value - there are 9 copies of each within the Far Lands!
+This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value - there are 9 copies of each within the Far Lands on any given world!
 
 - `cargo run --release -- find --seed 617`
 
