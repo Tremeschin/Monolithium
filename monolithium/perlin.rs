@@ -118,10 +118,10 @@ impl PerlinNoise {
                     if (max as u32).is_power_of_two() {
                         rng.step()
                     } else {
-                        let mut next = rng.next(31);
+                        let mut next = rng.next::<31>();
                         let mut take = next % max;
                         while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                            next = rng.next(31);
+                            next = rng.next::<31>();
                             take = next % max;
                         }
                     }
@@ -174,7 +174,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     // When all stars align, you get a girlfriend
     // and a really big perlin noise value
     pub fn tmaxval(&self) -> f64 {
-        (0..OCTAVES).map(|n| {
+        (0..=OCTAVES).map(|n| {
             self.octave_maxval(n)
         }).sum()
     }

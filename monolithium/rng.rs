@@ -1,59 +1,58 @@
-// Note: This file is a copy of https://github.com/coderbot16/java-rand with
+// This file started as a copy of https://github.com/coderbot16/java-rand, with
 // unused parts removed, speed improvements at less safety, new functions to
 // discard the next step quickly, that weren't possible to directly modify
 // or extend in the original crate, per practical rust limitations.
 
-use std::num::Wrapping;
-
-pub const M: Wrapping<i64> = Wrapping((1 << 48) - 1);
-pub const A: Wrapping<i64> = Wrapping(0x5DEECE66D);
-pub const C: Wrapping<i64> = Wrapping(11);
-
-const F64_DIV: f64 = (1u64 << 53) as f64;
+pub const M: i64 = (1 << 48) - 1;
+pub const A: i64 = 0x5DEECE66D;
+pub const C: i64 = 11;
 
 pub struct JavaRNG {
-	state: Wrapping<i64>,
+    pub state: i64,
 }
 
 impl JavaRNG {
-	pub fn new(seed: u64) -> Self {
-		JavaRNG {
-			state: Wrapping((seed as i64) ^ A.0) & M,
-		}
-	}
+    pub fn new(seed: u64) -> Self {
+        Self {state: ((seed as i64) ^ A) & M}
+    }
 
-	/// Roll the state, same effect as ignoring a `next`` call
+	/// Roll the state, same effect as ignoring a `.next()` call
     #[inline(always)]
-	pub fn step(&mut self) {
-		self.state = (self.state * A + C) & M;
-	}
+    pub fn step(&mut self) {
+        self.state = (self.state.wrapping_mul(A).wrapping_add(C)) & M
+    }
 
+	/// Rolls the state and returns N low bits
     #[inline(always)]
-	pub fn next(&mut self, bits: u8) -> i32 {
-		self.step();
-		((self.state.0 as u64) >> (48 - bits)) as i32
-	}
+    pub fn next<const BITS: u8>(&mut self) -> i32 {
+        self.step();
+		return (self.state >> (48 - BITS)) as i32;
+    }
 
+	/// Returns a pseudo-random i32 in the range [0, max)
     #[inline(always)]
-	pub fn next_i32_bound(&mut self, max: i32) -> i32 {
-		if (max as u32).is_power_of_two() {
-			(((max as i64).wrapping_mul(self.next(31) as i64)) >> 31) as i32
-		} else {
-			let mut next = self.next(31);
-			let mut take = next % max;
+    pub fn next_i32_bound(&mut self, max: i32) -> i32 {
+        if (max as u32).is_power_of_two() {
+            (((max as i64).wrapping_mul(self.next::<31>() as i64)) >> 31) as i32
+        } else {
+            let mut next = self.next::<31>();
+            let mut take = next % max;
 
-			while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-				next = self.next(31);
-				take = next % max;
-			}
+            while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
+                next = self.next::<31>();
+                take = next % max;
+            }
 
-			return take;
-		}
-	}
+            return take;
+        }
+    }
 
-	pub fn next_f64(&mut self) -> f64 {
-		let high = (self.next(26) as i64) << 27;
-		let low  =  self.next(27) as i64;
-		(high.wrapping_add(low) as f64) / F64_DIV
-	}
+	/// Returns a pseudo-random f64 in the range [0, 1)
+    #[inline(always)]
+    pub fn next_f64(&mut self) -> f64 {
+        let high = (self.next::<26>() as i64) << 27;
+        let low  =  self.next::<27>() as i64;
+		const MAGIC: f64 = (1u64 << 53) as f64;
+        (high.wrapping_add(low) as f64) / MAGIC
+    }
 }
