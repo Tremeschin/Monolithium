@@ -26,27 +26,38 @@ Monoliths are..
 
 ## 📦 Installation
 
-Install the [Rust](https://www.rust-lang.org/tools/install) programming language and [git](https://git-scm.com/downloads) (winget recommended), open a terminal in some directory and run:
+Install the [Rust](https://www.rust-lang.org/tools/install) programming language and [git](https://git-scm.com/downloads), open a terminal in some directory and run:
 
 - `git clone https://github.com/Tremeschin/Monolithium`
 - `cd Monolithium && rustup default stable`
 - `cargo run --release -- (arguments)`
 
-There are multiple subcommands available, you can run `cargo run --release -- (subcommand) --help` to see options:
+There are multiple commands available; run `cargo run --release -- (subcommand) --help` for options:
 
 <sup><b>Warning:</b> The code <i>will</i> shred your cpu, make sure you have a good cooling solution, it may be unusable while running</sup>
 
-### Find all Monoliths in a world
+### 🔴 Find all Monoliths in a world
 
 This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value - there are 9 copies of each within the Far Lands on any given world!
 
 - `cargo run --release -- find --seed 617`
 
-### Find seeds with spawn monoliths
+### 🟡 Find seeds with spawn monoliths
 
 This will search for seeds that contains monoliths close to spawn.
 
 - `cargo run --release -- spawn random -n 1000000`
+
+## 🚀 Speeds
+
+Monolithium is written in [Rust](https://www.rust-lang.org/), a blazingly fast and memory safe language. Crates like [Rayon](https://crates.io/crates/rayon) gives high-speed fearless parallelism and [Ahash](https://crates.io/crates/ahash) fast hashing, fully utilizing all available CPU resources.
+
+🦀 For a Ryzen 9 5900X 12c/24t, 2x3200 MT/s DDR4 CL16 2Rx8 system, one might expect:
+
+- **3.75 minutes** to find all monoliths in a seed, probing every 128 blocks.
+- **Search 410,000** seeds per second for spawn monoliths.
+
+Such speeds should scale about linearly with your hardware.
 
 ## ⭐️ Showcase
 

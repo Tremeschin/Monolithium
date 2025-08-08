@@ -28,6 +28,7 @@ strict = []
 strip = true
 
 [profile.release]
+overflow-checks = false
 codegen-units = 1
 opt-level = 3
 panic = "abort"
