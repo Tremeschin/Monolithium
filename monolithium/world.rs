@@ -119,7 +119,7 @@ impl World {
         let zrange: Vec<i64> = (query.minz..=query.maxz).step_by(query.spacing).collect();
 
         // Use non-threaded approach for small areas (lower latency)
-        if (query.maxx - query.minx).abs() < 1000 {
+        if (query.maxx - query.minx).abs() < 10000 {
             let mut monoliths = AHashSet::new();
 
             'a: for x in xrange.clone() {
@@ -236,9 +236,9 @@ impl FindOptions {
 
     pub fn wraps(&mut self) -> &mut Self {
         self.minx = 0;
-        self.maxx = WORLD_WRAP;
+        self.maxx = PERLIN_WRAP;
         self.minz = 0;
-        self.maxz = WORLD_WRAP;
+        self.maxz = PERLIN_WRAP;
         return self;
     }
 }

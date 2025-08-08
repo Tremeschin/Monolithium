@@ -26,15 +26,27 @@ Monoliths are..
 
 ## 📦 Installation
 
-Install the [Rust](https://www.rust-lang.org/tools/install) programming language and [git](https://git-scm.com/downloads), open a terminal in some directory and run:
+Install the [Rust](https://www.rust-lang.org/tools/install) programming language and [git](https://git-scm.com/downloads) (winget recommended), open a terminal in some directory and run:
 
 - `git clone https://github.com/Tremeschin/Monolithium`
 - `cd Monolithium && rustup default stable`
-- `cargo run --release`
+- `cargo run --release -- (arguments)`
 
-Most of the code is self-documented, you can edit `monolithium/main.rs` to change what the program does, parameters to search for, etc. Just beware this is mostly a technical project with limited free time for user experience improvements!
+There are multiple subcommands available, you can run `cargo run --release -- (subcommand) --help` to see options:
 
 <sup><b>Warning:</b> The code <i>will</i> shred your cpu, make sure you have a good cooling solution, it may be unusable while running</sup>
+
+### Find all Monoliths in a world
+
+This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value - there are 9 copies of each within the Far Lands!
+
+- `cargo run --release -- find --seed 617`
+
+### Find seeds with spawn monoliths
+
+This will search for seeds that contains monoliths close to spawn.
+
+- `cargo run --release -- spawn random -n 1000000`
 
 ## ⭐️ Showcase
 
