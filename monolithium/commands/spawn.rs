@@ -6,10 +6,10 @@ pub struct SpawnCommand {
     #[command(subcommand)]
     seeds: SeedFactory,
 
-    #[arg(short='r', long, default_value_t=200)]
+    #[arg(short='r', long, default_value_t=150)]
     radius: i64,
 
-    #[arg(short='s', long, default_value_t=100)]
+    #[arg(short='s', long, default_value_t=300)]
     spacing: usize,
 }
 

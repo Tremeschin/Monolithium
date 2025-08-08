@@ -5,12 +5,6 @@ use monolithium::commands::*;
 #[derive(Parser)]
 #[command(name="monolithium")]
 #[command(about="Finding the Largest Minecraft Infdev/Alpha Monoliths")]
-struct Cli {
-    #[command(subcommand)]
-    command: Commands,
-}
-
-#[derive(Subcommand)]
 enum Commands {
     /// Search for worlds with monoliths near spawn
     Spawn(SpawnCommand),
@@ -25,7 +19,7 @@ enum Commands {
 impl Commands {
     fn run(&self) {
         match self {
-            Commands::Mask(cmd)  => cmd.run(),
+            Commands::Mask(cmd)   => cmd.run(),
             Commands::Spawn(cmd)  => cmd.run(),
             Commands::Find(cmd)   => cmd.run(),
             Commands::Perlin(cmd) => cmd.run(),
@@ -34,6 +28,5 @@ impl Commands {
 }
 
 fn main() {
-    let cli = Cli::parse();
-    cli.command.run();
+    Commands::parse().run();
 }
