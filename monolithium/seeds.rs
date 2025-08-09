@@ -1,8 +1,5 @@
 use crate::*;
 
-// Fixme: IntoParallelIterator without Vec<u64>
-// with progressive yielding to fix memory hog
-
 #[derive(clap::Subcommand)]
 pub enum SeedFactory {
 
@@ -12,30 +9,33 @@ pub enum SeedFactory {
         start: u64,
 
         #[arg(short='c', long, default_value_t=1_000_000)]
-        count: u64,
+        total: u64,
     },
 
     // Search in N unique random seeds
     Random {
         #[arg(short='n', long, default_value_t=1_000_000)]
-        total: usize,
+        total: u64,
     },
 }
 
 
 impl SeedFactory {
-    pub fn values(&self) -> Vec<u64> {
+    pub fn total(&self) -> u64 {
         match self {
-            SeedFactory::Linear{start, count} =>
-                (*start.. (*start + *count)).collect(),
+            SeedFactory::Linear{total, ..} => *total,
+            SeedFactory::Random{total, ..} => *total
+        }
+    }
 
-            SeedFactory::Random{total} => {
-                let mut set = HashSet::with_capacity(*total);
-                while set.len() < *total {
-                    set.insert(rand::random_range(0..TOTAL_SEEDS));
-                }
-                set.into_iter().collect()
-            }
+    pub fn get(&self, n: u64) -> u64 {
+        match self {
+            SeedFactory::Linear{start, ..} =>
+                (*start + n) as u64,
+
+            // Fixme: Birthday paradox N = 2**48
+            SeedFactory::Random{..} =>
+                rand::random_range(0..TOTAL_SEEDS),
         }
     }
 }

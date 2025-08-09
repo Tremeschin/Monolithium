@@ -6,23 +6,24 @@ pub struct SpawnCommand {
     #[command(subcommand)]
     seeds: SeedFactory,
 
-    #[arg(short='r', long, default_value_t=150)]
+    #[arg(short='r', long, default_value_t=100)]
     radius: i64,
 
-    #[arg(short='s', long, default_value_t=300)]
+    #[arg(short='s', long, default_value_t=200)]
     spacing: usize,
 }
 
 impl SpawnCommand {
     pub fn run(&self) {
-        let seeds = self.seeds.values();
-        let progress = ProgressBar::new(seeds.len() as u64)
+        let progress = ProgressBar::new(self.seeds.total())
             .with_style(utils::progress("Searching"));
 
-        let mut monoliths: Vec<Monolith> = seeds
+        let mut monoliths: Vec<Monolith> =
+            (0..=self.seeds.total())
             .into_par_iter()
             .progress_with(progress)
             .map(|seed| {
+                let seed  = self.seeds.get(seed);
                 let world = World::new(seed);
                 world.find_monoliths(
                     &FindOptions::default()
