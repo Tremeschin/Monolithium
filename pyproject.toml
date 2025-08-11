@@ -21,7 +21,7 @@ dev = [
 ]
 
 [project.scripts]
-cuda = "monolithium.__main__:cuda"
+monolithium-cuda = "monolithium.__main__:cuda"
 
 [build-system]
 requires = ["hatchling"]

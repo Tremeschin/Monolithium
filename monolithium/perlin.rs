@@ -3,10 +3,10 @@ use crate::*;
 #[derive(Clone)]
 pub struct PerlinNoise {
     /// Permutations map (Vector -> Grid)
-    map: [u8; 512],
-    xoff: f64,
-    yoff: f64,
-    zoff: f64,
+    pub map: [u8; 512],
+    pub xoff: f64,
+    pub yoff: f64,
+    pub zoff: f64,
 }
 
 /* -------------------------------------------------------------------------- */
@@ -135,7 +135,7 @@ impl PerlinNoise {
 
 #[derive(Clone)]
 pub struct FractalPerlin<const OCTAVES: usize> {
-    noise: [PerlinNoise; OCTAVES],
+    pub noise: [PerlinNoise; OCTAVES],
 }
 
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
