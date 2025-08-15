@@ -22,7 +22,7 @@ impl PerlinPng {
                 let index = (x + z * self.size) as usize;
                 let world_x = utils::lerp(x as f64 / self.size as f64, min_x, max_x);
                 let world_z = utils::lerp(z as f64 / self.size as f64, min_z, max_z);
-                let value = world.hill.sample(world_x, 0.0, world_z, true).abs();
+                let value = world.hill.sample(world_x, world_z).abs();
                 let pixel = ((value / world.hill.maxval()) * 255.0) as u8;
                 pixels[index] = pixel;
             }

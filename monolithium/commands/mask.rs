@@ -26,7 +26,7 @@ impl Mask {
         let mut index = 0;
         for x in (self.minx..self.maxx).step_by(4) {
             for z in (self.minz..self.maxz).step_by(4) {
-                if world.is_monolith(x, z, true) {
+                if world.is_monolith(x, z) {
                     pixels[index] = 255;
                 }
                 if (x % 250 == 0) || (z % 250 == 0) {

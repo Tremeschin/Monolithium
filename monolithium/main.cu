@@ -28,7 +28,6 @@
 
 #include <cuda_runtime.h>
 
-#define Any __global__
 #define Gpu __device__
 #define Cpu __host__
 

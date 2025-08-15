@@ -146,36 +146,70 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     }
 
     /// Sample the fractal noise at a given coordinate
-    pub fn sample(&self, x: f64, y: f64, z: f64, precise: bool) -> f64 {
-        (0..if precise {OCTAVES} else {4}).map(|i| {
-            let i = OCTAVES - 1 - i;
-            let s = (1 << i) as f64;
-            self.noise[i].sample(x/s, y/s, z/s) * s
+    pub fn sample(&self, x: f64, z: f64) -> f64 {
+        (0..OCTAVES).map(|i| {
+            let s = self.octave_scale(i);
+            self.noise[i].sample(x/s, 0.0, z/s) * s
         }).sum()
     }
 
     /// Value at which the noise wraps around and repeats.
-    /// - For Perlin noise, this value is 16 without any scaling
-    /// - Each octave halves the frequency, so 16 * 2**(N-1)
+    /// - For Perlin noise, this value is 256 without any scaling
+    /// - Each octave halves the frequency, extending it
     pub fn repeats(&self) -> usize {
-        16 * 2usize.pow(OCTAVES as u32 - 1)
+        256 * (1 << (OCTAVES - 1))
     }
 
     /// The maximum value a given octave can produce
-    pub fn octave_maxval(&self, octave: usize) -> f64 {
-        2.0f64.powi(octave as i32 - 1)
+    pub fn octave_scale(&self, octave: usize) -> f64 {
+        (1 << octave) as f64
     }
 
     // Usual maximum value of the noise
     pub fn maxval(&self) -> f64 {
-       self.octave_maxval(OCTAVES)
+       self.octave_scale(OCTAVES)
     }
 
     // When all stars align, you get a girlfriend
     // and a really big perlin noise value
     pub fn tmaxval(&self) -> f64 {
         (0..=OCTAVES).map(|n| {
-            self.octave_maxval(n)
+            self.octave_scale(n)
         }).sum()
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+
+pub enum SmartSample {
+    Depth,
+    Hill,
+}
+
+impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
+
+    /// Most coordinates are nowhere close to being monoliths, staging
+    /// optimization to discard sums where reaching a target is impossible
+    pub fn smart_sample(&self, x: f64, z: f64, kind: SmartSample) -> bool {
+        let mut sum = 0.0;
+
+        for i in (0..OCTAVES).rev() {
+            let s = self.octave_scale(i);
+            sum  += self.noise[i].sample(x/s, 0.0, z/s) * s;
+
+            if match kind {
+                SmartSample::Depth =>
+                    sum.abs() + 0.5*self.octave_scale(i) < 8000.0,
+                SmartSample::Hill =>
+                    sum - 0.5*self.octave_scale(i) > -512.0
+            } {
+                return false;
+            }
+        }
+
+        match kind {
+            SmartSample::Depth => sum.abs() > 8000.0,
+            SmartSample::Hill  => sum < -512.0,
+        }
     }
 }

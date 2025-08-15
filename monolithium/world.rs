@@ -21,28 +21,24 @@ impl World {
     }
 
     // Check if a given coordinate is part of a monolith
-    pub fn is_monolith(&self,
-        x: i64, z: i64,
-        precise: bool
-    ) -> bool {
+    pub fn is_monolith(&self, x: i64, z: i64) -> bool {
         self.depth.sample(
-            ((x/4) as f64) * 100.0, 0.0,
+            ((x/4) as f64) * 100.0,
             ((z/4) as f64) * 100.0,
-            precise
         ).abs() > 8000.0
         &&
         self.hill.sample(
-            ((x/4) as f64) * 1.0, 0.0,
-            ((z/4) as f64) * 1.0,
-            precise
+            (x/4) as f64,
+            (z/4) as f64,
         ) < -512.0
     }
 
     /// Get a Monolith at a given coordinate, compute properties
-    pub fn get_monolith(&self, x: i64, z: i64, precise: bool) -> Option<Monolith> {
+    /// Todo: Arc Mutex HashMap (x, y) => Monolith struct?
+    pub fn get_monolith(&self, x: i64, z: i64) -> Option<Monolith> {
 
         // Most blocks are not monoliths
-        if !self.is_monolith(x, z, precise) {
+        if !self.is_monolith(x, z) {
             return None;
         }
 
@@ -76,7 +72,7 @@ impl World {
             if !visited.insert((x, z)) {
                 continue;
             }
-            if !self.is_monolith(x, z, true) {
+            if !self.is_monolith(x, z) {
                 continue;
             }
 
@@ -124,7 +120,7 @@ impl World {
 
             'a: for x in xrange.clone() {
                 for z in zrange.clone() {
-                    if let Some(mono) = self.get_monolith(x, z, query.precise) {
+                    if let Some(mono) = self.get_monolith(x, z) {
                         monoliths.insert(mono);
 
                         // Early break if limit is reached
@@ -153,7 +149,7 @@ impl World {
                 .progress_with(progress)
                 .for_each(|x| {
                     for z in zrange.clone() {
-                        if let Some(mono) = self.get_monolith(x, z, query.precise) {
+                        if let Some(mono) = self.get_monolith(x, z) {
                             let mut monoliths = monoliths.lock().unwrap();
                             monoliths.insert(mono);
                         }
@@ -181,10 +177,6 @@ pub struct FindOptions {
 
     /// How many monoliths to find
     pub limit: Option<u64>,
-
-    /// Use all octaves of the perlin noise
-    #[default(true)]
-    pub precise: bool,
 }
 
 impl FindOptions {
@@ -196,16 +188,6 @@ impl FindOptions {
 
     pub fn limit(&mut self, many: u64) -> &mut Self {
         self.limit = Some(many);
-        return self;
-    }
-
-    pub fn precise(&mut self) -> &mut Self {
-        self.precise = true;
-        return self;
-    }
-
-    pub fn imprecise(&mut self) -> &mut Self {
-        self.precise = false;
         return self;
     }
 
