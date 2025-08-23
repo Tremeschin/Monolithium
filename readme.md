@@ -87,7 +87,6 @@ Sadly, the Far Lands override the monoliths, there's no such thing as a Far Mono
 
 > [!NOTE]
 > _For the keen among you, that value is `2**23` - this happens for a couple of reasons:_
->
 > - Ken Perlin's noise, unscaled, repeats every 256 units on any coordinate • `(2**8)`
 > - There are 16 octaves on the hill noise, each octave halves the previous frequency, so the highest one repeats every `(2**15)` blocks (starting from multiplier 1).
 > - Minecraft samples every 4 blocks, the depth scale is 100 but `& 0xFF` truncations cancels it at `2**20`
@@ -96,7 +95,14 @@ Sadly, the Far Lands override the monoliths, there's no such thing as a Far Mono
 
 _Spoiler: Not much_, certain seeds are more likely to generate monoliths (anthropic principle confirmed?), but most contains at least half a million monolith _complexes_ within the Far Lands (12,550,824 blocks squared).
 
+## 🔎 Future work
+
+- Investigate the correlation of Perlin coefficients to the likeliness and size of Monoliths.
+- Is it more efficient for CUDA to stream perlin coefficients than inline JavaRNG on CPU?
+- Make statistical analysis (Average size, Distribution) of Monoliths in seeds.
+- Throw 2x Epyc 9965 at the code. I have a spare one for sure iirc.
 
 ## ♻️ Credits
 
-- **User [@kahomayo](https://github.com/kahomayo)** for [`monolith-renderer`](https://github.com/kahomayo/monolith-renderer), which this rewritten code is heavily inspired by.
+- **User [@kahomayo](https://github.com/kahomayo)** for [`monolith-renderer`](https://github.com/kahomayo/monolith-renderer) to understand the underlying mathematics.
+- **YouTuber [@AntVenom](https://www.youtube.com/@AntVenom/)** For the [Breaking Minecraft](https://www.youtube.com/playlist?list=PLR50dP3MW9ZWMSVz2LkRoob_KRf72xcEx) playlist inspiration.
