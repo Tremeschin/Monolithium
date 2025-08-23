@@ -55,7 +55,7 @@ impl World {
         };
 
         // Using a Breadth First Search like approach
-        let mut visited = AHashSet::new();
+        let mut visited = AHashSet::from([(x, z)]);
         let mut queue   = VecDeque::from([(x, z)]);
 
         // Search around the block
@@ -69,9 +69,6 @@ impl World {
         }
 
         while let Some((x, z)) = queue.pop_front() {
-            if !visited.insert((x, z)) {
-                continue;
-            }
             if !self.is_monolith(x, z) {
                 continue;
             }
@@ -103,7 +100,9 @@ impl World {
             }
 
             for (dx, dz) in neighbors {
-                queue.push_back((x+dx, z+dz));
+                if visited.insert((x, z)) {
+                    queue.push_back((x+dx, z+dz));
+                }
             }
         }
 
