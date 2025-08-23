@@ -1,0 +1,28 @@
+name: make-pypi
+on:
+  workflow_dispatch:
+
+jobs:
+  main:
+    name: Release wheels
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Make wheels
+        run: uv build --wheel
+
+      - name: Publish wheels
+        run: uv publish dist/*
+
+      - name: Upload wheels
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheels
+          path: dist/*
