@@ -114,51 +114,51 @@ Hall of fame for the timeline of computations:
     <tbody>
       <tr>
         <td>1,745,664</td><td>4609608251</td><td>August 2025</td>
-        <td>🥇 Largest, high monolith density in world</td>
+        <td align="left">🥇 Largest, high monolith density in world</td>
       </tr>
       <tr>
         <td>1,584,112</td><td>1847066092</td><td>August 2025</td>
-        <td>🥈 Second largest, hourglass shaped</td>
+        <td align="left">🥈 Second largest, hourglass shaped</td>
       </tr>
       <tr>
         <td>1,420,816</td><td>2045872561</td><td>August 2025</td>
-        <td>🥉 Third largest, shattered complex</td>
+        <td align="left">🥉 Third largest, shattered complex</td>
       </tr>
       <tr>
         <td>1,371,824</td><td>3847304212</td><td>August 2025</td>
-        <td>Balanced monolith complex</td>
+        <td align="left">Balanced monolith complex</td>
       </tr>
       <tr>
         <td>1,369,360</td><td>1593912439</td><td>August 2025</td>
-        <td>Contiguous (technically <i>The Largest</i>)</td>
+        <td align="left">Contiguous (technically <i>The Largest</i>)</td>
       </tr>
       <tr>
         <td>1,345,520</td><td>4563197188</td><td>August 2025</td>
-        <td>-</td>
+        <td align="left">-</td>
       </tr>
       <tr>
         <td>1,305,472</td><td>4432659853</td><td>August 2025</td>
-        <td>-</td>
+        <td align="left">-</td>
       </tr>
       <tr>
         <td>1,295,568</td><td>4801496200</td><td>August 2025</td>
-        <td>Closest to a circle?</td>
+        <td align="left">Closest to a circle?</td>
       </tr>
       <tr>
         <td>1,268,432</td><td>2273407323</td><td>August 2025</td>
-        <td>-</td>
+        <td align="left">-</td>
       </tr>
       <tr>
         <td>1,264,720</td><td>3054588959</td><td>August 2025</td>
-        <td>Spain</td>
+        <td align="left">Similar shape to the Iberian Peninsula</td>
       </tr>
       <tr>
         <td>1,262,784</td><td>4613464116</td><td>August 2025</td>
-        <td>-</td>
+        <td align="left">-</td>
       </tr>
       <tr>
         <td>1,242,256</td><td>4983179351</td><td>August 2025</td>
-        <td>Florida</td>
+        <td align="left">Florida</td>
       </tr>
     </tbody>
   </table>
