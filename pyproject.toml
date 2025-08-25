@@ -6,7 +6,7 @@ name        = "monolithium"
 description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
 authors     = [{name="Tremeschin"}]
 version     = "1.0.0"
-readme      = "readme.md"
+readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
 dependencies = [

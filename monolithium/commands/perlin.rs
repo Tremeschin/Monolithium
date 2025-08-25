@@ -11,7 +11,9 @@ pub struct PerlinPng {
 
 impl PerlinPng {
     pub fn run(&self) {
-        let world = World::new(self.seed);
+        let mut world = World::new();
+        world.init(self.seed);
+
         let repeat = world.hill.repeats() as f64;
         let (min_x, min_z) = (-repeat, -repeat);
         let (max_x, max_z) = ( repeat,  repeat);

@@ -12,36 +12,37 @@ pub struct PerlinNoise {
 /* -------------------------------------------------------------------------- */
 
 impl PerlinNoise {
-    pub fn new(rng: &mut JavaRNG) -> Self {
-        let xoff = rng.next_f64() * 256.0;
-        let yoff = rng.next_f64() * 256.0;
-        let zoff = rng.next_f64() * 256.0;
+    pub fn new() -> Self {
+        PerlinNoise {
+            map: [0; 512],
+            xoff: 0.0,
+            yoff: 0.0,
+            zoff: 0.0,
+        }
+    }
+
+    pub fn init(&mut self, rng: &mut JavaRNG) {
+        self.xoff = rng.next_f64() * 256.0;
+        self.yoff = rng.next_f64() * 256.0;
+        self.zoff = rng.next_f64() * 256.0;
 
         // Start a new 'arange' array
-        let mut map = [0u8; 512];
         for i in 0..512 {
-            map[i] = i as u8;
+            self.map[i] = i as u8;
         }
 
         // Shuffle the first half
         for a in 0..256 {
-            let b = a + rng.next_i32_bound((256 - a) as i32) as usize;
-            map.swap(a, b);
+            let b = rng.next_i32_bound((256 - a) as i32) as usize;
+            self.map.swap(a, a + b);
         }
 
         // Mirror to the second half (faster than for loop)
         unsafe {std::ptr::copy_nonoverlapping(
-            map.as_ptr(),
-            map.as_mut_ptr().add(256),
+            self.map.as_ptr(),
+            self.map.as_mut_ptr().add(256),
             256
         )};
-
-        PerlinNoise {
-            map: map,
-            xoff: xoff,
-            yoff: yoff,
-            zoff: zoff,
-        }
     }
 
     /// Sample the noise at a given coordinate
@@ -139,9 +140,15 @@ pub struct FractalPerlin<const OCTAVES: usize> {
 }
 
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
-    pub fn new(rng: &mut JavaRNG) -> Self {
+    pub fn new() -> Self {
         FractalPerlin {
-            noise: std::array::from_fn(|_| PerlinNoise::new(rng))
+            noise: std::array::from_fn(|_| PerlinNoise::new())
+        }
+    }
+
+    pub fn init(&mut self, rng: &mut JavaRNG) {
+        for i in 0..OCTAVES {
+            self.noise[i].init(rng);
         }
     }
 

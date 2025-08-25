@@ -18,19 +18,18 @@ impl SpawnCommand {
         let progress = ProgressBar::new(self.seeds.total())
             .with_style(utils::progress("Searching"));
 
+        let options = FindOptions::default()
+            .spacing(self.spacing)
+            .spawn(self.radius)
+            .limit(1);
+
         let mut monoliths: Vec<Monolith> =
             (0..=self.seeds.total())
             .into_par_iter()
             .progress_with(progress)
-            .map(|seed| {
-                let seed  = self.seeds.get(seed);
-                let world = World::new(seed);
-                world.find_monoliths(
-                    &FindOptions::default()
-                        .spawn(self.radius)
-                        .spacing(self.spacing)
-                        .limit(1)
-                )
+            .map_init(|| World::new(), |world, seed| {
+                world.init(self.seeds.get(seed));
+                world.find_monoliths(&options)
             })
             .flatten()
             .collect();

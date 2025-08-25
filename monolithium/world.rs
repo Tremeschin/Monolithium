@@ -7,17 +7,23 @@ pub struct World {
 }
 
 impl World {
-    pub fn new(seed: u64) -> Self {
+    pub fn new() -> Self {
+        World {
+            seed: 0,
+            hill:  FractalPerlin::new(),
+            depth: FractalPerlin::new(),
+        }
+    }
+
+    pub fn init(&mut self, seed: u64) {
         let mut rng = JavaRNG::new(seed);
 
         // Skip 48 generators priorly used elsewhere
         PerlinNoise::discard(&mut rng, 48);
 
-        World {
-            seed:  seed,
-            hill:  FractalPerlin::new(&mut rng),
-            depth: FractalPerlin::new(&mut rng),
-        }
+        self.hill.init(&mut rng);
+        self.depth.init(&mut rng);
+        self.seed = seed;
     }
 
     // Check if a given coordinate is part of a monolith
@@ -180,12 +186,12 @@ pub struct FindOptions {
 
 impl FindOptions {
 
-    pub fn spacing(&mut self, spacing: usize) -> &mut Self {
+    pub fn spacing(mut self, spacing: usize) -> Self {
         self.spacing = spacing;
         return self;
     }
 
-    pub fn limit(&mut self, many: u64) -> &mut Self {
+    pub fn limit(mut self, many: u64) -> Self {
         self.limit = Some(many);
         return self;
     }
@@ -193,7 +199,7 @@ impl FindOptions {
     // Defining regions
 
     /// Search around a given coordinate at most `radius` manhattan blocks away
-    pub fn around(&mut self, x: i64, z: i64, radius: i64) -> &mut Self {
+    pub fn around(mut self, x: i64, z: i64, radius: i64) -> Self {
         self.minx = x - radius;
         self.maxx = x + radius;
         self.minz = z - radius;
@@ -202,12 +208,12 @@ impl FindOptions {
     }
 
     /// Search around spawn at most `radius` manhattan blocks away
-    pub fn spawn(&mut self, radius: i64) -> &mut Self {
+    pub fn spawn(self, radius: i64) -> Self {
         self.around(0, 0, radius)
     }
 
     /// Search all blocks before the Far Lands
-    pub fn inbounds(&mut self) -> &mut Self {
+    pub fn inbounds(mut self) -> Self {
         self.minx = -FARLANDS;
         self.maxx =  FARLANDS;
         self.minz = -FARLANDS;
@@ -215,7 +221,7 @@ impl FindOptions {
         return self;
     }
 
-    pub fn wraps(&mut self) -> &mut Self {
+    pub fn wraps(mut self) -> Self {
         self.minx = 0;
         self.maxx = PERLIN_WRAP;
         self.minz = 0;

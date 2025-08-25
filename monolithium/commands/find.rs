@@ -14,7 +14,9 @@ pub struct FindCommand {
 
 impl FindCommand {
     pub fn run(&self) {
-        let world = World::new(self.seed);
+        let mut world = World::new();
+        world.init(self.seed);
+
         let mut monoliths = world.find_monoliths(
             &FindOptions::default()
                 .wraps().spacing(self.spacing)

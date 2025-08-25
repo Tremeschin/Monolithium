@@ -18,7 +18,9 @@ pub struct Mask {
 
 impl Mask {
     pub fn run(&self) {
-        let world  = World::new(self.seed);
+        let mut world  = World::new();
+        world.init(self.seed);
+
         let width  = ((self.maxx - self.minx) as u32) / 4;
         let height = ((self.maxz - self.minz) as u32) / 4;
         let mut pixels = vec![0u8; (width * height) as usize];
