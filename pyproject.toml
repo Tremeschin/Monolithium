@@ -4,7 +4,7 @@ GitHub = "https://github.com/Tremeschin/Monolithium"
 [project]
 name        = "monolithium"
 description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
-authors     = [{name="Tremeschin", email="29046864+Tremeschin@users.noreply.github.com"}]
+authors     = [{name="Tremeschin"}]
 version     = "1.0.0"
 readme      = "readme.md"
 license     = "MIT"
