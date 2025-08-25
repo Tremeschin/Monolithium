@@ -106,8 +106,10 @@ impl World {
             }
 
             for (dx, dz) in neighbors {
-                if visited.insert((x, z)) {
-                    queue.push_back((x+dx, z+dz));
+                let next = (x+dx, z+dz);
+
+                if visited.insert(next) {
+                    queue.push_back(next);
                 }
             }
         }
