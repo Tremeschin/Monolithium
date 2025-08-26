@@ -53,6 +53,6 @@ impl JavaRNG {
         let high = (self.next::<26>() as i64) << 27;
         let low  =  self.next::<27>() as i64;
 		const MAGIC: f64 = (1u64 << 53) as f64;
-        (high.wrapping_add(low) as f64) / MAGIC
+        (high | low) as f64 / MAGIC
     }
 }
