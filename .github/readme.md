@@ -55,7 +55,8 @@ This will search a 8,388,608 blocks square in both positive X and Z directions. 
 
 This will search for seeds that contains monoliths close to spawn.
 
-- `cargo run --release -- spawn random -n 1000000`
+- Search 0 through 100k seeds: `cargo run --release -- spawn linear -c 100000`
+- Search 50k random seeds: `cargo run --release -- spawn random -n 50000`
 
 ## 🚀 Speeds
 
@@ -186,6 +187,7 @@ Sadly, the Far Lands override the monoliths, there's no such thing as a Far Mono
 > - Ken Perlin's noise, unscaled, repeats every 256 units on any coordinate • `(2**8)`
 > - There are 16 octaves on the hill noise, each octave halves the previous frequency, so the highest one repeats every `(2**15)` blocks (starting from multiplier 1).
 > - Minecraft samples every 4 blocks, the depth scale is 100 but `& 0xFF` truncations cancels it at `2**20`
+> Multiplying factors, `2**(8+15) = 2**23`
 
 ### 🔵 How rare are they?
 
