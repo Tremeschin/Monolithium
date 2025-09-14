@@ -6,7 +6,7 @@ custom_target('monolithium',
     output: 'monolithium',
     command: [
         find_program('nvcc', required: true),
-        '-arch=sm_86', '-O3',
+        '-arch=native', '-O3',
         '@INPUT@', '-o', '@OUTPUT@',
     ]
 )

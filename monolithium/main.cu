@@ -46,11 +46,28 @@ Gpu inline float lerp(float t, float a, float b) {
     return fma(t, b - a, a);
 }
 
+Gpu const float GRAD_LOOKUP[16][3] = {
+    { 1.0f,  1.0f,  0.0f}, //  0:  x + y
+    {-1.0f,  1.0f,  0.0f}, //  1: -x + y
+    { 1.0f, -1.0f,  0.0f}, //  2:  x - y
+    {-1.0f, -1.0f,  0.0f}, //  3: -x - y
+    { 1.0f,  0.0f,  1.0f}, //  4:  x + z
+    {-1.0f,  0.0f,  1.0f}, //  5: -x + z
+    { 1.0f,  0.0f, -1.0f}, //  6:  x - z
+    {-1.0f,  0.0f, -1.0f}, //  7: -x - z
+    { 0.0f,  1.0f,  1.0f}, //  8:  y + z
+    { 0.0f, -1.0f,  1.0f}, //  9: -y + z
+    { 0.0f,  1.0f, -1.0f}, // 10:  y - z
+    { 0.0f, -1.0f, -1.0f}, // 11: -y - z
+    { 1.0f,  1.0f,  0.0f}, // 12:  y + x
+    { 0.0f, -1.0f,  1.0f}, // 13: -y + z
+    {-1.0f,  1.0f,  0.0f}, // 14:  y - x
+    { 0.0f, -1.0f, -1.0f}, // 15: -y - z
+};
+
 Gpu inline float grad(uint8_t hash, float x, float y, float z) {
-    int h = hash & 15;
-    float u = h < 8 ? x : y;
-    float v = h < 4 ? y : h == 12 || h == 14 ? x : z;
-    return ((h & 1) == 0 ? u : -u) + ((h & 2) == 0 ? v : -v);
+    const float* weights = GRAD_LOOKUP[hash & 0x0F];
+    return fma(weights[0], x, fma(weights[1], y, weights[2] * z));
 }
 
 /* -------------------------------------------------------------------------- */
@@ -186,6 +203,7 @@ struct PerlinNoise {
 
         // Gotta love magic numbers!
         #if SKIP_TABLE
+            // Note: Only for (count == 48)
             rng->state *= 249870891710593LL;
             rng->state += 44331453843488LL;
             rng->state &= M;
