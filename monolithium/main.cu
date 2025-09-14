@@ -31,6 +31,9 @@
 #define Gpu __device__
 #define Cpu __host__
 
+#define SKIP_REJECTION 1
+#define SKIP_TABLE 1
+
 /* -------------------------------------------------------------------------- */
 // Utility functions
 
@@ -83,10 +86,15 @@ struct JavaRNG {
         } else {
             int32_t next = this->next(31);
             int32_t take = next % max;
-            while (next - take + max - 1 < 0) {
-                next = this->next(31);
-                take = next % max;
-            }
+
+            #if SKIP_REJECTION
+            #else
+                while (next - take + max - 1 < 0) {
+                    next = this->next(31);
+                    take = next % max;
+                }
+            #endif
+
             return take;
         }
     }
@@ -175,6 +183,15 @@ struct PerlinNoise {
     /// Roll the generator state that would have created a PerlinNoise
     /// - Fast way around without as many memory operations
     Gpu static void discard(JavaRNG* rng, int count) {
+
+        // Gotta love magic numbers!
+        #if SKIP_TABLE
+            rng->state *= 249870891710593LL;
+            rng->state += 44331453843488LL;
+            rng->state &= M;
+            return;
+        #endif
+
         for (int i=0; i<count; i++) {
 
             // Coordinates f64 offsets
@@ -310,14 +327,14 @@ __global__ void get_monoliths_world_per_thread(
     World world;
     world.init(seed);
 
-    if (tid % 1000 == 0)
+    if (tid % 10000 == 0)
         printf("Block %d seed %d\n", blk, seed);
 
-    if (!world.around_spawn(300, 50))
+    if (!world.around_spawn(200, 200))
         return;
 
-    int64_t side = 4096;
-    int64_t step = 32;
+    int64_t side = 256;
+    int64_t step = 4;
 
     for (int64_t x=-side; x<=side; x+=step) {
         for (int64_t z=-side; z<=side; z+=step) {
@@ -335,8 +352,8 @@ enum Variant {
 
 int main() {
     int start  = 0;
-    int seeds  = 1000000;
-    int thread = 32;
+    int seeds  = 10000000;
+    int thread = 64;
 
     float* d_results;
     cudaMalloc(&d_results, seeds * sizeof(float));
