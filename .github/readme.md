@@ -65,8 +65,8 @@ Monolithium is written in heavily parallelized [Rust](https://www.rust-lang.org/
 🦀 For a Ryzen 9 5900X 12c/24t, 2x3200 MT/s DDR4 CL16 2Rx8 system, one might expect:
 
 - **3.75 minutes** to find all monoliths in a seed, probing every 128 blocks.
-- **Search 410,000** seeds per second for spawn monoliths (accurate)
-- **Search 1 Million** seeds per second for spawn monoliths (lossy)
+- **Search 1,150,000** seeds per second for spawn monoliths (approximated)
+- **Search 440,000** seeds per second for spawn monoliths (accurate)
 
 Such speeds scales about linearly with your hardware - for better or worse!
 

@@ -8,6 +8,8 @@ readme      = "readme.md"
 license     = "MIT"
 edition     = "2024"
 
+# ---------------------------------------------------------------------------- #
+
 [lib]
 name = "monolithium"
 path = "monolithium/lib.rs"
@@ -15,6 +17,8 @@ path = "monolithium/lib.rs"
 [[bin]]
 name = "monolithium"
 path = "monolithium/main.rs"
+
+# ---------------------------------------------------------------------------- #
 
 [dependencies]
 ahash         = "0.8.12"
@@ -26,15 +30,38 @@ rand          = "0.9.2"
 rayon         = "1.11.0"
 smart-default = "0.7.1"
 
+# ---------------------------------------------------------------------------- #
+
 [features]
 
+default = ["grad-lookup"]
+
+# ------------------------------------ #
+# Accurate optimizations
+
+# Use a lookup table for `utils::grad()`
+grad-lookup = []
+
+# ------------------------------------ #
+# Lossy optimizations
+
 # Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
-# three check operations per call (low error for perlin values)
-# • Monte Carlo says 0.03474% error rate
+# three math operations check per call (low error for perlin values)
+# • Monte Carlo says 0.03474% error rates
 skip-rejection = []
 
 # Use a Skip Table for fast LCN stepping, same loss as `skip-rejection`
 skip-table = []
+
+# ------------------------------------ #
+# Groups
+
+fast = [
+    "skip-rejection",
+    "skip-table",
+]
+
+# ---------------------------------------------------------------------------- #
 
 [profile.dev]
 strip = true
