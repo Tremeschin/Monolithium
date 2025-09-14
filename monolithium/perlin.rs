@@ -32,9 +32,13 @@ impl PerlinNoise {
         }
 
         // Shuffle the first half
-        for a in 0..256 {
-            let b = rng.next_i32_bound((256 - a) as i32) as usize;
-            self.map.swap(a, a + b);
+        unsafe {
+            let ptr = self.map.as_mut_ptr();
+
+            for a in 0..256 {
+                let b = rng.next_i32_bound((256 - a) as i32) as usize;
+                std::ptr::swap(ptr.add(a), ptr.add(a + b));
+            }
         }
     }
 
