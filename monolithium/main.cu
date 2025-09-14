@@ -66,12 +66,12 @@ struct JavaRNG {
         this->state = ((int64_t) seed ^ A) & M;
     }
 
-	/// Roll the state, same effect as ignoring a `.next()` call
+    /// Roll the state, same effect as ignoring a `.next()` call
     Gpu inline void step() {
         this->state = (this->state * A + C) & M;
     }
 
-	/// Rolls the state and returns N low bits
+    /// Rolls the state and returns N low bits
     Gpu inline int32_t next(uint8_t bits) {
         this->step();
         return (int32_t) (this->state >> (48 - bits));

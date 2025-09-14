@@ -28,6 +28,7 @@ smart-default = "0.7.1"
 
 [features]
 strict = []
+lossy = []
 
 [profile.dev]
 strip = true

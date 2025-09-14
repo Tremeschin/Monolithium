@@ -103,29 +103,21 @@ impl PerlinNoise {
 
             // Coordinates f64 offsets
             for _ in 0..3 {
-                if cfg!(feature="strict") {
-                    rng.next_f64();
-                } else {
-                    rng.step();
-                    rng.step();
-                }
+                rng.step();
+                rng.step();
             }
 
             // Permutations swapping
             for max in (1..=256).rev() {
                 if cfg!(feature="strict") {
                     rng.next_i32_bound(max as i32);
+
+                // Monte Carlo says 0.03474% error rate
+                } else if cfg!(feature="lossy") {
+                    rng.step()
+
                 } else {
-                    if (max as u32).is_power_of_two() {
-                        rng.step()
-                    } else {
-                        let mut next = rng.next::<31>();
-                        let mut take = next % max;
-                        while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                            next = rng.next::<31>();
-                            take = next % max;
-                        }
-                    }
+                    rng.skip_next_i32_bound(max as i32);
                 }
             }
         }
