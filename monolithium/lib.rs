@@ -8,6 +8,7 @@ pub use std::hash::Hasher;
 pub use std::sync::Arc;
 pub use std::sync::mpsc;
 pub use std::sync::Mutex;
+pub use std::sync::OnceLock;
 pub use std::thread;
 
 pub use ahash::AHashSet;

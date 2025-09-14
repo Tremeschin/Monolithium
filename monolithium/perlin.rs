@@ -27,8 +27,10 @@ impl PerlinNoise {
         self.zoff = rng.next_f64() * 256.0;
 
         // Start a new 'arange' array
-        for i in 0..256 {
-            self.map[i] = i as u8;
+        unsafe {
+            for i in 0..256 {
+                *self.map.get_unchecked_mut(i) = i as u8;
+            }
         }
 
         // Shuffle the first half

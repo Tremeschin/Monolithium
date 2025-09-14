@@ -15,7 +15,7 @@ pub fn fade(t: f64) -> f64 {
 /// Standard linear interpolation function
 #[inline(always)]
 pub fn lerp(t: f64, a: f64, b: f64) -> f64 {
-    a + t * (b - a)
+    t.mul_add(b - a, a)
 }
 
 const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
