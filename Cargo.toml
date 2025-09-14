@@ -33,7 +33,7 @@ smart-default = "0.7.1"
 # • Monte Carlo says 0.03474% error rate
 skip-rejection = []
 
-# Use a Skip Table for fast LCN stepping, implies `skip-rejection`
+# Use a Skip Table for fast LCN stepping, same loss as `skip-rejection`
 skip-table = []
 
 [profile.dev]

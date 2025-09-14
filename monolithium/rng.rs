@@ -49,20 +49,13 @@ impl JavaRNG {
         }
     }
 
-    /// Accurate, slightly faster than `.next_i32_bound()`. Does not compute
-    /// the returned value, just rolls the state as if it did.
+    /// Faster, but slightly inaccurate version of `.next_i32_bound()`
     #[inline(always)]
-    pub fn skip_next_i32_bound(&mut self, max: i32) {
+    pub fn next_i32_bound_skip_rejection(&mut self, max: i32) -> i32 {
         if (max as u32).is_power_of_two() {
-            self.step();
+            (((max as i64).wrapping_mul(self.next::<31>() as i64)) >> 31) as i32
         } else {
-            let mut next = self.next::<31>();
-            let mut take = next % max;
-
-            while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                next = self.next::<31>();
-                take = next % max;
-            }
+            return self.next::<31>() % max;
         }
     }
 

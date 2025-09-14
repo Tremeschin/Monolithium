@@ -36,7 +36,16 @@ impl PerlinNoise {
             let ptr = self.map.as_mut_ptr();
 
             for a in 0..256 {
-                let b = rng.next_i32_bound((256 - a) as i32) as usize;
+                let max = (256 - a) as i32;
+
+                let b = {
+                    if cfg!(feature="skip-rejection") {
+                        rng.next_i32_bound_skip_rejection(max)
+                    } else {
+                        rng.next_i32_bound(max)
+                    }
+                } as usize;
+
                 std::ptr::swap(ptr.add(a), ptr.add(a + b));
             }
         }
@@ -120,9 +129,8 @@ impl PerlinNoise {
             for max in (1..=256).rev() {
                 if cfg!(feature="skip-rejection") {
                     rng.step()
-
                 } else {
-                    rng.skip_next_i32_bound(max as i32);
+                    rng.next_i32_bound(max as i32);
                 }
             }
         }
