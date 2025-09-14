@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Clone)]
 pub struct PerlinNoise {
     /// Permutations map (Vector -> Grid)
-    pub map: [u8; 512],
+    pub map: [u8; 256],
     pub xoff: f64,
     pub yoff: f64,
     pub zoff: f64,
@@ -14,7 +14,7 @@ pub struct PerlinNoise {
 impl PerlinNoise {
     pub fn new() -> Self {
         PerlinNoise {
-            map: [0; 512],
+            map: [0; 256],
             xoff: 0.0,
             yoff: 0.0,
             zoff: 0.0,
@@ -27,7 +27,7 @@ impl PerlinNoise {
         self.zoff = rng.next_f64() * 256.0;
 
         // Start a new 'arange' array
-        for i in 0..512 {
+        for i in 0..256 {
             self.map[i] = i as u8;
         }
 
@@ -36,13 +36,11 @@ impl PerlinNoise {
             let b = rng.next_i32_bound((256 - a) as i32) as usize;
             self.map.swap(a, a + b);
         }
+    }
 
-        // Mirror to the second half (faster than for loop)
-        unsafe {std::ptr::copy_nonoverlapping(
-            self.map.as_ptr(),
-            self.map.as_mut_ptr().add(256),
-            256
-        )};
+    #[inline(always)]
+    fn get_map(&self, index: usize) -> u8 {
+        self.map[index & 0xFF]
     }
 
     /// Sample the noise at a given coordinate
@@ -70,28 +68,28 @@ impl PerlinNoise {
         let w = utils::fade(zf);
 
         // Get the hash values for the corners
-        let a  = self.map[xi + 0 + 0] as usize;
-        let aa = self.map[yi + a + 0] as usize;
-        let ab = self.map[yi + a + 1] as usize;
-        let b  = self.map[xi + 0 + 1] as usize;
-        let ba = self.map[yi + b + 0] as usize;
-        let bb = self.map[yi + b + 1] as usize;
+        let a  = self.get_map(xi + 0 + 0) as usize;
+        let aa = self.get_map(yi + a + 0) as usize;
+        let ab = self.get_map(yi + a + 1) as usize;
+        let b  = self.get_map(xi + 0 + 1) as usize;
+        let ba = self.get_map(yi + b + 0) as usize;
+        let bb = self.get_map(yi + b + 1) as usize;
 
         // Interpolate corner values relative to sample point
         return utils::lerp(w,
             utils::lerp(v, utils::lerp(u,
-                utils::grad(self.map[aa + zi], xf,       yf, zf),
-                utils::grad(self.map[ba + zi], xf - 1.0, yf, zf),
+                utils::grad(self.get_map(aa + zi), xf,       yf, zf),
+                utils::grad(self.get_map(ba + zi), xf - 1.0, yf, zf),
             ), utils::lerp(u,
-                utils::grad(self.map[ab + zi], xf,       yf - 1.0, zf),
-                utils::grad(self.map[bb + zi], xf - 1.0, yf - 1.0, zf),
+                utils::grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
+                utils::grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf),
             )),
             utils::lerp(v, utils::lerp(u,
-                utils::grad(self.map[aa + zi + 1], xf,       yf, zf - 1.0),
-                utils::grad(self.map[ba + zi + 1], xf - 1.0, yf, zf - 1.0),
+                utils::grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
+                utils::grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0),
             ), utils::lerp(u,
-                utils::grad(self.map[ab + zi + 1], xf,       yf - 1.0, zf - 1.0),
-                utils::grad(self.map[bb + zi + 1], xf - 1.0, yf - 1.0, zf - 1.0),
+                utils::grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
+                utils::grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0),
             )),
         );
     }

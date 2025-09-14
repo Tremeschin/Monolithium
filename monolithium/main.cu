@@ -101,7 +101,7 @@ struct JavaRNG {
 /* -------------------------------------------------------------------------- */
 
 struct PerlinNoise {
-    uint8_t map[512];
+    uint8_t map[256];
     float xoff;
     float yoff;
     float zoff;
@@ -112,7 +112,7 @@ struct PerlinNoise {
         this->zoff = (float) (rng->next_f64() * 256.0);
 
         // Start a new 'arange' array
-        for (int i=0; i<512; i++) {
+        for (int i=0; i<256; i++) {
             this->map[i] = i & 0xFF;
         }
 
@@ -123,11 +123,10 @@ struct PerlinNoise {
             this->map[a] = this->map[b];
             this->map[b] = temp;
         }
+    }
 
-        // Mirror to the second half
-        for (int i=0; i<256; i++) {
-            this->map[i+256] = this->map[i];
-        }
+    Gpu float get_map(int index) {
+        return this->map[index & 0xFF];
     }
 
     /// Sample the noise at a given coordinate
@@ -153,24 +152,24 @@ struct PerlinNoise {
         float w = fade(zf);
 
         // Get the hash values for the corners
-        int a  = this->map[xi + 0 + 0];
-        int aa = this->map[yi + a + 0];
-        int ab = this->map[yi + a + 1];
-        int b  = this->map[xi + 0 + 1];
-        int ba = this->map[yi + b + 0];
-        int bb = this->map[yi + b + 1];
+        int a  = this->get_map(xi + 0 + 0);
+        int aa = this->get_map(yi + a + 0);
+        int ab = this->get_map(yi + a + 1);
+        int b  = this->get_map(xi + 0 + 1);
+        int ba = this->get_map(yi + b + 0);
+        int bb = this->get_map(yi + b + 1);
 
         return lerp(w,
             lerp(v,
-                lerp(u, grad(this->map[aa + zi], xf, yf, zf),
-                        grad(this->map[ba + zi], xf - 1.0, yf, zf)),
-                lerp(u, grad(this->map[ab + zi], xf, yf - 1.0, zf),
-                        grad(this->map[bb + zi], xf - 1.0, yf - 1.0, zf))),
+                lerp(u, grad(this->get_map(aa + zi), xf, yf, zf),
+                        grad(this->get_map(ba + zi), xf - 1.0, yf, zf)),
+                lerp(u, grad(this->get_map(ab + zi), xf, yf - 1.0, zf),
+                        grad(this->get_map(bb + zi), xf - 1.0, yf - 1.0, zf))),
             lerp(v,
-                lerp(u, grad(this->map[aa + zi + 1], xf, yf, zf - 1.0),
-                        grad(this->map[ba + zi + 1], xf - 1.0, yf, zf - 1.0)),
-                lerp(u, grad(this->map[ab + zi + 1], xf, yf - 1.0, zf - 1.0),
-                        grad(this->map[bb + zi + 1], xf - 1.0, yf - 1.0, zf - 1.0))));
+                lerp(u, grad(this->get_map(aa + zi + 1), xf, yf, zf - 1.0),
+                        grad(this->get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
+                lerp(u, grad(this->get_map(ab + zi + 1), xf, yf - 1.0, zf - 1.0),
+                        grad(this->get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))));
     }
 
     /// Roll the generator state that would have created a PerlinNoise
@@ -336,7 +335,7 @@ enum Variant {
 
 int main() {
     int start  = 0;
-    int seeds  = 10000;
+    int seeds  = 1000000;
     int thread = 32;
 
     float* d_results;

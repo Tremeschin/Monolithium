@@ -88,7 +88,6 @@ impl JavaRNG {
     // Roll the state N times, fast
     #[inline(always)]
     pub fn step_n(&mut self, n: usize) {
-        debug_assert!(n < SKIP_TABLE_SIZE);
         if n == 0 {return;}
         let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
         self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
@@ -113,5 +112,4 @@ impl JavaRNG {
             table
         });
     }
-
 }
