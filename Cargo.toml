@@ -18,7 +18,7 @@ path = "monolithium/main.rs"
 
 [dependencies]
 ahash         = "0.8.12"
-clap          = {version="4.5.46", features=["derive"]}
+clap          = {version="4.5.47", features=["derive"]}
 indicatif     = {version="0.18.0", features=["rayon"]}
 microbench    = "0.5.0"
 png           = "0.18.0"
@@ -27,8 +27,14 @@ rayon         = "1.11.0"
 smart-default = "0.7.1"
 
 [features]
-strict = []
-lossy = []
+
+# Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
+# three check operations per call (low error for perlin values)
+# • Monte Carlo says 0.03474% error rate
+skip-rejection = []
+
+# Use a Skip Table for fast LCN stepping, implies `skip-rejection`
+skip-table = []
 
 [profile.dev]
 strip = true

@@ -99,6 +99,13 @@ impl PerlinNoise {
     /// Roll the generator state that would have created a PerlinNoise
     /// - Fast way around without as many memory operations
     pub fn discard(rng: &mut JavaRNG, many: usize) {
+
+        // Super fast but slightly lossy
+        if cfg!(feature="skip-table") {
+            rng.step_n(many*(3*2 + 256));
+            return;
+        }
+
         for _ in 0..many {
 
             // Coordinates f64 offsets
@@ -109,11 +116,7 @@ impl PerlinNoise {
 
             // Permutations swapping
             for max in (1..=256).rev() {
-                if cfg!(feature="strict") {
-                    rng.next_i32_bound(max as i32);
-
-                // Monte Carlo says 0.03474% error rate
-                } else if cfg!(feature="lossy") {
+                if cfg!(feature="skip-rejection") {
                     rng.step()
 
                 } else {

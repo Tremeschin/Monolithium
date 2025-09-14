@@ -49,6 +49,8 @@ impl JavaRNG {
         }
     }
 
+    /// Accurate, slightly faster than `.next_i32_bound()`. Does not compute
+    /// the returned value, just rolls the state as if it did.
     #[inline(always)]
     pub fn skip_next_i32_bound(&mut self, max: i32) {
         if (max as u32).is_power_of_two() {
@@ -72,4 +74,44 @@ impl JavaRNG {
         const MAGIC: f64 = (1u64 << 53) as f64;
         (high | low) as f64 / MAGIC
     }
+}
+
+/* -------------------------------------------------------------------------- */
+
+use std::sync::OnceLock;
+
+static SKIP_TABLE_SIZE: usize = 16_384;
+static SKIP_TABLE: OnceLock<[(i64, i64); SKIP_TABLE_SIZE]> = OnceLock::new();
+
+impl JavaRNG {
+
+    // Roll the state N times, fast
+    #[inline(always)]
+    pub fn step_n(&mut self, n: usize) {
+        debug_assert!(n < SKIP_TABLE_SIZE);
+        if n == 0 {return;}
+        let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
+        self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+    }
+
+    pub fn init_skip_table() {
+        SKIP_TABLE.get_or_init(|| {
+            let mut table = [(0i64, 0i64); SKIP_TABLE_SIZE];
+
+            // Start with the identity
+            table[0] = (1, 0);
+
+            // Precompute N steps of the LCN
+            for n in 1..SKIP_TABLE_SIZE {
+                let (p_a, p_c) = table[n - 1];
+                let n_a = (p_a.wrapping_mul(A)) & M;
+                let n_c = (p_c.wrapping_mul(A).wrapping_add(C)) & M;
+
+                table[n] = (n_a, n_c);
+            }
+
+            table
+        });
+    }
+
 }

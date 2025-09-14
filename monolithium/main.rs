@@ -28,5 +28,7 @@ impl Commands {
 }
 
 fn main() {
+    #[cfg(feature="skip-table")]
+    JavaRNG::init_skip_table();
     Commands::parse().run();
 }
