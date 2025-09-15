@@ -1,9 +1,9 @@
-project('monolithium', 'cpp')
+project('cudalith', 'cpp')
 
-custom_target('monolithium',
+custom_target('cudalith',
     build_by_default: true,
     input:  'monolithium/main.cu',
-    output: 'monolithium',
+    output: 'cudalith',
     command: [
         find_program('nvcc', required: true),
         '-arch=native', '-O3',

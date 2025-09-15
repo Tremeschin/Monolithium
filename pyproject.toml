@@ -5,7 +5,7 @@ GitHub = "https://github.com/Tremeschin/Monolithium"
 name        = "monolithium"
 description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
 authors     = [{name="Tremeschin"}]
-version     = "1.0.0"
+version     = "1.1.0"
 readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
@@ -18,14 +18,14 @@ dependencies = [
 [dependency-groups]
 dev = [
     "altair~=5.5.0",
-    "mkdocs-material~=9.6.18",
+    "mkdocs-material~=9.6.20",
     "mkdocs~=1.6.1",
     "vl-convert-python~=1.8.0",
 ]
 
 [project.scripts]
-monocuda = "monolithium.__init__:monocuda"
-monorust = "monolithium.__init__:monorust"
+cudalith = "monolithium.__init__:_cudalith"
+rustlith = "monolithium.__init__:_rustlith"
 
 [build-system]
 requires = ["hatchling"]

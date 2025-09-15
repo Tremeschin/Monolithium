@@ -3,6 +3,7 @@ import subprocess
 import sys
 from pathlib import Path
 from subprocess import PIPE, CompletedProcess
+from typing import NoReturn
 
 import tomllib
 
@@ -10,7 +11,7 @@ import tomllib
 class Paths:
     PACKAGE: Path = Path(__file__).parent
     REPO:    Path = (PACKAGE.parent)
-    BUILD:   Path = (REPO/"build")
+    BUILD:   Path = (Path.cwd()/"build")
 
 class Tools:
     PYTHON: tuple[str] = (sys.executable,)
@@ -19,8 +20,9 @@ class Tools:
     RUSTUP: tuple[str] = (shutil.which("rustup"),)
     CARGO:  tuple[str] = (shutil.which("cargo"),)
 
+# ---------------------------------------------------------------------------- #
 
-def monorust(args: list[str]=None) -> CompletedProcess:
+def rustlith(args: list[str]=None) -> CompletedProcess:
     """Run the Rust version of Monolithium"""
     args = (args or sys.argv[1:])
 
@@ -35,7 +37,7 @@ def monorust(args: list[str]=None) -> CompletedProcess:
         ))
 
     # Simple features handling via anywhere in args flags
-    cargo = tomllib.loads((Paths.REPO/"Cargo.toml").read_text(encoding="utf-8"))
+    cargo = tomllib.loads((Paths.PACKAGE/"Cargo.toml").read_text(encoding="utf-8"))
     features = list()
 
     for feature in cargo["features"]:
@@ -46,11 +48,18 @@ def monorust(args: list[str]=None) -> CompletedProcess:
 
     return subprocess.run((
         *Tools.CARGO, "run",
+        "--manifest-path", (Paths.PACKAGE/"Cargo.toml"),
+        "--target-dir", str(Path.cwd()),
         "--release", *features,
         "--", *args,
-    ), cwd=Paths.PACKAGE)
+    ))
 
-def monocuda(args: list[str]=None) -> CompletedProcess:
+def _rustlith() -> NoReturn:
+    sys.exit(rustlith().returncode)
+
+# ---------------------------------------------------------------------------- #
+
+def cudalith(args: list[str]=None) -> CompletedProcess:
     """Run the CUDA version of Monolithium"""
     args = (args or sys.argv[1:])
 
@@ -63,7 +72,7 @@ def monocuda(args: list[str]=None) -> CompletedProcess:
         "setup", Paths.BUILD,
         "--buildtype", "release",
         "--reconfigure"
-    ), cwd=Paths.REPO)
+    ), cwd=Paths.PACKAGE)
 
     # Compile the cuda part
     subprocess.check_call((
@@ -72,6 +81,9 @@ def monocuda(args: list[str]=None) -> CompletedProcess:
     ))
 
     return subprocess.run((
-        Paths.BUILD/"monolithium",
+        Paths.BUILD/"cudalith",
         *args
     ))
+
+def _cudalith() -> NoReturn:
+    sys.exit(cudalith().returncode)

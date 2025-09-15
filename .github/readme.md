@@ -35,28 +35,43 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 
 ## 📦 Installation
 
+<sup><b>Warning:</b> The code <i>will</i> shred your cpu, make sure you have a good cooling solution, it may be unusable while running!</sup>
+
+### 1. Stable releases
+
+Install [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal and run:
+- **Rust code**: `uvx --with monolithium rustlith (arguments)`
+- **Cuda code**: `uvx --with monolithium cudalith (arguments)`
+
+You can pass a `--fast` argument at the cost of accuracy for rust.
+
+<sup><b>Note:</b> This will create a `target` and/or `build` directory in the current working directory.</sup>
+
+### 2. Latest Git
+
 Install the [Rust](https://www.rust-lang.org/tools/install) programming language and [git](https://git-scm.com/downloads), open a terminal in some directory and run:
 
 - `git clone https://github.com/Tremeschin/Monolithium`
 - `cd Monolithium && rustup default stable`
 - `cargo run --release -- (arguments)`
 
-There are multiple commands available; run `cargo run --release -- (subcommand) --help` for options:
+You can pass any `--features (name)` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups
 
-<sup><b>Warning:</b> The code <i>will</i> shred your cpu, make sure you have a good cooling solution, it may be unusable while running</sup>
+It's also possible to run directly with [astral-sh/uv](https://docs.astral.sh/uv/):
+- `uvx --with git+https://github.com/Tremeschin/Monolithium (script) (arguments)`
 
 ### 🔴 Find all Monoliths in a world
 
 This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value on any coordinate - there are 9 copies of each within the Far Lands on any given world!
 
-- `cargo run --release -- find --seed 617`
+- `rustlith find --seed 617`
 
 ### 🟡 Find seeds with spawn monoliths
 
 This will search for seeds that contains monoliths close to spawn.
 
-- Search 0 through 100k seeds: `cargo run --release -- spawn linear -c 100000`
-- Search 50k random seeds: `cargo run --release -- spawn random -n 50000`
+- Search 0 through 100k seeds: `rustlith spawn linear -c 100000`
+- Search 50k random seeds: `rustlith spawn random -n 50000`
 
 ## 🚀 Speeds
 

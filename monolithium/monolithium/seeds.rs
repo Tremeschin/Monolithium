@@ -14,7 +14,7 @@ pub enum SeedFactory {
         #[arg(short='s', long, default_value_t=0)]
         start: u64,
 
-        #[arg(short='c', long, default_value_t=1_000_000)]
+        #[arg(short='t', long, default_value_t=1_000_000)]
         total: u64,
     },
 
