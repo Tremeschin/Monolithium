@@ -16,13 +16,15 @@ dependencies = [
 ]
 [project.optional-dependencies]
 statistics = [
-    "altair~=5.5.0",
-    "attrs~=25.3.0",
+    "altair",
+    "attrs",
+    "numpy",
+    "scipy",
+    "vl-convert-python",
+]
+website = [
     "mkdocs-material~=9.6.20",
     "mkdocs~=1.6.1",
-    "numpy~=2.2.6",
-    "scipy~=1.15.3",
-    "vl-convert-python~=1.8.0",
 ]
 all = [
     "monolithium[statistics]",
