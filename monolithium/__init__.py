@@ -3,7 +3,8 @@ import subprocess
 import sys
 from pathlib import Path
 from subprocess import PIPE, CompletedProcess
-from typing import Optional
+
+import tomllib
 
 
 class Paths:
@@ -19,8 +20,9 @@ class Tools:
     CARGO:  tuple[str] = (shutil.which("cargo"),)
 
 
-def monorust(args: Optional[list[str]]=None) -> CompletedProcess:
+def monorust(args: list[str]=None) -> CompletedProcess:
     """Run the Rust version of Monolithium"""
+    args = (args or sys.argv[1:])
 
     # Have a rust toolchain
     if subprocess.run(
@@ -32,15 +34,25 @@ def monorust(args: Optional[list[str]]=None) -> CompletedProcess:
             "default", "stable"
         ))
 
-    # Run the project
+    # Simple features handling via anywhere in args flags
+    cargo = tomllib.loads((Paths.REPO/"Cargo.toml").read_text(encoding="utf-8"))
+    features = list()
+
+    for feature in cargo["features"]:
+        if (flag := f"--{feature}") in args:
+            features.append("--features")
+            features.append(feature)
+            args.remove(flag)
+
     return subprocess.run((
-        *Tools.CARGO,
-        "run", "--release",
-        "--", *(args or sys.argv[1:]),
+        *Tools.CARGO, "run",
+        "--release", *features,
+        "--", *args,
     ), cwd=Paths.PACKAGE)
 
-def monocuda(args: Optional[list[str]]=None) -> CompletedProcess:
+def monocuda(args: list[str]=None) -> CompletedProcess:
     """Run the CUDA version of Monolithium"""
+    args = (args or sys.argv[1:])
 
     if not shutil.which("nvcc"):
         raise RuntimeError("nvcc wasn't found in path, do you have cuda toolkit?")
@@ -59,8 +71,7 @@ def monocuda(args: Optional[list[str]]=None) -> CompletedProcess:
         Paths.BUILD
     ))
 
-    # Execute the built binary
     return subprocess.run((
         Paths.BUILD/"monolithium",
-        *(args or sys.argv[1:]),
+        *args
     ))
