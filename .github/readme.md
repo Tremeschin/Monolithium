@@ -40,12 +40,12 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 ### 1. Stable releases
 
 Install [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal and run:
-- **Rust code**: `uvx --with monolithium rustlith (arguments)`
-- **Cuda code**: `uvx --with monolithium cudalith (arguments)`
+- **Rust code**: `uvx --from monolithium rustlith (commands)`
+- **Cuda code**: `uvx --from monolithium cudalith (commands)`
 
 You can pass a `--fast` argument at the cost of accuracy for rust.
 
-<sup><b>Note:</b> This will create a `target` and/or `build` directory in the current working directory.</sup>
+<sup><b>Note:</b> This will create a large `target` and/or `build` directory in the current working directory.</sup>
 
 ### 2. Latest Git
 
@@ -53,12 +53,14 @@ Install the [Rust](https://www.rust-lang.org/tools/install) programming language
 
 - `git clone https://github.com/Tremeschin/Monolithium`
 - `cd Monolithium && rustup default stable`
-- `cargo run --release -- (arguments)`
+- `cargo run --release -- (commands)`
 
 You can pass any `--features (name)` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups
 
 It's also possible to run directly with [astral-sh/uv](https://docs.astral.sh/uv/):
-- `uvx --with git+https://github.com/Tremeschin/Monolithium (script) (arguments)`
+- `uvx --from git+https://github.com/Tremeschin/Monolithium (script) (commands)`
+
+<sup><b>Note:</b> This will create a large `target` and/or `build` directory in the current working directory.</sup>
 
 ### 🔴 Find all Monoliths in a world
 
