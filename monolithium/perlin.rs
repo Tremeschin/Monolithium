@@ -1,6 +1,5 @@
 use crate::*;
 
-#[derive(Clone)]
 pub struct PerlinNoise {
     /// Permutations map (Vector -> Grid)
     pub map: [u8; 256],
@@ -90,22 +89,23 @@ impl PerlinNoise {
         let ba = self.get_map(yi + b + 0) as usize;
         let bb = self.get_map(yi + b + 1) as usize;
 
+        use utils::lerp;
+        use utils::grad;
+
         // Interpolate corner values relative to sample point
-        return utils::lerp(w,
-            utils::lerp(v, utils::lerp(u,
-                utils::grad(self.get_map(aa + zi), xf,       yf, zf),
-                utils::grad(self.get_map(ba + zi), xf - 1.0, yf, zf),
-            ), utils::lerp(u,
-                utils::grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
-                utils::grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf),
-            )),
-            utils::lerp(v, utils::lerp(u,
-                utils::grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
-                utils::grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0),
-            ), utils::lerp(u,
-                utils::grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
-                utils::grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0),
-            )),
+        return lerp(w,
+            lerp(v,
+                lerp(u, grad(self.get_map(aa + zi), xf,       yf, zf),
+                        grad(self.get_map(ba + zi), xf - 1.0, yf, zf)),
+                lerp(u, grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
+                        grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf))
+            ),
+            lerp(v,
+                lerp(u, grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
+                        grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
+                lerp(u, grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
+                        grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))
+            ),
         );
     }
 
@@ -141,7 +141,6 @@ impl PerlinNoise {
 
 /* -------------------------------------------------------------------------- */
 
-#[derive(Clone)]
 pub struct FractalPerlin<const OCTAVES: usize> {
     pub noise: [PerlinNoise; OCTAVES],
 }

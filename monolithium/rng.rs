@@ -24,9 +24,10 @@ impl JavaRNG {
         self.state = self.state.wrapping_mul(A).wrapping_add(C) & M
     }
 
-    /// Rolls the state and returns N low bits
+    /// Rolls the state and returns N<=48 low bits
     #[inline(always)]
     pub fn next<const BITS: u8>(&mut self) -> i32 {
+        debug_assert!(BITS <= 48);
         self.step();
         return (self.state >> (48 - BITS)) as i32;
     }
@@ -81,6 +82,7 @@ impl JavaRNG {
     // Roll the state N times, fast
     #[inline(always)]
     pub fn step_n(&mut self, n: usize) {
+        debug_assert!(n < SKIP_TABLE_SIZE);
         if n == 0 {return;}
         let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
         self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;

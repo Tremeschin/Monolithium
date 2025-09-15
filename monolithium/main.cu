@@ -100,20 +100,20 @@ struct JavaRNG {
     Gpu inline int32_t next_i32_bound(int32_t max) {
         if (__popc(max) == 1) {
             return (int32_t)(((int64_t) max * (int64_t) this->next(31)) >> 31);
-        } else {
-            int32_t next = this->next(31);
-            int32_t take = next % max;
-
-            #if SKIP_REJECTION
-            #else
-                while (next - take + max - 1 < 0) {
-                    next = this->next(31);
-                    take = next % max;
-                }
-            #endif
-
-            return take;
         }
+
+        int32_t next = this->next(31);
+        int32_t take = next % max;
+
+        #if SKIP_REJECTION
+        #else
+            while (next - take + max - 1 < 0) {
+                next = this->next(31);
+                take = next % max;
+            }
+        #endif
+
+        return take;
     }
 
     Gpu inline double next_f64() {
@@ -138,13 +138,15 @@ struct PerlinNoise {
 
         // Start a new 'arange' array
         for (int i=0; i<256; i++) {
-            this->map[i] = i & 0xFF;
+            this->map[i] = i;
         }
+
+        uint8_t temp;
 
         // Shuffle the first half
         for (int a=0; a<256; a++) {
             int b = a + rng->next_i32_bound(256 - a);
-            uint8_t temp = this->map[a];
+            temp = this->map[a];
             this->map[a] = this->map[b];
             this->map[b] = temp;
         }
@@ -189,12 +191,15 @@ struct PerlinNoise {
                 lerp(u, grad(this->get_map(aa + zi), xf, yf, zf),
                         grad(this->get_map(ba + zi), xf - 1.0, yf, zf)),
                 lerp(u, grad(this->get_map(ab + zi), xf, yf - 1.0, zf),
-                        grad(this->get_map(bb + zi), xf - 1.0, yf - 1.0, zf))),
+                        grad(this->get_map(bb + zi), xf - 1.0, yf - 1.0, zf))
+            ),
             lerp(v,
                 lerp(u, grad(this->get_map(aa + zi + 1), xf, yf, zf - 1.0),
                         grad(this->get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
                 lerp(u, grad(this->get_map(ab + zi + 1), xf, yf - 1.0, zf - 1.0),
-                        grad(this->get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))));
+                        grad(this->get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))
+            )
+        );
     }
 
     /// Roll the generator state that would have created a PerlinNoise

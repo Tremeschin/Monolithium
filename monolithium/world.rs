@@ -225,9 +225,9 @@ impl FindOptions {
 
     pub fn wraps(mut self) -> Self {
         self.minx = 0;
-        self.maxx = PERLIN_WRAP;
+        self.maxx = MONOLITHS_REPEAT;
         self.minz = 0;
-        self.maxz = PERLIN_WRAP;
+        self.maxz = MONOLITHS_REPEAT;
         return self;
     }
 }

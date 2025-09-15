@@ -25,6 +25,6 @@ impl FindCommand {
         monoliths.sort();
         monoliths.iter().for_each(|x| println!("{:?}", x));
         println!("Found {} Monoliths, remember they repeat every {} blocks on any direction!",
-            monoliths.len(), PERLIN_WRAP);
+            monoliths.len(), MONOLITHS_REPEAT);
     }
 }

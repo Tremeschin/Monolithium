@@ -42,7 +42,7 @@ pub const WORLD_SIZE: i64 = 2*FARLANDS + 1;
 /// It was found experimentally that the perlin noise and
 /// monoliths wraps around every 2**23 blocks, drastically
 /// reducing the practical search space!
-pub const PERLIN_WRAP: i64 = 2_i64.pow(23);
+pub const MONOLITHS_REPEAT: i64 = 2_i64.pow(23);
 
 /// Java uses a 48-bit Linear Congruential Generator for its RNG,
 /// which continuously masks the state's (1 << 48) - 1 lower bits,

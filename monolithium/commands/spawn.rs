@@ -23,9 +23,9 @@ impl SpawnCommand {
     pub fn run(&self) {
 
         // Standard math to split a work into many blocks
-        let blocks = (self.seeds.total() + self.chunks - 1) / self.chunks;
+        let chunks = (self.seeds.total() + self.chunks - 1) / self.chunks;
 
-        let progress = ProgressBar::new(blocks)
+        let progress = ProgressBar::new(chunks)
             .with_style(utils::progress("Searching"));
 
         let options = FindOptions::default()
@@ -34,7 +34,7 @@ impl SpawnCommand {
             .limit(1);
 
         let mut monoliths: Vec<Monolith> =
-            (0..=blocks)
+            (0..=chunks)
             .into_par_iter()
             .progress_with(progress)
             .map_init(|| World::new(), |world, chunk| {

@@ -79,7 +79,7 @@ Hall of fame for the timeline of computations:
     <thead>
       <tr>
         <th><b>Date</b></th>
-        <th><b>CPU</b></th>
+        <th><b>Hardware</b></th>
         <th><b>Time</b></th>
         <th><b>Seeds</b></th>
         <th><b>% Total</b></th>
