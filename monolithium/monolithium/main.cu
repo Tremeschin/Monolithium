@@ -18,16 +18,13 @@
 //   - Run: `./build/monolithium`
 //
 // Or install [uv](https://docs.astral.sh/uv/):
-//   - Run: `uv run monocuda`
+//   - Run: `uvx run cudalith`
 /* -------------------------------------------------------------------------- */
 
-#include <cmath>
 #include <cstdint>
 #include <cstdio>
-#include <unistd.h>
 
-#include <cuda_runtime.h>
-
+// Having trouble with names..
 #define Gpu __device__
 #define Cpu __host__
 

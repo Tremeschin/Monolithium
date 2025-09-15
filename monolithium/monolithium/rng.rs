@@ -3,9 +3,10 @@
 // discard the next step quickly, that weren't possible to directly modify
 // or extend in the original crate, per practical rust limitations.
 
-pub const M: i64 = (1 << 48) - 1;
-pub const A: i64 = 0x5DEECE66D;
-pub const C: i64 = 11;
+const F: f64 = (1u64 << 53) as f64;
+const M: i64 = (1 << 48) - 1;
+const A: i64 = 0x5DEECE66D;
+const C: i64 = 11;
 
 pub struct JavaRNG {
     state: i64,
@@ -65,8 +66,7 @@ impl JavaRNG {
     pub fn next_f64(&mut self) -> f64 {
         let high = (self.next::<26>() as i64) << 27;
         let low  =  self.next::<27>() as i64;
-        const MAGIC: f64 = (1u64 << 53) as f64;
-        (high | low) as f64 / MAGIC
+        (high | low) as f64 / F
     }
 }
 

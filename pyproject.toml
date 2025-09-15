@@ -28,6 +28,7 @@ website = [
 ]
 all = [
     "monolithium[statistics]",
+    "monolithium[website]",
 ]
 
 [dependency-groups]
