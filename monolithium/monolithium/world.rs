@@ -118,8 +118,8 @@ impl World {
     }
 
     pub fn find_monoliths(&self, query: &FindOptions) -> Vec<Monolith> {
-        let xrange: Vec<i64> = (query.minx..=query.maxx).step_by(query.spacing).collect();
-        let zrange: Vec<i64> = (query.minz..=query.maxz).step_by(query.spacing).collect();
+        let xrange: Vec<i64> = (query.minx..=query.maxx).step_by(query.step).collect();
+        let zrange: Vec<i64> = (query.minz..=query.maxz).step_by(query.step).collect();
 
         // Use non-threaded approach for small areas (lower latency)
         if (query.maxx - query.minx).abs() < 10000 {
@@ -179,8 +179,9 @@ pub struct FindOptions {
     pub minz: i64,
     pub maxz: i64,
 
+    /// Probe the world every N blocks
     #[default(32)]
-    pub spacing: usize,
+    pub step: usize,
 
     /// How many monoliths to find
     pub limit: Option<u64>,
@@ -188,8 +189,8 @@ pub struct FindOptions {
 
 impl FindOptions {
 
-    pub fn spacing(mut self, spacing: usize) -> Self {
-        self.spacing = spacing;
+    pub fn step(mut self, step: usize) -> Self {
+        self.step = step;
         return self;
     }
 

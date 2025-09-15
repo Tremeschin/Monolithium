@@ -9,7 +9,7 @@ pub struct FindCommand {
 
     /// Probe the world every N blocks
     #[arg(short='x', long, default_value_t=128)]
-    spacing: usize,
+    step: usize,
 }
 
 impl FindCommand {
@@ -19,7 +19,7 @@ impl FindCommand {
 
         let mut monoliths = world.find_monoliths(
             &FindOptions::default()
-                .wraps().spacing(self.spacing)
+                .wraps().step(self.step)
         );
 
         monoliths.sort();

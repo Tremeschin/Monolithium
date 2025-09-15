@@ -2,7 +2,8 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-from subprocess import PIPE, CompletedProcess
+from subprocess import PIPE, CompletedProcess, Popen
+from typing import Union
 
 import tomllib
 
@@ -21,13 +22,17 @@ class Tools:
 
 # ---------------------------------------------------------------------------- #
 
-def rustlith(*args: list[str], **kwargs) -> CompletedProcess:
+def rustlith(
+    *args: list[str],
+    Popen: bool=False,
+    **kwargs
+) -> Union[CompletedProcess, Popen]:
     """Run the Rust version of Monolithium"""
     args = list(map(str, (args or sys.argv[1:])))
 
     # Have a rust toolchain
     if subprocess.run(
-        (*Tools.RUSTUP, "run", "stable", "rustc"),
+        (*Tools.RUSTUP, "run", "stable", "rustc", "--version"),
         stdout=PIPE, stderr=PIPE
     ).returncode != 0:
         subprocess.check_call((
@@ -45,7 +50,7 @@ def rustlith(*args: list[str], **kwargs) -> CompletedProcess:
             features.append(feature)
             args.remove(flag)
 
-    return subprocess.run((
+    return (subprocess.Popen if Popen else subprocess.run)((
         *Tools.CARGO, "run",
         "--manifest-path", (Paths.PACKAGE/"Cargo.toml"),
         "--target-dir", str(Path.cwd()),
@@ -55,7 +60,11 @@ def rustlith(*args: list[str], **kwargs) -> CompletedProcess:
 
 # ---------------------------------------------------------------------------- #
 
-def cudalith(*args: list[str], **kwargs) -> CompletedProcess:
+def cudalith(
+    *args: list[str],
+    Popen: bool=False,
+    **kwargs
+) -> Union[CompletedProcess, Popen]:
     """Run the CUDA version of Monolithium"""
     args = list(map(str, (args or sys.argv[1:])))
 
@@ -76,7 +85,7 @@ def cudalith(*args: list[str], **kwargs) -> CompletedProcess:
         Paths.BUILD
     ))
 
-    return subprocess.run((
+    return (subprocess.Popen if Popen else subprocess.run)((
         Paths.BUILD/"cudalith",
         *args
     ), **kwargs)

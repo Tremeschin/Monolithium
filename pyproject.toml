@@ -10,27 +10,32 @@ readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
 dependencies = [
-    "attrs~=25.3.0",
     "meson~=1.9.0",
     "ninja~=1.13.0",
     "rustup~=1.28.2.1",
 ]
-
-[dependency-groups]
-dev = [
+[project.optional-dependencies]
+statistics = [
     "altair~=5.5.0",
+    "attrs~=25.3.0",
     "mkdocs-material~=9.6.20",
     "mkdocs~=1.6.1",
+    "numpy~=2.2.6",
+    "scipy~=1.15.3",
     "vl-convert-python~=1.8.0",
 ]
+all = [
+    "monolithium[statistics]",
+]
+
+[dependency-groups]
+dev = ["monolithium[all]"]
 
 [project.scripts]
 # Common
 cudalith = "monolithium.__main__:_cudalith"
 rustlith = "monolithium.__main__:_rustlith"
-# Statistics
-world-distribution = "monolithium.statistics:Distribution.world"
-multi-distribution = "monolithium.statistics:Distribution.multi"
+statlith = "monolithium.statistics:main"
 
 [build-system]
 requires = ["hatchling"]

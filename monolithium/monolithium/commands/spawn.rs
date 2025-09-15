@@ -16,7 +16,7 @@ pub struct SpawnCommand {
 
     /// Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]
-    spacing: usize,
+    step: usize,
 }
 
 impl SpawnCommand {
@@ -29,7 +29,7 @@ impl SpawnCommand {
             .with_style(utils::progress("Searching"));
 
         let options = FindOptions::default()
-            .spacing(self.spacing)
+            .step(self.step)
             .spawn(self.radius)
             .limit(1);
 

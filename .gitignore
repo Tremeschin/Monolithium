@@ -1,4 +1,4 @@
-.rustc_info.json
+*.json
 *.pyc
 build
 output
