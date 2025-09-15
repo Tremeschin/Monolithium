@@ -18,7 +18,7 @@
 //   - Run: `./build/monolithium`
 //
 // Or install [uv](https://docs.astral.sh/uv/):
-//   - Run: `uv run monolithium-cuda`
+//   - Run: `uv run monocuda`
 /* -------------------------------------------------------------------------- */
 
 #include <cmath>

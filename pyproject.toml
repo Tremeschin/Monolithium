@@ -12,16 +12,20 @@ requires-python = ">=3.10"
 dependencies = [
     "meson~=1.9.0",
     "ninja~=1.13.0",
+    "rustup~=1.28.2.1",
 ]
 
 [dependency-groups]
 dev = [
-    "mkdocs~=1.6.1",
+    "altair~=5.5.0",
     "mkdocs-material~=9.6.18",
+    "mkdocs~=1.6.1",
+    "vl-convert-python~=1.8.0",
 ]
 
 [project.scripts]
-monolithium-cuda = "monolithium.__main__:cuda"
+monocuda = "monolithium.__init__:monocuda"
+monorust = "monolithium.__init__:monorust"
 
 [build-system]
 requires = ["hatchling"]
