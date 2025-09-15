@@ -51,7 +51,7 @@ impl SpawnCommand {
             .collect();
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("{:?}", x));
+        monoliths.iter().for_each(|x| println!("json {}", serde_json::to_string(&x).unwrap()));
         println!("Found {} Monoliths", monoliths.len());
     }
 }

@@ -23,7 +23,7 @@ impl FindCommand {
         );
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("{:?}", x));
+        monoliths.iter().for_each(|x| println!("json {}", serde_json::to_string(&x).unwrap()));
         println!("Found {} Monoliths, remember they repeat every {} blocks on any direction!",
             monoliths.len(), MONOLITHS_REPEAT);
     }

@@ -10,6 +10,7 @@ readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
 dependencies = [
+    "attrs~=25.3.0",
     "meson~=1.9.0",
     "ninja~=1.13.0",
     "rustup~=1.28.2.1",
@@ -24,8 +25,12 @@ dev = [
 ]
 
 [project.scripts]
-cudalith = "monolithium.__init__:_cudalith"
-rustlith = "monolithium.__init__:_rustlith"
+# Common
+cudalith = "monolithium.__main__:_cudalith"
+rustlith = "monolithium.__main__:_rustlith"
+# Statistics
+world-distribution = "monolithium.statistics:Distribution.world"
+multi-distribution = "monolithium.statistics:Distribution.multi"
 
 [build-system]
 requires = ["hatchling"]

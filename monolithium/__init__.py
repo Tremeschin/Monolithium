@@ -3,7 +3,6 @@ import subprocess
 import sys
 from pathlib import Path
 from subprocess import PIPE, CompletedProcess
-from typing import NoReturn
 
 import tomllib
 
@@ -22,9 +21,9 @@ class Tools:
 
 # ---------------------------------------------------------------------------- #
 
-def rustlith(args: list[str]=None) -> CompletedProcess:
+def rustlith(*args: list[str], **kwargs) -> CompletedProcess:
     """Run the Rust version of Monolithium"""
-    args = (args or sys.argv[1:])
+    args = list(map(str, (args or sys.argv[1:])))
 
     # Have a rust toolchain
     if subprocess.run(
@@ -52,16 +51,13 @@ def rustlith(args: list[str]=None) -> CompletedProcess:
         "--target-dir", str(Path.cwd()),
         "--release", *features,
         "--", *args,
-    ))
-
-def _rustlith() -> NoReturn:
-    sys.exit(rustlith().returncode)
+    ), **kwargs)
 
 # ---------------------------------------------------------------------------- #
 
-def cudalith(args: list[str]=None) -> CompletedProcess:
+def cudalith(*args: list[str], **kwargs) -> CompletedProcess:
     """Run the CUDA version of Monolithium"""
-    args = (args or sys.argv[1:])
+    args = list(map(str, (args or sys.argv[1:])))
 
     if not shutil.which("nvcc"):
         raise RuntimeError("nvcc wasn't found in path, do you have cuda toolkit?")
@@ -83,7 +79,4 @@ def cudalith(args: list[str]=None) -> CompletedProcess:
     return subprocess.run((
         Paths.BUILD/"cudalith",
         *args
-    ))
-
-def _cudalith() -> NoReturn:
-    sys.exit(cudalith().returncode)
+    ), **kwargs)
