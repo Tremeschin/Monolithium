@@ -45,7 +45,7 @@ Install [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal and run:
 
 You can pass a `--fast` argument at the cost of accuracy for rust.
 
-<sup><b>Note:</b> This will create a large `target` and/or `build` directory in the current working directory.</sup>
+<sup><b>Note:</b> The project creates large directories where you run it from - any of `target`, `build`, `release`.</sup>
 
 ### 2. Latest Git
 
@@ -60,7 +60,7 @@ You can pass any `--features (name)` explained in [`Cargo.toml`](../monolithium/
 It's also possible to run directly with [astral-sh/uv](https://docs.astral.sh/uv/):
 - `uvx --from git+https://github.com/Tremeschin/Monolithium (script) (commands)`
 
-<sup><b>Note:</b> This will create a large `target` and/or `build` directory in the current working directory.</sup>
+<sup><b>Note:</b> The project creates large directories where you run it from - any of `target`, `build`, `release`.</sup>
 
 ### 🔴 Find all Monoliths in a world
 

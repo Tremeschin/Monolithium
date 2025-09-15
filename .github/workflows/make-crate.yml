@@ -13,3 +13,4 @@ jobs:
 
       - name: Publish crate
         run: cargo publish --locked
+        working-directory: monolithium
