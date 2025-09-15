@@ -15,6 +15,7 @@ pub fn fade(t: f64) -> f64 {
 /// Standard linear interpolation function
 #[inline(always)]
 pub fn lerp(t: f64, a: f64, b: f64) -> f64 {
+    // Note: uses fma if available!
     t.mul_add(b - a, a)
 }
 

@@ -60,6 +60,9 @@ impl PerlinNoise {
     /// Sample the noise at a given coordinate
     /// - Note: For monoliths, y is often 0.0
     pub fn sample(&self, x: f64, y: f64, z: f64) -> f64 {
+        use utils::fade;
+        use utils::grad;
+        use utils::lerp;
 
         // Apply offsets
         let x: f64 = x + self.xoff;
@@ -67,9 +70,9 @@ impl PerlinNoise {
         let z: f64 = z + self.zoff;
 
         // Convert to grid coordinates (512 length)
-        let xi = (x.floor() as i32 & 0xFF) as usize;
-        let yi = (y.floor() as i32 & 0xFF) as usize;
-        let zi = (z.floor() as i32 & 0xFF) as usize;
+        let xi: usize = (x.floor() as i32 & 0xFF) as usize;
+        let yi: usize = (y.floor() as i32 & 0xFF) as usize;
+        let zi: usize = (z.floor() as i32 & 0xFF) as usize;
 
         // Get the fractional parts
         let xf: f64 = x - x.floor();
@@ -77,9 +80,9 @@ impl PerlinNoise {
         let zf: f64 = z - z.floor();
 
         // Smoothstep-like factors
-        let u = utils::fade(xf);
-        let v = utils::fade(yf);
-        let w = utils::fade(zf);
+        let u: f64 = fade(xf);
+        let v: f64 = fade(yf);
+        let w: f64 = fade(zf);
 
         // Get the hash values for the corners
         let a  = self.get_map(xi + 0 + 0) as usize;
@@ -88,9 +91,6 @@ impl PerlinNoise {
         let b  = self.get_map(xi + 0 + 1) as usize;
         let ba = self.get_map(yi + b + 0) as usize;
         let bb = self.get_map(yi + b + 1) as usize;
-
-        use utils::lerp;
-        use utils::grad;
 
         // Interpolate corner values relative to sample point
         return lerp(w,

@@ -31,7 +31,10 @@
 #define Gpu __device__
 #define Cpu __host__
 
+// Read Cargo.toml for more info!
 #define SKIP_REJECTION 1
+
+// Read Cargo.toml for more info!
 #define SKIP_TABLE 1
 
 /* -------------------------------------------------------------------------- */
@@ -125,8 +128,8 @@ struct JavaRNG {
 
 /* -------------------------------------------------------------------------- */
 
-struct PerlinNoise {
-    uint8_t map[256];
+struct __align__(4) PerlinNoise {
+    alignas(4) uint8_t map[256];
     float xoff;
     float yoff;
     float zoff;
@@ -152,7 +155,7 @@ struct PerlinNoise {
         }
     }
 
-    Gpu float get_map(int index) {
+    Gpu inline float get_map(int index) {
         return this->map[index & 0xFF];
     }
 
@@ -212,21 +215,20 @@ struct PerlinNoise {
             rng->state *= 249870891710593LL;
             rng->state += 44331453843488LL;
             rng->state &= M;
-            return;
+        #else
+            for (int i=0; i<count; i++) {
+
+                // Coordinates f64 offsets
+                for (int j=0; j<3; j++) {
+                    rng->next_f64();
+                }
+
+                // Permutations swapping
+                for (int max=256; max>=1; max--) {
+                    rng->next_i32_bound(max);
+                }
+            }
         #endif
-
-        for (int i=0; i<count; i++) {
-
-            // Coordinates f64 offsets
-            for (int j=0; j<3; j++) {
-                rng->next_f64();
-            }
-
-            // Permutations swapping
-            for (int max=256; max>=1; max--) {
-                rng->next_i32_bound(max);
-            }
-        }
     }
 };
 
@@ -241,12 +243,15 @@ template<int OCTAVES> struct FractalPerlin {
         }
     }
 
+    Gpu inline int octave_scale(int index) {
+        return (1 << index);
+    }
+
     Gpu float sample(float x, float y, float z) {
         float sum = 0.0f;
         for (int i=0; i<OCTAVES; i++) {
-            int   j = OCTAVES - 1 - i;
-            float s = (float) (1 << j);
-            sum += this->noise[j].sample(x/s, y/s, z/s) * s;
+            int s = this->octave_scale(i);
+            sum += this->noise[i].sample(x/s, y/s, z/s) * s;
         }
         return sum;
     }
@@ -356,12 +361,15 @@ __global__ void get_monoliths_world_per_thread(
     if (!world.around_spawn(200, 200))
         return;
 
-    int64_t side = 256;
-    int64_t step = 4;
+    constexpr int64_t side = 256;
+    constexpr int64_t step = 4;
+    constexpr float step_area = (step * step);
 
     for (int64_t x=-side; x<=side; x+=step) {
         for (int64_t z=-side; z<=side; z+=step) {
-            results[tid] += world.is_monolith(x, z) ? step*step : 0.0f;
+            if (world.is_monolith(x, z)) {
+                results[tid] += step_area;
+            }
         }
     }
 }

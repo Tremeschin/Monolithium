@@ -47,7 +47,7 @@ grad-lookup = []
 
 # Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
 # three math operations check per call (low error for perlin values)
-# • Monte Carlo says 0.03474% error rates
+# • Monte Carlo says 0.03474% error rates for minecraft values
 skip-rejection = []
 
 # Use a Skip Table for fast LCN stepping, same loss as `skip-rejection`
