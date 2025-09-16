@@ -73,11 +73,10 @@ Gpu inline float grad(uint8_t hash, float x, float y, float z) {
 /* -------------------------------------------------------------------------- */
 // Java RNG implementation
 
+constexpr double F64_DIV = (1ULL << 53);
 constexpr uint64_t M = (1LL << 48) - 1;
 constexpr uint64_t A = 0x5DEECE66DLL;
 constexpr uint64_t C = 11LL;
-
-constexpr double F64_DIV = (1ULL << 53);
 
 struct JavaRNG {
     uint64_t state;
@@ -106,6 +105,7 @@ struct JavaRNG {
         int take = next % max;
 
         #if SKIP_REJECTION
+            // Nothing out of the ordinary, I mean
         #else
             while (next - take + max - 1 < 0) {
                 next = this->next(31);
@@ -125,8 +125,8 @@ struct JavaRNG {
 
 /* -------------------------------------------------------------------------- */
 
-struct __align__(4) PerlinNoise {
-    alignas(4) uint8_t map[256];
+struct PerlinNoise {
+    uint8_t map[256];
     float xoff;
     float yoff;
     float zoff;
@@ -152,6 +152,7 @@ struct __align__(4) PerlinNoise {
         }
     }
 
+    // Lazy and DRY to write bitwise everywhere
     Gpu inline uint8_t get_map(uint8_t index) {
         return this->map[index & 0xFF];
     }
@@ -349,15 +350,13 @@ __global__ void get_monoliths_world_per_thread(
     if (!world.around_spawn(200, 200))
         return;
 
-    constexpr int side = 256;
-    constexpr int step = 4;
-    constexpr float step_area = (step * step);
+    const int side = 256;
+    const int step = 4;
 
+    // Todo: BFS-like approach from Rust
     for (int x=-side; x<=side; x+=step) {
         for (int z=-side; z<=side; z+=step) {
-            if (world.is_monolith(x, z)) {
-                results[tid] += step_area;
-            }
+            results[tid] += (int) world.is_monolith(x, z) * (step*step);
         }
     }
 }
@@ -370,23 +369,36 @@ enum Variant {
 };
 
 int main() {
-    int start  = 0;
-    int seeds  = 10000000;
-    int thread = 64;
 
+    /* ------------------------------ */
+
+    // Disable spin-wait on device syncronization
+    cudaSetDeviceFlags(cudaDeviceScheduleBlockingSync);
+
+    /* ------------------------------ */
+
+    Variant variant;
+    variant = WORLD_PER_THREAD;
+    // variant = WORLD_PER_BLOCK;
+
+    int start = 0;
+    int seeds = 10000000;
     float* d_results;
     cudaMalloc(&d_results, seeds * sizeof(float));
 
-    Variant variant = WORLD_PER_THREAD;
-    // Variant variant = WORLD_PER_BLOCK;
+    /* ------------------------------ */
 
     if (variant == WORLD_PER_THREAD) {
+        int thread = 32; // Ephemeral threads
         int blocks = (seeds + thread - 1) / thread;
         get_monoliths_world_per_thread<<<blocks, thread>>>(start, seeds, d_results);
     } else if (variant == WORLD_PER_BLOCK) {
+        int thread = 64; // Full warp
         int blocks = seeds;
         get_monoliths_world_per_block<<<blocks, thread>>>(start, seeds, d_results);
     }
+
+    /* ------------------------------ */
 
     cudaDeviceSynchronize();
 
@@ -401,7 +413,9 @@ int main() {
     cudaMemcpy(results, d_results, seeds * sizeof(float), cudaMemcpyDeviceToHost);
     cudaFree(d_results);
 
+    /* ------------------------------ */
     // Print findings
+
     for (int i=0; i<seeds; i++) {
         if (results[i] > 0) {
             printf("Seed %llu area: %f\n", start + i, results[i]);
