@@ -48,8 +48,11 @@ impl World {
             return None;
         }
 
-        let x = utils::nearest(x, 4);
-        let z = utils::nearest(z, 4);
+        // How accurate the area calculation is
+        let step: i64 = if cfg!(feature="fast-area") {4} else {1};
+
+        let x = utils::nearest(x, step as i64);
+        let z = utils::nearest(z, step as i64);
         let o = 32; // "Occasionally"
 
         // Start with current block
@@ -66,8 +69,8 @@ impl World {
 
         // Search around the block
         let far: i64 = 256;
-        for dx in (-far..=far).step_by(16) {
-            for dz in (-far..=far).step_by(16) {
+        for dx in (-far..=far).step_by(step as usize) {
+            for dz in (-far..=far).step_by(step as usize) {
                 if (dx*dx + dz*dz) < far*far {
                     queue.push_back((x+dx, z+dz));
                 }
@@ -79,10 +82,13 @@ impl World {
                 continue;
             }
 
-            lith.area += 16;
+            lith.area += (step*step) as u64;
 
             // Check neighbors with step 4 per hill/depth scaling
-            let mut neighbors = vec!((0, 4), (4, 0), (0, -4), (-4, 0));
+            let mut neighbors = vec!(
+                (0,  step), ( step, 0),
+                (0, -step), (-step, 0)
+            );
 
             // Occasional more expensive stuff
             if (x % o == 0) && (z % o == 0) {
