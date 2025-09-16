@@ -73,17 +73,17 @@ Gpu inline float grad(uint8_t hash, float x, float y, float z) {
 /* -------------------------------------------------------------------------- */
 // Java RNG implementation
 
-constexpr int64_t M = (1LL << 48) - 1;
-constexpr int64_t A = 0x5DEECE66DLL;
-constexpr int64_t C = 11LL;
+constexpr uint64_t M = (1LL << 48) - 1;
+constexpr uint64_t A = 0x5DEECE66DLL;
+constexpr uint64_t C = 11LL;
 
 constexpr double F64_DIV = (1ULL << 53);
 
 struct JavaRNG {
-    int64_t state;
+    uint64_t state;
 
     Gpu inline JavaRNG(uint64_t seed) {
-        this->state = ((int64_t) seed ^ A) & M;
+        this->state = ((uint64_t) seed ^ A) & M;
     }
 
     /// Roll the state, same effect as ignoring a `.next()` call
@@ -92,18 +92,18 @@ struct JavaRNG {
     }
 
     /// Rolls the state and returns N low bits
-    Gpu inline int32_t next(uint8_t bits) {
+    Gpu inline int next(uint8_t bits) {
         this->step();
-        return (int32_t) (this->state >> (48 - bits));
+        return (int) (this->state >> (48 - bits));
     }
 
-    Gpu inline int32_t next_i32_bound(int32_t max) {
+    Gpu inline int next_i32_bound(int max) {
         if (__popc(max) == 1) {
-            return (int32_t)(((int64_t) max * (int64_t) this->next(31)) >> 31);
+            return (int)(((int64_t) max * (int64_t) this->next(31)) >> 31);
         }
 
-        int32_t next = this->next(31);
-        int32_t take = next % max;
+        int next = this->next(31);
+        int take = next % max;
 
         #if SKIP_REJECTION
         #else
@@ -152,7 +152,7 @@ struct __align__(4) PerlinNoise {
         }
     }
 
-    Gpu inline float get_map(int index) {
+    Gpu inline uint8_t get_map(uint8_t index) {
         return this->map[index & 0xFF];
     }
 
@@ -179,12 +179,12 @@ struct __align__(4) PerlinNoise {
         float w = fade(zf);
 
         // Get the hash values for the corners
-        int a  = this->get_map(xi + 0 + 0);
-        int aa = this->get_map(yi + a + 0);
-        int ab = this->get_map(yi + a + 1);
-        int b  = this->get_map(xi + 0 + 1);
-        int ba = this->get_map(yi + b + 0);
-        int bb = this->get_map(yi + b + 1);
+        uint8_t a  = this->get_map(xi + 0 + 0);
+        uint8_t aa = this->get_map(yi + a + 0);
+        uint8_t ab = this->get_map(yi + a + 1);
+        uint8_t b  = this->get_map(xi + 0 + 1);
+        uint8_t ba = this->get_map(yi + b + 0);
+        uint8_t bb = this->get_map(yi + b + 1);
 
         return lerp(w,
             lerp(v,
@@ -205,27 +205,18 @@ struct __align__(4) PerlinNoise {
     /// Roll the generator state that would have created a PerlinNoise
     /// - Fast way around without as many memory operations
     Gpu static void discard(JavaRNG* rng, int count) {
+        for (int i=0; i<count; i++) {
 
-        // Gotta love magic numbers!
-        #if SKIP_TABLE
-            // Note: Only for (count == 48)
-            rng->state *= 249870891710593LL;
-            rng->state += 44331453843488LL;
-            rng->state &= M;
-        #else
-            for (int i=0; i<count; i++) {
-
-                // Coordinates f64 offsets
-                for (int j=0; j<3; j++) {
-                    rng->next_f64();
-                }
-
-                // Permutations swapping
-                for (int max=256; max>=1; max--) {
-                    rng->next_i32_bound(max);
-                }
+            // Coordinates f64 offsets
+            for (int j=0; j<3; j++) {
+                rng->next_f64();
             }
-        #endif
+
+            // Permutations swapping
+            for (int max=256; max>=1; max--) {
+                rng->next_i32_bound(max);
+            }
+        }
     }
 };
 
@@ -235,19 +226,19 @@ template<int OCTAVES> struct FractalPerlin {
     PerlinNoise noise[OCTAVES];
 
     Gpu void init(JavaRNG* rng) {
-        for (int i=0; i<OCTAVES; i++) {
+        for (uint8_t i=0; i<OCTAVES; i++) {
             this->noise[i].init(rng);
         }
     }
 
-    Gpu inline int octave_scale(int index) {
+    Gpu inline float octave_scale(uint8_t index) {
         return (1 << index);
     }
 
     Gpu float sample(float x, float y, float z) {
         float sum = 0.0f;
-        for (int i=0; i<OCTAVES; i++) {
-            int s = this->octave_scale(i);
+        for (uint8_t i=0; i<OCTAVES; i++) {
+            float s = this->octave_scale(i);
             sum += this->noise[i].sample(x/s, y/s, z/s) * s;
         }
         return sum;
@@ -264,31 +255,33 @@ struct World {
         JavaRNG rng(seed);
 
         // Skip 48 generators priorly used elsewhere
-        PerlinNoise::discard(&rng, 48);
+        #if SKIP_TABLE
+            // Gotta love magic numbers!
+            rng.state *= 249870891710593LL;
+            rng.state += 44331453843488LL;
+            rng.state &= M;
+        #else
+            PerlinNoise::discard(&rng, 48);
+        #endif
 
         this->hill.init(&rng);
         this->depth.init(&rng);
     }
 
     // Check if a given coordinate is part of a monolith
-    Gpu bool is_monolith(int64_t x, int64_t z) {
-        float depth = this->depth.sample(
+    Gpu bool is_monolith(int x, int z) {
+        return fabs(this->depth.sample(
             (float) (x/4) * 100.0, 0.0,
             (float) (z/4) * 100.0
-        );
-
-        if (fabs(depth) < 8000.0)
-            return false;
-
-        float hill = this->hill.sample(
+        )) > 8000.0f
+        &&
+        this->hill.sample(
             (float) (x/4) * 1.0, 0.0,
             (float) (z/4) * 1.0
-        );
-
-        return hill < -512.0;
+        ) < -512.0f;
     }
 
-    Gpu bool around_spawn(int64_t radius, int64_t step) {
+    Gpu bool around_spawn(int radius, int step) {
         for (int x=-radius; x<=radius; x+=step) {
             for (int z=-radius; z<=radius; z+=step) {
                 if (this->is_monolith(x, z)) {
@@ -316,23 +309,21 @@ __global__ void get_monoliths_world_per_block(
     if (threadIdx.x == 0) {
         world.init(seed);
 
-        if (blockIdx.x % 1000 == 0)
+        if (blockIdx.x % 10000 == 0)
             printf("Block %d seed %d\n", blk, seed);
 
         if (!world.around_spawn(200, 100))
             return;
     }
 
-    __syncthreads();
-
-    int64_t side = 4096;
-    int64_t step = 32;
-    float   area = 0;
+    const int side = 4096;
+    const int step = 32;
+    float area = 0;
 
     // Each thread sums its strip
-    for (int64_t x=-side+idx; x<=side; x+=step*dim) {
-        for (int64_t z=-side; z<=side; z+=step) {
-            area += world.is_monolith(x, z) ? step*step : 0.0f;
+    for (int x=-side+idx; x<=side; x+=step*dim) {
+        for (int z=-side; z<=side; z+=step) {
+            area += (int) world.is_monolith(x, z) * (step*step);
         }
     }
 
@@ -352,18 +343,18 @@ __global__ void get_monoliths_world_per_thread(
     World world;
     world.init(seed);
 
-    if (tid % 10000 == 0)
+    if (tid % 100000 == 0)
         printf("Block %d seed %d\n", blk, seed);
 
     if (!world.around_spawn(200, 200))
         return;
 
-    constexpr int64_t side = 256;
-    constexpr int64_t step = 4;
+    constexpr int side = 256;
+    constexpr int step = 4;
     constexpr float step_area = (step * step);
 
-    for (int64_t x=-side; x<=side; x+=step) {
-        for (int64_t z=-side; z<=side; z+=step) {
+    for (int x=-side; x<=side; x+=step) {
+        for (int z=-side; z<=side; z+=step) {
             if (world.is_monolith(x, z)) {
                 results[tid] += step_area;
             }

@@ -93,15 +93,13 @@ impl JavaRNG {
             let mut table = [(0i64, 0i64); SKIP_TABLE_SIZE];
 
             // Start with the identity
-            table[0] = (1, 0);
+            let (mut mul, mut add) = (1, 0);
 
             // Precompute N steps of the LCN
-            for n in 1..SKIP_TABLE_SIZE {
-                let (p_a, p_c) = table[n - 1];
-                let n_a = (p_a.wrapping_mul(A)) & M;
-                let n_c = (p_c.wrapping_mul(A).wrapping_add(C)) & M;
-
-                table[n] = (n_a, n_c);
+            for n in 0..SKIP_TABLE_SIZE {
+                table[n] = (mul, add);
+                mul = (mul.wrapping_mul(A)) & M;
+                add = (add.wrapping_mul(A).wrapping_add(C)) & M;
             }
 
             table
