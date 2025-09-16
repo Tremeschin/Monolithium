@@ -1,5 +1,5 @@
 /* -------------------------------------------------------------------------- */
-// Failed attempt to find monoliths with cuda.
+// Half-failed attempt to find monoliths with cuda.
 //
 // I'm somewhat sure the lack of memory locality between different seeds and
 // the large-ish fractal perlin structs for the tiny cores killed performance.
@@ -85,12 +85,12 @@ struct JavaRNG {
         this->state = ((uint64_t) seed ^ A) & M;
     }
 
-    /// Roll the state, same effect as ignoring a `.next()` call
+    // Roll the state, same effect as ignoring a `.next()` call
     Gpu inline void step() {
         this->state = (this->state * A + C) & M;
     }
 
-    /// Rolls the state and returns N low bits
+    // Rolls the state and returns N low bits
     Gpu inline int next(uint8_t bits) {
         this->step();
         return (int) (this->state >> (48 - bits));
@@ -143,7 +143,8 @@ struct PerlinNoise {
 
         uint8_t temp;
 
-        // Shuffle the first half
+        // Fixme: The memory swap is one of the most expensive operations in
+        //   the whole code, is there a better way to do this?
         for (int a=0; a<256; a++) {
             int b = a + rng->next_i32_bound(256 - a);
             temp = this->map[a];
@@ -157,8 +158,9 @@ struct PerlinNoise {
         return this->map[index & 0xFF];
     }
 
-    /// Sample the noise at a given coordinate
-    /// - Note: For monoliths, y is often 0.0
+    // Fixme: Second-most expensive method, can we avoid random memory access?
+    // Sample the noise at a given coordinate
+    // - Note: For monoliths, y is often 0.0
     Gpu float sample(float x, float y, float z) {
         x += this->xoff;
         y += this->yoff;
@@ -203,8 +205,8 @@ struct PerlinNoise {
         );
     }
 
-    /// Roll the generator state that would have created a PerlinNoise
-    /// - Fast way around without as many memory operations
+    // Roll the generator state that would have created a PerlinNoise
+    // - Fast way around without as many memory operations
     Gpu static void discard(JavaRNG* rng, int count) {
         for (int i=0; i<count; i++) {
 

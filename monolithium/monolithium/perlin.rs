@@ -32,7 +32,7 @@ impl PerlinNoise {
             }
         }
 
-        // Shuffle the first half
+        // Shuffle the array
         unsafe {
             let ptr = self.map.as_mut_ptr();
 
