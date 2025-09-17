@@ -4,19 +4,19 @@
 // or extend in the original crate, per practical rust limitations.
 
 const F: f64 = (1u64 << 53) as f64;
-const M: i64 = (1 << 48) - 1;
-const A: i64 = 0x5DEECE66D;
-const C: i64 = 11;
+const M: u64 = (1 << 48) - 1;
+const A: u64 = 0x5DEECE66D;
+const C: u64 = 11;
 
 pub struct JavaRNG {
-    state: i64,
+    state: u64,
 }
 
 impl JavaRNG {
 
     #[inline(always)]
     pub fn new(seed: u64) -> Self {
-        Self {state: ((seed as i64) ^ A) & M}
+        Self {state: ((seed as u64) ^ A) & M}
     }
 
     /// Roll the state, same effect as ignoring a `.next()` call
@@ -75,7 +75,7 @@ impl JavaRNG {
 use std::sync::OnceLock;
 
 static SKIP_TABLE_SIZE: usize = 16_384;
-static SKIP_TABLE: OnceLock<[(i64, i64); SKIP_TABLE_SIZE]> = OnceLock::new();
+static SKIP_TABLE: OnceLock<[(u64, u64); SKIP_TABLE_SIZE]> = OnceLock::new();
 
 impl JavaRNG {
 
@@ -90,7 +90,7 @@ impl JavaRNG {
 
     pub fn init_skip_table() {
         SKIP_TABLE.get_or_init(|| {
-            let mut table = [(0i64, 0i64); SKIP_TABLE_SIZE];
+            let mut table = [(0u64, 0u64); SKIP_TABLE_SIZE];
 
             // Start with the identity
             let (mut mul, mut add) = (1, 0);

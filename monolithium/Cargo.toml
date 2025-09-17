@@ -66,7 +66,6 @@ skip-table = []
 # Groups
 
 fast = [
-    "grad-lookup",
     "skip-rejection",
     "skip-table",
 ]

@@ -69,8 +69,8 @@ impl World {
 
         // Search around the block
         let far: i64 = 256;
-        for dx in (-far..=far).step_by(step as usize) {
-            for dz in (-far..=far).step_by(step as usize) {
+        for dx in (-far..=far).step_by(32) {
+            for dz in (-far..=far).step_by(32) {
                 if (dx*dx + dz*dz) < far*far {
                     queue.push_back((x+dx, z+dz));
                 }
@@ -105,10 +105,10 @@ impl World {
                 }
 
                 // Update coordinates
-                lith.minx = min(lith.minx, x);
-                lith.maxx = max(lith.maxx, x);
-                lith.minz = min(lith.minz, z);
-                lith.maxz = max(lith.maxz, z);
+                lith.minx = lith.minx.min(x);
+                lith.maxx = lith.maxx.max(x);
+                lith.minz = lith.minz.min(z);
+                lith.maxz = lith.maxz.max(z);
             }
 
             for (dx, dz) in neighbors {

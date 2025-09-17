@@ -24,6 +24,8 @@
 #include <cstdint>
 #include <cstdio>
 
+#include <cuda_runtime.h>
+
 // Having trouble with names..
 #define Gpu __device__
 #define Cpu __host__

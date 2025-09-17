@@ -29,8 +29,8 @@ impl SpawnCommand {
             .with_style(utils::progress("Searching"));
 
         let options = FindOptions::default()
-            .step(self.step)
             .spawn(self.radius)
+            .step(self.step)
             .limit(1);
 
         let mut monoliths: Vec<Monolith> =
