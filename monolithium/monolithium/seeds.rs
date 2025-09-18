@@ -53,7 +53,7 @@ impl SeedFactory {
 
             // Fixme: Birthday paradox N = 2**48
             Self::Random{..} =>
-                rand::random_range(0..TOTAL_SEEDS),
+                fastrand::u64(0..TOTAL_SEEDS),
 
             Self::Ratio{ratio} =>
                 (n as f64 / *ratio) as u64,
