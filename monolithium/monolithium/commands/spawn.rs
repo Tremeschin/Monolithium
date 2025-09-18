@@ -12,7 +12,7 @@ pub struct SpawnCommand {
 
     /// How far from spawn to search in a square radius
     #[arg(short='r', long, default_value_t=100)]
-    radius: i64,
+    radius: i32,
 
     /// Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]

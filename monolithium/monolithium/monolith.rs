@@ -6,18 +6,18 @@ pub struct Monolith {
     pub seed: u64,
 
     // Position in the world
-    pub minx: i64, pub maxx: i64,
-    pub minz: i64, pub maxz: i64,
+    pub minx: i32, pub maxx: i32,
+    pub minz: i32, pub maxz: i32,
 }
 
 /* -------------------------------------------------------------------------- */
 
 impl Monolith {
-    pub fn center_x(&self) -> i64 {
+    pub fn center_x(&self) -> i32 {
         (self.minx + self.maxx) / 2
     }
 
-    pub fn center_z(&self) -> i64 {
+    pub fn center_z(&self) -> i32 {
         (self.minz + self.maxz) / 2
     }
 }

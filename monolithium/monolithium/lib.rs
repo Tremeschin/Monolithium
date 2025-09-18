@@ -35,15 +35,15 @@ pub use seeds::*;
 pub use world::*;
 
 /// Coordinate at which the Far Lands start
-pub const FARLANDS: i64 = 12_550_824;
+pub const FARLANDS: i32 = 12_550_824;
 
 /// Lateral size of the inbounds worlds within the Far Lands
-pub const WORLD_SIZE: i64 = 2*FARLANDS + 1;
+pub const WORLD_SIZE: i32 = 2*FARLANDS + 1;
 
 /// It was found experimentally that the perlin noise and
 /// monoliths wraps around every 2**23 blocks, drastically
 /// reducing the practical search space!
-pub const MONOLITHS_REPEAT: i64 = 2_i64.pow(23);
+pub const MONOLITHS_REPEAT: i32 = 2_i32.pow(23);
 
 /// Java uses a 48-bit Linear Congruential Generator for its RNG,
 /// which continuously masks the state's (1 << 48) - 1 lower bits,

@@ -6,14 +6,14 @@ pub struct Mask {
     seed: u64,
 
     #[arg(long, default_value_t=-2000)]
-    minx: i64,
+    minx: i32,
     #[arg(long, default_value_t= 2000)]
-    maxx: i64,
+    maxx: i32,
 
     #[arg(long, default_value_t=-2000)]
-    minz: i64,
+    minz: i32,
     #[arg(long, default_value_t= 2000)]
-    maxz: i64,
+    maxz: i32,
 }
 
 impl Mask {

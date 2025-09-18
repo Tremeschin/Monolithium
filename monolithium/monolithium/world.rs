@@ -30,7 +30,7 @@ impl World {
     }
 
     // Check if a given coordinate is part of a monolith
-    pub fn is_monolith(&self, x: i64, z: i64) -> bool {
+    pub fn is_monolith(&self, x: i32, z: i32) -> bool {
         self.depth.sample(
             ((x/4) as f64) * 100.0,
             ((z/4) as f64) * 100.0,
@@ -44,7 +44,7 @@ impl World {
 
     /// Get a Monolith at a given coordinate, compute properties
     /// Todo: Arc Mutex HashMap (x, y) => Monolith struct?
-    pub fn get_monolith(&self, x: i64, z: i64) -> Option<Monolith> {
+    pub fn get_monolith(&self, x: i32, z: i32) -> Option<Monolith> {
 
         // Most blocks are not monoliths
         if !self.is_monolith(x, z) {
@@ -52,10 +52,10 @@ impl World {
         }
 
         // How accurate the area calculation is
-        let step: i64 = if cfg!(feature="fast-area") {4} else {1};
+        let step: i32 = if cfg!(feature="fast-area") {4} else {1};
 
-        let x = utils::nearest(x, step as i64);
-        let z = utils::nearest(z, step as i64);
+        let x = utils::nearest(x, step);
+        let z = utils::nearest(z, step);
         let o = 32; // "Occasionally"
 
         // Start with current block
@@ -71,7 +71,7 @@ impl World {
         let mut queue   = VecDeque::from([(x, z)]);
 
         // Search around the block
-        let far: i64 = 256;
+        let far: i32 = 256;
         for dx in (-far..=far).step_by(32) {
             for dz in (-far..=far).step_by(32) {
                 if (dx*dx + dz*dz) < far*far {
@@ -127,8 +127,8 @@ impl World {
     }
 
     pub fn find_monoliths(&self, query: &FindOptions) -> Vec<Monolith> {
-        let xrange: Vec<i64> = (query.minx..=query.maxx).step_by(query.step).collect();
-        let zrange: Vec<i64> = (query.minz..=query.maxz).step_by(query.step).collect();
+        let xrange: Vec<i32> = (query.minx..=query.maxx).step_by(query.step).collect();
+        let zrange: Vec<i32> = (query.minz..=query.maxz).step_by(query.step).collect();
 
         // Use non-threaded approach for small areas (lower latency)
         if (query.maxx - query.minx).abs() < 10000 {
@@ -195,10 +195,10 @@ impl World {
 
 #[derive(SmartDefault)]
 pub struct FindOptions {
-    pub minx: i64,
-    pub maxx: i64,
-    pub minz: i64,
-    pub maxz: i64,
+    pub minx: i32,
+    pub maxx: i32,
+    pub minz: i32,
+    pub maxz: i32,
 
     /// Probe the world every N blocks
     #[default(32)]
@@ -223,7 +223,7 @@ impl FindOptions {
     // Defining regions
 
     /// Search around a given coordinate at most `radius` manhattan blocks away
-    pub fn around(mut self, x: i64, z: i64, radius: i64) -> Self {
+    pub fn around(mut self, x: i32, z: i32, radius: i32) -> Self {
         self.minx = x - radius;
         self.maxx = x + radius;
         self.minz = z - radius;
@@ -232,7 +232,7 @@ impl FindOptions {
     }
 
     /// Search around spawn at most `radius` manhattan blocks away
-    pub fn spawn(self, radius: i64) -> Self {
+    pub fn spawn(self, radius: i32) -> Self {
         self.around(0, 0, radius)
     }
 
