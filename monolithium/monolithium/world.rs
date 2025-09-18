@@ -3,6 +3,7 @@ use crate::*;
 pub const HILL_OCTAVES:  usize = 10;
 pub const DEPTH_OCTAVES: usize = 16;
 
+#[derive(Debug)]
 pub struct World {
     pub seed:  u64,
     pub hill:  FracPerlin<HILL_OCTAVES>,
@@ -31,15 +32,15 @@ impl World {
 
     // Check if a given coordinate is part of a monolith
     pub fn is_monolith(&self, x: i32, z: i32) -> bool {
-        self.depth.sample(
-            ((x/4) as f64) * 100.0,
-            ((z/4) as f64) * 100.0,
-        ).abs() > 8000.0
-        &&
         self.hill.sample(
             (x/4) as f64,
             (z/4) as f64,
         ) < -512.0
+        &&
+        self.depth.sample(
+            ((x/4) as f64) * 100.0,
+            ((z/4) as f64) * 100.0,
+        ).abs() > 8000.0
     }
 
     /// Get a Monolith at a given coordinate, compute properties

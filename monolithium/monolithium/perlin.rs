@@ -1,5 +1,6 @@
 use crate::*;
 
+#[derive(Debug)]
 pub struct Perlin {
     /// Permutations map (Vector -> Grid)
     pub map: [u8; 256],
@@ -129,6 +130,7 @@ impl Perlin {
 
 /* -------------------------------------------------------------------------- */
 
+#[derive(Debug)]
 pub struct FracPerlin<const OCTAVES: usize> {
     pub noise: [Perlin; OCTAVES],
 }
