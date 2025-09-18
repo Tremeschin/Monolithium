@@ -38,15 +38,7 @@ impl Perlin {
 
             for a in 0..256 {
                 let max = (256 - a) as i32;
-
-                let b = {
-                    if cfg!(feature="skip-rejection") {
-                        rng.next_i32_bound_skip_rejection(max)
-                    } else {
-                        rng.next_i32_bound(max)
-                    }
-                } as usize;
-
+                let b = rng.next_i32_bound(max) as usize;
                 std::ptr::swap(ptr.add(a), ptr.add(a + b));
             }
         }
@@ -129,11 +121,7 @@ impl Perlin {
 
             // Permutations swapping
             for max in (1..=256).rev() {
-                if cfg!(feature="skip-rejection") {
-                    rng.step()
-                } else {
-                    rng.next_i32_bound(max as i32);
-                }
+                rng.next_i32_bound(max);
             }
         }
     }

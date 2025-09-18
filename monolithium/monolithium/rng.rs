@@ -16,7 +16,7 @@ impl JavaRNG {
 
     #[inline(always)]
     pub fn new(seed: u64) -> Self {
-        Self {state: ((seed as u64) ^ A) & M}
+        Self {state: (seed ^ A) & M}
     }
 
     /// Roll the state, same effect as ignoring a `.next()` call
@@ -25,10 +25,10 @@ impl JavaRNG {
         self.state = self.state.wrapping_mul(A).wrapping_add(C) & M
     }
 
-    /// Rolls the state and returns N<=48 low bits
+    /// Rolls the state and returns N<=32 low bits
     #[inline(always)]
     pub fn next<const BITS: u8>(&mut self) -> i32 {
-        debug_assert!(BITS <= 48);
+        debug_assert!(BITS <= 32);
         self.step();
         return (self.state >> (48 - BITS)) as i32;
     }
@@ -42,22 +42,14 @@ impl JavaRNG {
             let mut next = self.next::<31>();
             let mut take = next % max;
 
-            while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                next = self.next::<31>();
-                take = next % max;
+            if cfg!(not(feature="skip-rejection")) {
+                while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
+                    next = self.next::<31>();
+                    take = next % max;
+                }
             }
 
             return take;
-        }
-    }
-
-    /// Faster, but slightly inaccurate version of `.next_i32_bound()`
-    #[inline(always)]
-    pub fn next_i32_bound_skip_rejection(&mut self, max: i32) -> i32 {
-        if (max as u32).is_power_of_two() {
-            (((max as i64).wrapping_mul(self.next::<31>() as i64)) >> 31) as i32
-        } else {
-            return self.next::<31>() % max;
         }
     }
 

@@ -20,14 +20,14 @@ pub enum SeedFactory {
 
     /// Search in N random seeds
     Random {
-        #[arg(short='n', long, default_value_t=1_000_000)]
+        #[arg(short='t', long, default_value_t=1_000_000)]
         total: u64,
     },
 
     /// Search in a fraction of all possible seeds
     Ratio {
         /// Percentage of all seeds to search (0.0-1.0)
-        #[arg(short='t', long, default_value_t=1.0)]
+        #[arg(short='r', long, default_value_t=1.0)]
         ratio: f64,
     }
 }
