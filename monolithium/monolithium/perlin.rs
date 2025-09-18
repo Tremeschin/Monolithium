@@ -131,13 +131,13 @@ impl Perlin {
 /* -------------------------------------------------------------------------- */
 
 #[derive(Debug)]
-pub struct FracPerlin<const OCTAVES: usize> {
+pub struct FractalPerlin<const OCTAVES: usize> {
     pub noise: [Perlin; OCTAVES],
 }
 
-impl<const OCTAVES: usize> FracPerlin<OCTAVES> {
+impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     pub fn new() -> Self {
-        FracPerlin {
+        FractalPerlin {
             noise: std::array::from_fn(|_| Perlin::new())
         }
     }
@@ -189,7 +189,7 @@ pub enum SmartSample {
     Hill,
 }
 
-impl<const OCTAVES: usize> FracPerlin<OCTAVES> {
+impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     /// Most coordinates are nowhere close to being monoliths, staging
     /// optimization to discard sums where reaching a target is impossible

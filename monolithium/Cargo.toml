@@ -64,6 +64,15 @@ skip-rejection = []
 skip-table = []
 
 # ------------------------------------ #
+# Behavioral changes
+
+# About 40% of all blocks have valid |depth| > 8000 for monoliths, which makes
+# the hill noise almost always (~85% Monte Carlo) an accurate source of truth
+# for such. This change removes the 'depth' calculations, **only yielding seed
+# candidates** (all results are "mostly wrong") with ~34% greater areas.
+only-hill = []
+
+# ------------------------------------ #
 # Groups
 
 fast = [

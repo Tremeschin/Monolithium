@@ -5,42 +5,68 @@ pub const DEPTH_OCTAVES: usize = 16;
 
 #[derive(Debug)]
 pub struct World {
-    pub seed:  u64,
-    pub hill:  FracPerlin<HILL_OCTAVES>,
-    pub depth: FracPerlin<DEPTH_OCTAVES>,
+    pub seed: u64,
+
+    /// Noise which determines how 'flat' the terrain is via elevation, with
+    /// values below -512.0 being required to form a monolith.
+    ///
+    /// - This is the rarest of the two conditions
+    ///
+    pub hill: FractalPerlin<HILL_OCTAVES>,
+
+    /// Noise which modulates the hill factor's influence, with absolute values
+    /// greater than 8000.0 being required to form a monolith.
+    ///
+    /// - About 40% of all blocks in any world satisfy this condition.
+    ///
+    #[cfg(not(feature="only-hill"))]
+    pub depth: FractalPerlin<DEPTH_OCTAVES>,
 }
 
 impl World {
     pub fn new() -> Self {
         World {
             seed: 0,
-            hill:  FracPerlin::new(),
-            depth: FracPerlin::new(),
+            hill: FractalPerlin::new(),
+
+            #[cfg(not(feature="only-hill"))]
+            depth: FractalPerlin::new(),
         }
     }
 
     pub fn init(&mut self, seed: u64) {
         let mut rng = JavaRNG::new(seed);
+        self.seed = seed;
 
         // Skip 48 generators priorly used elsewhere
         Perlin::discard(&mut rng, 48);
 
         self.hill.init(&mut rng);
+
+        #[cfg(not(feature="only-hill"))]
         self.depth.init(&mut rng);
-        self.seed = seed;
     }
 
     // Check if a given coordinate is part of a monolith
     pub fn is_monolith(&self, x: i32, z: i32) -> bool {
-        self.hill.sample(
-            (x/4) as f64,
-            (z/4) as f64,
-        ) < -512.0
-        &&
-        self.depth.sample(
-            ((x/4) as f64) * 100.0,
-            ((z/4) as f64) * 100.0,
-        ).abs() > 8000.0
+        #[cfg(feature="only-hill")] {
+            self.hill.sample(
+                (x/4) as f64,
+                (z/4) as f64,
+            ) < -512.0
+        }
+
+        #[cfg(not(feature="only-hill"))] {
+            self.hill.sample(
+                (x/4) as f64,
+                (z/4) as f64,
+            ) < -512.0
+            &&
+            self.depth.sample(
+                ((x/4) as f64) * 100.0,
+                ((z/4) as f64) * 100.0,
+            ).abs() > 8000.0
+        }
     }
 
     /// Get a Monolith at a given coordinate, compute properties
