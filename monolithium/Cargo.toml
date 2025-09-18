@@ -47,13 +47,13 @@ default = [
 # Use a lookup table for `utils::grad()`
 grad-lookup = []
 
+# ------------------------------------ #
+# Lossy optimizations
+
 # Step by 4 blocks when calculating areas, as each noise coordinate is the world
 # position divided by 4. This causes a small error in area calculation due to
 # interpolation, but the average of over/under-shoots gives at most 1% error
 fast-area = []
-
-# ------------------------------------ #
-# Lossy optimizations
 
 # Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
 # three math operations check per call (low error for perlin values)
