@@ -43,7 +43,7 @@ impl SpawnCommand {
 
                 (c_a..c_b).map(|seed| {
                     world.init(self.seeds.get(seed));
-                    world.find_monoliths(&options)
+                    world.find_monolith(&options)
                 }).flatten()
                   .collect::<Vec<Monolith>>()
             })

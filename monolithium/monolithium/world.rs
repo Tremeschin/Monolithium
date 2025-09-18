@@ -1,17 +1,20 @@
 use crate::*;
 
+pub const HILL_OCTAVES:  usize = 10;
+pub const DEPTH_OCTAVES: usize = 16;
+
 pub struct World {
     pub seed:  u64,
-    pub hill:  FractalPerlin<10>,
-    pub depth: FractalPerlin<16>,
+    pub hill:  FracPerlin<HILL_OCTAVES>,
+    pub depth: FracPerlin<DEPTH_OCTAVES>,
 }
 
 impl World {
     pub fn new() -> Self {
         World {
             seed: 0,
-            hill:  FractalPerlin::new(),
-            depth: FractalPerlin::new(),
+            hill:  FracPerlin::new(),
+            depth: FracPerlin::new(),
         }
     }
 
@@ -19,7 +22,7 @@ impl World {
         let mut rng = JavaRNG::new(seed);
 
         // Skip 48 generators priorly used elsewhere
-        PerlinNoise::discard(&mut rng, 48);
+        Perlin::discard(&mut rng, 48);
 
         self.hill.init(&mut rng);
         self.depth.init(&mut rng);
@@ -173,6 +176,18 @@ impl World {
                 .lock().unwrap().clone()
                 .into_iter().collect();
         }
+    }
+
+    /// Lightweight alternative to `find_monoliths()`, shall only return one
+    pub fn find_monolith(&self, query: &FindOptions) -> Option<Monolith> {
+        for x in (query.minx..=query.maxx).step_by(query.step) {
+            for z in (query.minz..=query.maxz).step_by(query.step) {
+                if let Some(mono) = self.get_monolith(x, z) {
+                    return Some(mono);
+                }
+            }
+        }
+        return None;
     }
 }
 

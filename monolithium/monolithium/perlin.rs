@@ -1,6 +1,6 @@
 use crate::*;
 
-pub struct PerlinNoise {
+pub struct Perlin {
     /// Permutations map (Vector -> Grid)
     pub map: [u8; 256],
     pub xoff: f64,
@@ -10,9 +10,9 @@ pub struct PerlinNoise {
 
 /* -------------------------------------------------------------------------- */
 
-impl PerlinNoise {
+impl Perlin {
     pub fn new() -> Self {
-        PerlinNoise {
+        Perlin {
             map: [0; 256],
             xoff: 0.0,
             yoff: 0.0,
@@ -141,14 +141,14 @@ impl PerlinNoise {
 
 /* -------------------------------------------------------------------------- */
 
-pub struct FractalPerlin<const OCTAVES: usize> {
-    pub noise: [PerlinNoise; OCTAVES],
+pub struct FracPerlin<const OCTAVES: usize> {
+    pub noise: [Perlin; OCTAVES],
 }
 
-impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
+impl<const OCTAVES: usize> FracPerlin<OCTAVES> {
     pub fn new() -> Self {
-        FractalPerlin {
-            noise: std::array::from_fn(|_| PerlinNoise::new())
+        FracPerlin {
+            noise: std::array::from_fn(|_| Perlin::new())
         }
     }
 
@@ -161,7 +161,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     /// Sample the fractal noise at a given coordinate
     pub fn sample(&self, x: f64, z: f64) -> f64 {
         (0..OCTAVES).map(|i| {
-            let s = self.octave_scale(i);
+            let s = Self::octave_scale(i);
             self.noise[i].sample(x/s, 0.0, z/s) * s
         }).sum()
     }
@@ -174,20 +174,20 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     }
 
     /// The maximum value a given octave can produce
-    pub fn octave_scale(&self, octave: usize) -> f64 {
+    pub fn octave_scale(octave: usize) -> f64 {
         (1 << octave) as f64
     }
 
     // Usual maximum value of the noise
     pub fn maxval(&self) -> f64 {
-       self.octave_scale(OCTAVES)
+       Self::octave_scale(OCTAVES)
     }
 
     // When all stars align, you get a girlfriend
     // and a really big perlin noise value
     pub fn tmaxval(&self) -> f64 {
         (0..=OCTAVES).map(|n| {
-            self.octave_scale(n)
+            Self::octave_scale(n)
         }).sum()
     }
 }
@@ -199,7 +199,7 @@ pub enum SmartSample {
     Hill,
 }
 
-impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
+impl<const OCTAVES: usize> FracPerlin<OCTAVES> {
 
     /// Most coordinates are nowhere close to being monoliths, staging
     /// optimization to discard sums where reaching a target is impossible
@@ -207,14 +207,14 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
         let mut sum = 0.0;
 
         for i in (0..OCTAVES).rev() {
-            let s = self.octave_scale(i);
+            let s = Self::octave_scale(i);
             sum  += self.noise[i].sample(x/s, 0.0, z/s) * s;
 
             if match kind {
                 SmartSample::Depth =>
-                    sum.abs() + 0.5*self.octave_scale(i) < 8000.0,
+                    sum.abs() + 0.5*Self::octave_scale(i) < 8000.0,
                 SmartSample::Hill =>
-                    sum - 0.5*self.octave_scale(i) > -512.0
+                    sum - 0.5*Self::octave_scale(i) > -512.0
             } {
                 return false;
             }

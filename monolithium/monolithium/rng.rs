@@ -79,13 +79,18 @@ static SKIP_TABLE: OnceLock<[(u64, u64); SKIP_TABLE_SIZE]> = OnceLock::new();
 
 impl JavaRNG {
 
-    // Roll the state N times, fast
+    /// Roll the state N times, fast
     #[inline(always)]
     pub fn step_n(&mut self, n: usize) {
-        debug_assert!(n < SKIP_TABLE_SIZE);
-        if n == 0 {return;}
-        let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
-        self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+        if cfg!(feature="skip-table") {
+            debug_assert!(n < SKIP_TABLE_SIZE);
+            let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
+            self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+        } else {
+            for _ in 0..n {
+                self.step();
+            }
+        }
     }
 
     pub fn init_skip_table() {
@@ -95,7 +100,7 @@ impl JavaRNG {
             // Start with the identity
             let (mut mul, mut add) = (1, 0);
 
-            // Precompute N steps of the LCN
+            // Precompute N steps of the LCG
             for n in 0..SKIP_TABLE_SIZE {
                 table[n] = (mul, add);
                 mul = (mul.wrapping_mul(A)) & M;

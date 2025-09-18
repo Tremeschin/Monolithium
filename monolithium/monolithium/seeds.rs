@@ -36,26 +36,26 @@ pub enum SeedFactory {
 impl SeedFactory {
     pub fn total(&self) -> u64 {
         match self {
-            SeedFactory::Seed{..} => 1,
-            SeedFactory::Linear{total, ..} => *total,
-            SeedFactory::Random{total, ..} => *total,
-            SeedFactory::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as u64,
+            Self::Seed{..} => 1,
+            Self::Linear{total, ..} => *total,
+            Self::Random{total, ..} => *total,
+            Self::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as u64,
         }
     }
 
     pub fn get(&self, n: u64) -> u64 {
         match self {
-            SeedFactory::Seed{value} =>
+            Self::Seed{value} =>
                 *value,
 
-            SeedFactory::Linear{start, ..} =>
+            Self::Linear{start, ..} =>
                 (*start + n) as u64,
 
             // Fixme: Birthday paradox N = 2**48
-            SeedFactory::Random{..} =>
+            Self::Random{..} =>
                 rand::random_range(0..TOTAL_SEEDS),
 
-            SeedFactory::Ratio{ratio} =>
+            Self::Ratio{ratio} =>
                 (n as f64 / *ratio) as u64,
         }
     }
