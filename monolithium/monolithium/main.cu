@@ -32,8 +32,6 @@
 
 // Read Cargo.toml for more info!
 #define SKIP_REJECTION 1
-
-// Read Cargo.toml for more info!
 #define SKIP_TABLE 1
 
 /* -------------------------------------------------------------------------- */
