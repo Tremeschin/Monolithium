@@ -51,9 +51,11 @@ impl World {
     // Check if a given coordinate is part of a monolith
     #[inline(always)]
     pub fn is_monolith(&self, x: i32, z: i32) -> bool {
-        if cfg!(feature="only_hill") {
+        #[cfg(feature="only-hill")] {
             self.hill.is_hill_monolith(x, z)
-        } else {
+        }
+
+        #[cfg(not(feature="only-hill"))] {
             self.hill.is_hill_monolith(x, z) &&
             self.depth.is_depth_monolith(x, z)
         }
