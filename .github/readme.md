@@ -17,7 +17,7 @@
 
 <img alt="Monolith screenshot" src="https://github.com/user-attachments/assets/cfa62e8f-6367-4768-9e62-c8879aba16b8"/>
 
-<b>Seed:</b> 26829160 • (x: 0, y: 0) • Area: 1,044,848 blocks squared • _Most Aesthetic_
+<b>Seed:</b> 26829160 • (x: 0, y: 0) • Area: 1,044,848 blocks squared • _First Millionaire_
 <br><sup><b>Using</b> [Moderner Beta](https://modrinth.com/mod/moderner-beta) Alpha v1.1.2_01 Terrain on MC 1.21 • [Distant Horizons](https://modrinth.com/mod/distanthorizons) • [Bliss Shaders](https://github.com/X0nk/Bliss-Shader/)</sup>
 
 ## 🔥 Description
@@ -36,30 +36,22 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 ## 📦 Installation
 
 > [!WARNING]
-> The code _will_ shred your cpu, make sure you have a good cooling solution, it may be unusable while running!
+> - The code _will_ shred your cpu, make sure you have a good cooling solution!
+> - Large directories are created where you run it - any of `target`, `build`, `release`.
 
-> [!NOTE]
-> The project creates large directories where you run it from - any of `target`, `build`, `release`.
-
-### 1. Stable releases
+### • Stable releases
 
 Install [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
 - **Rust code**: `uvx --from monolithium rustlith (commands)`
 - **Cuda code**: `uvx --from monolithium cudalith (commands)`
 
-You can pass a `--fast` argument at the cost of accuracy for rust.
+### • Latest Git
 
-### 2. Latest Git
-
-- Install [git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
-  - `git clone https://github.com/Tremeschin/Monolithium`
-  - `cd Monolithium` • `uv run rustlith (commands)`
+Install [git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
+- `git clone https://github.com/Tremeschin/Monolithium`
+- `cd Monolithium` • `uv run rustlith (commands)`
 
 You can pass any `--<feature>` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups, like `--fast`!
-
-> [!NOTE]
-> It's also possible to run directly with [astral-sh/uv](https://docs.astral.sh/uv/) without cloning the repository:
-> - `uvx --from git+https://github.com/Tremeschin/Monolithium (script) (commands)`
 
 ### 🔴 Find all Monoliths in a world
 
