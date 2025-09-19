@@ -1,6 +1,6 @@
 [package]
 name        = "monolithium"
-version     = "1.1.0"
+version     = "1.2.0"
 authors     = ["Tremeschin"]
 description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
 repository  = "https://github.com/Tremeschin/Monolithium"
