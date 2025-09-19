@@ -14,6 +14,9 @@ pub struct SpawnCommand {
     #[arg(short='r', long, default_value_t=100)]
     radius: i32,
 
+    #[arg(short='l', long, default_value_t=1)]
+    limit: i32,
+
     /// Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]
     step: usize,
@@ -30,8 +33,8 @@ impl SpawnCommand {
 
         let options = FindOptions::default()
             .spawn(self.radius)
-            .step(self.step)
-            .limit(1);
+            .limit(self.limit)
+            .step(self.step);
 
         let mut monoliths: Vec<Monolith> =
             (0..=chunks)
@@ -42,8 +45,15 @@ impl SpawnCommand {
                 let c_b = (chunk + 1) * self.chunks;
 
                 (c_a..c_b).map(|seed| {
-                    world.init(self.seeds.get(seed));
-                    world.find_monolith(&options)
+                    let seed = self.seeds.get(seed);
+
+                    #[cfg(feature="filter-fracts")]
+                    if !World::good_perlin_fracts(seed) {
+                        return Vec::new();
+                    }
+
+                    world.init(seed);
+                    world.find_monoliths(&options)
                 }).flatten()
                   .collect::<Vec<Monolith>>()
             })

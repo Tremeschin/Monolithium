@@ -69,11 +69,37 @@ skip-table = []
 # About 40% of all blocks have valid |depth| > 8000 for monoliths, which makes
 # the hill noise almost always (~85% Monte Carlo) an accurate source of truth
 # for such. This change removes the 'depth' calculations, **only yielding seed
-# candidates** (all results are "mostly wrong") with ~34% greater areas.
+# candidates** (all results are "mostly wrong" with ~34% greater areas).
+#
+# A second pass searching the largest monoliths for the best candidates inbounds
+# is highly recommended with the 'find --step 512 --seed <seed>'. Many records
+# were found this way in the middle ages of monolith hunting, as the hill noise
+# repeats every 524288 blocks giving multiple chances of lucky depth values.
 only-hill = []
+
+# Filter out seeds in which the fractional part of perlin noises offsets aren't
+# close to a half in the 'spawn' command (edit cutoffs in world.rs). Such seeds
+# generally generates larger monoliths at spawn. By default, only the hill noise
+# coefficients are checked, you can enable 'depth-fracts' to include depth.
+#
+# Reason being the lattices of perlin noises are zero-valued, with the highest
+# values often found at halfway points between grid coordinates.
+filter-fracts = []
+
+# With the 'filter-fracts' feature, include the depth noise deviations.
+depth-fracts = []
+
+# Scale seed probing deviations with their octave.
+scaled-deviation = []
 
 # ------------------------------------ #
 # Groups
+
+candidates = [
+    "only-hill",
+    "filter-fracts",
+    "scaled-deviation",
+]
 
 fast = [
     "skip-rejection",

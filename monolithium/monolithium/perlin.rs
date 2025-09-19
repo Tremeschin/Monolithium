@@ -21,6 +21,7 @@ impl Perlin {
         }
     }
 
+    #[inline(always)]
     pub fn init(&mut self, rng: &mut JavaRNG) {
         self.xoff = rng.next_f64() * 256.0;
         self.yoff = rng.next_f64() * 256.0;
@@ -136,12 +137,15 @@ pub struct FractalPerlin<const OCTAVES: usize> {
 }
 
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
+
+    #[inline(always)]
     pub fn new() -> Self {
         FractalPerlin {
             noise: std::array::from_fn(|_| Perlin::new())
         }
     }
 
+    #[inline(always)]
     pub fn init(&mut self, rng: &mut JavaRNG) {
         for i in 0..OCTAVES {
             self.noise[i].init(rng);
@@ -149,6 +153,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     }
 
     /// Sample the fractal noise at a given coordinate
+    #[inline(always)]
     pub fn sample(&self, x: f64, z: f64) -> f64 {
         (0..OCTAVES).map(|i| {
             let s = Self::octave_scale(i);
@@ -159,22 +164,26 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     /// Value at which the noise wraps around and repeats.
     /// - For Perlin noise, this value is 256 without any scaling
     /// - Each octave halves the frequency, extending it
+    #[inline(always)]
     pub fn repeats(&self) -> usize {
         256 * (1 << (OCTAVES - 1))
     }
 
     /// The maximum value a given octave can produce
+    #[inline(always)]
     pub fn octave_scale(octave: usize) -> f64 {
         (1 << octave) as f64
     }
 
     // Usual maximum value of the noise
+    #[inline(always)]
     pub fn maxval(&self) -> f64 {
        Self::octave_scale(OCTAVES)
     }
 
     // When all stars align, you get a girlfriend
     // and a really big perlin noise value
+    #[inline(always)]
     pub fn tmaxval(&self) -> f64 {
         (0..=OCTAVES).map(|n| {
             Self::octave_scale(n)
@@ -184,35 +193,47 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
 /* -------------------------------------------------------------------------- */
 
-pub enum SmartSample {
-    Depth,
-    Hill,
-}
-
+/// Most coordinates are nowhere close to being monoliths, optimization to
+/// discard sums where reaching a target with next octave is impossible
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
-    /// Most coordinates are nowhere close to being monoliths, staging
-    /// optimization to discard sums where reaching a target is impossible
-    pub fn smart_sample(&self, x: f64, z: f64, kind: SmartSample) -> bool {
+    #[inline(always)]
+    pub fn is_hill_monolith(&self, x: i32, z: i32) -> bool {
+        let x = (x/4) as f64;
+        let z = (z/4) as f64;
         let mut sum = 0.0;
 
-        for i in (0..OCTAVES).rev() {
-            let s = Self::octave_scale(i);
-            sum  += self.noise[i].sample(x/s, 0.0, z/s) * s;
+        // Start from most influential octaves
+        for octave in (0..OCTAVES).rev() {
+            let s = Self::octave_scale(octave);
+            sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
 
-            if match kind {
-                SmartSample::Depth =>
-                    sum.abs() + 0.5*Self::octave_scale(i) < 8000.0,
-                SmartSample::Hill =>
-                    sum - 0.5*Self::octave_scale(i) > -512.0
-            } {
+            // Next octave cannot go lower than -512
+            if sum - 0.5*s > -512.0 {
                 return false;
             }
         }
 
-        match kind {
-            SmartSample::Depth => sum.abs() > 8000.0,
-            SmartSample::Hill  => sum < -512.0,
+        sum < -512.0
+    }
+
+    #[inline(always)]
+    pub fn is_depth_monolith(&self, x: i32, z: i32) -> bool {
+        let x = (x/4) as f64 * 100.0;
+        let z = (z/4) as f64 * 100.0;
+        let mut sum = 0.0;
+
+        // Start from most influential octaves
+        for octave in (0..OCTAVES).rev() {
+            let s = Self::octave_scale(octave);
+            sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
+
+            // Next octave cannot go higher than abs(8000)
+            if (sum.abs() + 0.5*s) < 8000.0 {
+                return false;
+            }
         }
+
+        sum.abs() > 8000.0
     }
 }
