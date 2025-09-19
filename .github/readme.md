@@ -106,9 +106,25 @@ Hall of fame for the timeline of computations:
     </thead>
     <tbody>
       <tr>
-        <td>August 2025</td>
+        <!--
+          Via:
+          1. spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000
+            - Features: (skip-rejection, skip-table) • (only-hill, filter-fracts, scaled-deviation)
+          2. find --step 512 --seed <n> for best results
+        -->
+        <td>2025/09/18</td>
         <td>R9 5900x</td>
-        <td>8 hours</td>
+        <td>45m</td>
+        <td align="right">75,000,000,000</td>
+        <td align="right">0.02664%</td>
+        <td align="right">Lossy/2Pass</td>
+        <td><b><a href="https://github.com/Tremeschin/">Tremeschin</a></b></td>
+      </tr>
+      <tr>
+        <!-- Via: rustlith spawn --radius 200 --step 100 linear --total 5000000000 -->
+        <td>2025/08/13</td>
+        <td>R9 5900x</td>
+        <td>8h</td>
         <td align="right">5,000,000,000</td>
         <td align="right">0.00177%</td>
         <td align="right">Accurate</td>
@@ -120,6 +136,42 @@ Hall of fame for the timeline of computations:
 
 <sup><b>Note</b>: For sure throwing more CPU and/or Time at the code will break new records!</sup>
 
+<sup><b>Note:</b> Area calculations are within 1% error, nearby monoliths are part of the same complex.</sup>
+
+### 🔵 Largest monoliths anywhere
+
+<div align="center">
+  <table>
+    <thead>
+      <tr>
+        <th><b>Area</b></th>
+        <th><b>Seed</b></th>
+        <th><b>x</b></th>
+        <th><b>z</b></th>
+        <th><b>Date</b></th>
+        <th><b>Found by</b></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2,316,064</td><td>19907909658842</td>
+        <td align="right">1572070</td><td align="right">3668360</td>
+        <td>2025/09/18</td><td>Tremeschin</td>
+      </tr>
+      <tr>
+        <td>2,033,040</td><td>250673273362854</td>
+        <td align="right">7337600</td><td align="right">5768320</td>
+        <td>2025/09/18</td><td>Tremeschin</td>
+      </tr>
+      <tr>
+        <td>1,992,096</td><td>281351900698438</td>
+        <td align="right">4716910</td><td align="right">4718668</td>
+        <td>2025/09/18</td><td>Tremeschin</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 ### 🔵 Largest monoliths near spawn
 
 <div align="center">
@@ -129,63 +181,61 @@ Hall of fame for the timeline of computations:
         <th><b>Area</b></th>
         <th><b>Seed</b></th>
         <th><b>Date</b></th>
-        <th><b>Comment</b></th>
+        <th><b>Found by</b></th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td>1,745,664</td><td>4609608251</td><td>August 2025</td>
-        <td align="left">🥇 Largest, high monolith density in world</td>
+        <td>1,745,664</td><td>4609608251</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,584,112</td><td>1847066092</td><td>August 2025</td>
-        <td align="left">🥈 Second largest, hourglass shaped</td>
+        <td>1,584,112</td><td>1847066092</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,420,816</td><td>2045872561</td><td>August 2025</td>
-        <td align="left">🥉 Third largest, shattered complex</td>
+        <td>1,420,816</td><td>2045872561</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,371,824</td><td>3847304212</td><td>August 2025</td>
-        <td align="left">Balanced monolith complex</td>
+        <td>1,371,824</td><td>3847304212</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,369,360</td><td>1593912439</td><td>August 2025</td>
-        <td align="left">Contiguous (technically <i>The Largest</i>)</td>
+        <td>1,369,360</td><td>1593912439</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,345,520</td><td>4563197188</td><td>August 2025</td>
-        <td align="left">-</td>
+        <td>1,345,520</td><td>4563197188</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,305,472</td><td>4432659853</td><td>August 2025</td>
-        <td align="left">-</td>
+        <td>1,305,472</td><td>4432659853</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,295,568</td><td>4801496200</td><td>August 2025</td>
-        <td align="left">Closest to a circle?</td>
+        <td>1,295,568</td><td>4801496200</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,268,432</td><td>2273407323</td><td>August 2025</td>
-        <td align="left">-</td>
+        <td>1,268,432</td><td>2273407323</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,264,720</td><td>3054588959</td><td>August 2025</td>
-        <td align="left">Similar shape to the Iberian Peninsula</td>
+        <td>1,264,720</td><td>3054588959</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,262,784</td><td>4613464116</td><td>August 2025</td>
-        <td align="left">-</td>
+        <td>1,262,784</td><td>4613464116</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
       <tr>
-        <td>1,242,256</td><td>4983179351</td><td>August 2025</td>
-        <td align="left">Florida</td>
+        <td>1,242,256</td><td>4983179351</td>
+        <td>2025/08/13</td><td>Tremeschin</td>
       </tr>
     </tbody>
   </table>
 </div>
-
-<sup><b>Note:</b> The area calculation is within 2% error, nearby monoliths are part of the same complex.</sup>
 
 ### 🔵 Lowest seed visible from spawn
 
