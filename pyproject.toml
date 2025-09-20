@@ -13,6 +13,7 @@ dependencies = [
     "meson~=1.9.0",
     "ninja~=1.13.0",
     "rustup~=1.28.2.1",
+    "tomli~=2.2.1",
 ]
 [project.optional-dependencies]
 statistics = [
