@@ -43,8 +43,10 @@ pub const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
 #[inline(always)]
 pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
     if cfg!(feature="grad-lookup") {
-        let (cx, cy, cz) = GRAD_LOOKUP[hash as usize & 0x0F];
-        return (cx * x) + (cy * y) + (cz * z);
+        unsafe {
+            let (cx, cy, cz) = GRAD_LOOKUP.get_unchecked(hash as usize & 0x0F);
+            return (cx * x) + (cy * y) + (cz * z);
+        }
     } else {
         let h = hash & 0x0F;
         let u = if h < 8 {x} else {y};

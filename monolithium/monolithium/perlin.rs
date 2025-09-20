@@ -48,7 +48,7 @@ impl Perlin {
 
     #[inline(always)]
     fn get_map(&self, index: usize) -> u8 {
-        self.map[index & 0xFF]
+        unsafe {*self.map.get_unchecked(index & 0xFF)}
     }
 
     /// Get the gradient vector at a given grid coordinate
@@ -64,7 +64,7 @@ impl Perlin {
         let a  = self.get_map(xi +  0) as usize;
         let aa = self.get_map(yi +  a) as usize;
         let sh = self.get_map(aa + zi) as usize;
-        utils::GRAD_LOOKUP[(sh & 0x0F) as usize]
+        unsafe {*GRAD_LOOKUP.get_unchecked(sh & 0x0F)}
     }
 
     /// Sample the noise at a given coordinate
@@ -224,7 +224,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             let s = Self::octave_scale(octave);
             sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
 
-            // Next octave cannot go lower than -512
+            // Next octave cannot possibly reach target
             if sum - 0.5*s > -512.0 {
                 return false;
             }
@@ -244,7 +244,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             let s = Self::octave_scale(octave);
             sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
 
-            // Next octave cannot go higher than abs(8000)
+            // Next octave cannot possibly reach target
             if (sum.abs() + 0.5*s) < 8000.0 {
                 return false;
             }

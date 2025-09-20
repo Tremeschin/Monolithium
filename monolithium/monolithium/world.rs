@@ -250,16 +250,16 @@ impl World {
             quality = if cfg!(feature="scaled-deviation") {28000.0} else {16.0};
             noises  = &[HILL_OCTAVES, DEPTH_OCTAVES];
         } else {
-            quality = if cfg!(feature="scaled-deviation") {  380.0} else { 5.4};
+            quality = if cfg!(feature="scaled-deviation") {  280.0} else { 5.4};
             noises  = &[HILL_OCTAVES];
         };
 
         // Simulate parts of perlin initialization
-        for octaves in noises {
-            for _oct in 0..(*octaves) {
+        for part in noises {
+            for _octave in 0..(*part) {
 
                 #[cfg(feature="scaled-deviation")]
-                let scale = FractalPerlin::<0>::octave_scale(_oct);
+                let scale = FractalPerlin::<0>::octave_scale(_octave);
 
                 for _ in 0..3 {
                     let next = rng.next_f64() * 256.0;
@@ -273,6 +273,7 @@ impl World {
                 if quality < deviate {
                     return false;
                 }
+
                 rng.step_n(256);
             }
         }

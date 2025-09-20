@@ -64,10 +64,23 @@ impl JavaRNG {
 
 /* -------------------------------------------------------------------------- */
 
-use std::sync::OnceLock;
-
 static SKIP_TABLE_SIZE: usize = 16_384;
-static SKIP_TABLE: OnceLock<[(u64, u64); SKIP_TABLE_SIZE]> = OnceLock::new();
+static SKIP_TABLE: [(u64, u64); SKIP_TABLE_SIZE] = {
+    let mut table = [(0u64, 0u64); SKIP_TABLE_SIZE];
+
+    // Start with the identity
+    let (mut mul, mut add) = (1, 0);
+
+    // Precompute N steps of the LCG
+    let mut n = 0;
+    while n < SKIP_TABLE_SIZE {
+        table[n] = (mul, add);
+        mul = (mul.wrapping_mul(A)) & M;
+        add = (add.wrapping_mul(A).wrapping_add(C)) & M;
+        n += 1;
+    }
+    table
+};
 
 impl JavaRNG {
 
@@ -76,30 +89,12 @@ impl JavaRNG {
     pub fn step_n(&mut self, n: usize) {
         if cfg!(feature="skip-table") {
             debug_assert!(n < SKIP_TABLE_SIZE);
-            let (a_n, c_n) = SKIP_TABLE.get().unwrap()[n];
-            self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+            let (a_n, c_n) = unsafe {SKIP_TABLE.get_unchecked(n)};
+            self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
         } else {
             for _ in 0..n {
                 self.step();
             }
         }
-    }
-
-    pub fn init_skip_table() {
-        SKIP_TABLE.get_or_init(|| {
-            let mut table = [(0u64, 0u64); SKIP_TABLE_SIZE];
-
-            // Start with the identity
-            let (mut mul, mut add) = (1, 0);
-
-            // Precompute N steps of the LCG
-            for n in 0..SKIP_TABLE_SIZE {
-                table[n] = (mul, add);
-                mul = (mul.wrapping_mul(A)) & M;
-                add = (add.wrapping_mul(A).wrapping_add(C)) & M;
-            }
-
-            table
-        });
     }
 }
