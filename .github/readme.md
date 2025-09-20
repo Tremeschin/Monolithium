@@ -80,151 +80,56 @@ Such speeds scales about linearly with your hardware - for better or worse!
 
 ## ⭐️ Showcase
 
+> [!NOTE]
+> Area calculations are within 1% error, nearby monoliths are part of the same complex.
+
 Hall of fame for the timeline of computations:
 
 <div align="center">
-  <table>
-    <thead>
-      <tr>
-        <th><b>Date</b></th>
-        <th><b>Hardware</b></th>
-        <th><b>Time</b></th>
-        <th><b>Seeds</b></th>
-        <th><b>% Total</b></th>
-        <th><b>Type</b></th>
-        <th><b>User</b></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <!--
-          Via:
-          1. spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000
-            - Features: (skip-rejection, skip-table) • (only-hill, filter-fracts, scaled-deviation)
-            - Deviation quality (hill): 380.0
-          2. find --step 512 --seed <n> for best results
-        -->
-        <td>2025/09/18</td>
-        <td>R9 5900x</td>
-        <td>45m</td>
-        <td align="right">75,000,000,000</td>
-        <td align="right">0.02664%</td>
-        <td align="right">Lossy/2Pass</td>
-        <td><b><a href="https://github.com/Tremeschin/">Tremeschin</a></b></td>
-      </tr>
-      <tr>
-        <!-- Via: rustlith spawn --radius 200 --step 100 linear --total 5000000000 -->
-        <td>2025/08/13</td>
-        <td>R9 5900x</td>
-        <td>8h</td>
-        <td align="right">5,000,000,000</td>
-        <td align="right">0.00177%</td>
-        <td align="right">Accurate</td>
-        <td><b><a href="https://github.com/Tremeschin/">Tremeschin</a></b></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
 
-<sup><b>Note:</b> Area calculations are within 1% error, nearby monoliths are part of the same complex.</sup>
+<!--
+Methodology:
+- (2025/09/20): (rustlith spawn --chunks 1000 --radius 262144 --step 1024 random --total 1000000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 280.0) • (find --step 512 --seed <best>)
+- (2025/09/18): (rustlith spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 380.0) • (find --step 512 --seed <best>)
+- (2025/08/13): (rustlith spawn --radius 200 --step 100 linear --total 5000000000)
+-->
+
+| Date       | Hardware | Time | Seeds               |  Total (%) | Type        | User                        |
+| :--------: | :------: | :--: | ------------------: | ---------: | :---------: | :-------------------------: |
+| 2025/09/20 | i7 12700 | 14h  |   1,000,000,000,000 |   0.35527% | Lossy/2Pass | [**akatz-ai**](https://github.com/akatz-ai/) |
+| 2025/09/18 | R9 5900x | 45m  |      75,000,000,000 |   0.02664% | Lossy/2Pass | [**Tremeschin**](https://github.com/Tremeschin/) |
+| 2025/08/13 | R9 5900x | 8h   |       5,000,000,000 |   0.00177% | Accurate    | [**Tremeschin**](https://github.com/Tremeschin/) |
+
+</div>
 
 ### 🔵 Largest monoliths anywhere
 
 <div align="center">
-  <table>
-    <thead>
-      <tr>
-        <th><b>Area</b></th>
-        <th><b>Seed</b></th>
-        <th><b>x</b></th>
-        <th><b>z</b></th>
-        <th><b>Date</b></th>
-        <th><b>Found by</b></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>2,316,064</td><td>19907909658842</td>
-        <td align="right">1572070</td><td align="right">3668360</td>
-        <td>2025/09/18</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>2,033,040</td><td>250673273362854</td>
-        <td align="right">7337600</td><td align="right">5768320</td>
-        <td>2025/09/18</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,992,096</td><td>281351900698438</td>
-        <td align="right">4716910</td><td align="right">4718668</td>
-        <td>2025/09/18</td><td>Tremeschin</td>
-      </tr>
-    </tbody>
-  </table>
+
+| Area      | Seed               | X       | Z       | Date       | Found by   |
+| :-------: | :----------------: | ------: | ------: | :--------: | :--------: |
+| 2,890,848 | 143779371652733    |  265920 | 5994240 | 2025/09/20 | akatz-ai   |
+| 2,649,984 | 130449915832690    |  786608 | 4163520 | 2025/09/20 | akatz-ai   |
+| 2,316,064 | 19907909658842     | 1572070 | 3668360 | 2025/09/18 | Tremeschin |
+| 2,033,040 | 250673273362854    | 7337600 | 5768320 | 2025/09/18 | Tremeschin |
+| 1,992,096 | 281351900698438    | 4716910 | 4718668 | 2025/09/18 | Tremeschin |
+
 </div>
 
 ### 🔵 Largest monoliths near spawn
 
 <div align="center">
-  <table>
-    <thead>
-      <tr>
-        <th><b>Area</b></th>
-        <th><b>Seed</b></th>
-        <th><b>Date</b></th>
-        <th><b>Found by</b></th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>1,745,664</td><td>4609608251</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,584,112</td><td>1847066092</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,420,816</td><td>2045872561</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,371,824</td><td>3847304212</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,369,360</td><td>1593912439</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,345,520</td><td>4563197188</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,305,472</td><td>4432659853</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,295,568</td><td>4801496200</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,268,432</td><td>2273407323</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,264,720</td><td>3054588959</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,262,784</td><td>4613464116</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-      <tr>
-        <td>1,242,256</td><td>4983179351</td>
-        <td>2025/08/13</td><td>Tremeschin</td>
-      </tr>
-    </tbody>
-  </table>
+
+| Area      | Seed       | Date       | Found by   |
+| :-------: | :--------: | :--------: | :--------: |
+| 1,745,664 | 4609608251 | 2025/08/13 | Tremeschin |
+| 1,584,112 | 1847066092 | 2025/08/13 | Tremeschin |
+| 1,420,816 | 2045872561 | 2025/08/13 | Tremeschin |
+| 1,371,824 | 3847304212 | 2025/08/13 | Tremeschin |
+| 1,369,360 | 1593912439 | 2025/08/13 | Tremeschin |
+| 1,345,520 | 4563197188 | 2025/08/13 | Tremeschin |
+| 1,305,472 | 4432659853 | 2025/08/13 | Tremeschin |
+
 </div>
 
 ### 🔵 Lowest seed visible from spawn
