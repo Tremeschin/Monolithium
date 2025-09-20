@@ -32,6 +32,7 @@ pub use monolith::*;
 pub use perlin::*;
 pub use rng::JavaRNG;
 pub use seeds::*;
+pub use utils::*;
 pub use world::*;
 
 /// Coordinate at which the Far Lands start

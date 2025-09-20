@@ -51,6 +51,20 @@ impl Perlin {
         self.map[index & 0xFF]
     }
 
+    pub fn grid_gradient(&self,
+        grid_x: usize,
+        grid_y: usize,
+        grid_z: usize
+    ) -> (f64, f64, f64) {
+        let xi = grid_x & 0xFF;
+        let yi = grid_y & 0xFF;
+        let zi = grid_z & 0xFF;
+        let a  = self.get_map(xi) as usize;
+        let aa = self.get_map(yi + a) as usize;
+        let ha = self.get_map(aa + zi);
+        GRAD_LOOKUP[(ha & 0x0F) as usize]
+    }
+
     /// Sample the noise at a given coordinate
     /// - Note: For monoliths, y is often 0.0
     pub fn sample(&self, x: f64, y: f64, z: f64) -> f64 {
@@ -63,7 +77,7 @@ impl Perlin {
         let y: f64 = y + self.yoff;
         let z: f64 = z + self.zoff;
 
-        // Convert to grid coordinates (512 length)
+        // Convert to grid coordinates (256 length)
         let xi: usize = (x.floor() as i32 & 0xFF) as usize;
         let yi: usize = (y.floor() as i32 & 0xFF) as usize;
         let zi: usize = (z.floor() as i32 & 0xFF) as usize;
@@ -82,7 +96,7 @@ impl Perlin {
         let a  = self.get_map(xi + 0 + 0) as usize;
         let aa = self.get_map(yi + a + 0) as usize;
         let ab = self.get_map(yi + a + 1) as usize;
-        let b  = self.get_map(xi + 0 + 1) as usize;
+        let b  = self.get_map(xi + 1 + 0) as usize;
         let ba = self.get_map(yi + b + 0) as usize;
         let bb = self.get_map(yi + b + 1) as usize;
 

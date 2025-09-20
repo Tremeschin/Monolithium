@@ -19,7 +19,7 @@ pub fn lerp(t: f64, a: f64, b: f64) -> f64 {
     t.mul_add(b - a, a)
 }
 
-const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
+pub const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
     ( 1.0,  1.0,  0.0), //  0:  x + y
     (-1.0,  1.0,  0.0), //  1: -x + y
     ( 1.0, -1.0,  0.0), //  2:  x - y
