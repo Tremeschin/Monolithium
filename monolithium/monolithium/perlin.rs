@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Perlin {
     /// Permutations map (Vector -> Grid)
     pub map: [u8; 256],
@@ -51,18 +51,20 @@ impl Perlin {
         self.map[index & 0xFF]
     }
 
+    /// Get the gradient vector at a given grid coordinate
+    #[inline(always)]
     pub fn grid_gradient(&self,
         grid_x: usize,
         grid_y: usize,
-        grid_z: usize
+        grid_z: usize,
     ) -> (f64, f64, f64) {
         let xi = grid_x & 0xFF;
         let yi = grid_y & 0xFF;
         let zi = grid_z & 0xFF;
-        let a  = self.get_map(xi) as usize;
-        let aa = self.get_map(yi + a) as usize;
-        let ha = self.get_map(aa + zi);
-        GRAD_LOOKUP[(ha & 0x0F) as usize]
+        let a  = self.get_map(xi +  0) as usize;
+        let aa = self.get_map(yi +  a) as usize;
+        let sh = self.get_map(aa + zi) as usize;
+        utils::GRAD_LOOKUP[(sh & 0x0F) as usize]
     }
 
     /// Sample the noise at a given coordinate
@@ -145,7 +147,7 @@ impl Perlin {
 
 /* -------------------------------------------------------------------------- */
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct FractalPerlin<const OCTAVES: usize> {
     pub noise: [Perlin; OCTAVES],
 }

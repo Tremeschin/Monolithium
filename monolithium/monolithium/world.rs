@@ -151,8 +151,8 @@ impl World {
         let xrange: Vec<i32> = (query.minx..=query.maxx).step_by(query.step).collect();
         let zrange: Vec<i32> = (query.minz..=query.maxz).step_by(query.step).collect();
 
-        // Use non-threaded approach for small areas (lower latency)
-        if (query.maxx - query.minx).abs() < 100000 {
+        // Note: Lower latency, only use for huge areas
+        if !query.threaded {
             let mut monoliths = AHashSet::new();
 
             'a: for x in xrange.clone() {
@@ -296,6 +296,9 @@ pub struct FindOptions {
 
     /// How many monoliths to find
     pub limit: Option<u64>,
+
+    /// Whether to use multithreading
+    pub threaded: bool,
 }
 
 impl FindOptions {
@@ -307,6 +310,11 @@ impl FindOptions {
 
     pub fn limit(mut self, many: u64) -> Self {
         self.limit = Some(many);
+        return self;
+    }
+
+    pub fn threaded(mut self) -> Self {
+        self.threaded = true;
         return self;
     }
 

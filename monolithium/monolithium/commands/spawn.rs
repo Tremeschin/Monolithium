@@ -41,10 +41,10 @@ impl SpawnCommand {
             .into_par_iter()
             .progress_with(progress)
             .map_init(|| World::new(), |world, chunk| {
-                let c_a = (chunk + 0) * self.chunks;
-                let c_b = (chunk + 1) * self.chunks;
+                let min = (chunk + 0) * self.chunks;
+                let max = (chunk + 1) * self.chunks;
 
-                (c_a..c_b).map(|seed| {
+                (min..max).map(|seed| {
                     let seed = self.seeds.get(seed);
 
                     #[cfg(feature="filter-fracts")]

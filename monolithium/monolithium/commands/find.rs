@@ -19,7 +19,9 @@ impl FindCommand {
 
         let mut monoliths = world.find_monoliths(
             &FindOptions::default()
-                .wraps().step(self.step)
+                .step(self.step)
+                .threaded()
+                .wraps()
         );
 
         monoliths.sort();

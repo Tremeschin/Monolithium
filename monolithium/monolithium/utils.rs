@@ -1,6 +1,6 @@
 use crate::*;
 
-// Round an integer to a nearest multiple of another
+/// Round an integer to a nearest multiple of another
 pub fn nearest(num: i32, mul: i32) -> i32 {
     (num + mul/2) / mul * mul
 }
