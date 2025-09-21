@@ -72,10 +72,9 @@ impl World {
         }
 
         // How accurate the area calculation is
-        let step: i32 = if cfg!(feature="fast-area") {4} else {1};
-
-        let x = utils::nearest(x, step);
-        let z = utils::nearest(z, step);
+        let s = if cfg!(feature="fast-area") {4} else {1};
+        let x = utils::nearest(x, s);
+        let z = utils::nearest(z, s);
         let o = 32; // "Occasionally"
 
         // Start with current block
@@ -90,13 +89,18 @@ impl World {
         let mut visited = AHashSet::from([(x, z)]);
         let mut queue   = VecDeque::from([(x, z)]);
 
+        // Auxiliary closure for DRYness
+        let mut insert = |queue: &mut VecDeque<(i32, i32)>, x: i32, z: i32| {
+            if visited.insert((x, z)) {
+                queue.push_back((x, z));
+            }
+        };
+
         // Search around the block
-        let far: i32 = 256;
+        let far: i32 = 128;
         for dx in (-far..=far).step_by(32) {
             for dz in (-far..=far).step_by(32) {
-                if (dx*dx + dz*dz) < far*far {
-                    queue.push_back((x+dx, z+dz));
-                }
+                insert(&mut queue, x+dx, z+dz);
             }
         }
 
@@ -105,26 +109,27 @@ impl World {
                 continue;
             }
 
-            lith.area += (step*step) as u64;
+            lith.area += (s*s) as u64;
 
-            // Check neighbors with step 4 per hill/depth scaling
-            let mut neighbors = vec!(
-                (0,  step), ( step, 0),
-                (0, -step), (-step, 0)
-            );
+            // Check connected neighbors
+            insert(&mut queue, x+0, z+s);
+            insert(&mut queue, x+s, z+0);
+            insert(&mut queue, x+0, z-s);
+            insert(&mut queue, x-s, z+0);
 
             // Occasional more expensive stuff
             if (x % o == 0) && (z % o == 0) {
 
-                // Check for nearby disjoints
-                for factor in [1, 4] {
-                    let n = 64*factor;
-                    neighbors.extend(vec!(
-                        ( n,  n), ( n, -n),
-                        (-n,  n), (-n, -n),
-                        ( n,  0), ( 0,  n),
-                        (-n,  0), ( 0, -n),
-                    ))
+                // Check for nearby satellites
+                for n in [64, 128] {
+                    insert(&mut queue, x+n, z+n);
+                    insert(&mut queue, x+n, z-n);
+                    insert(&mut queue, x-n, z+n);
+                    insert(&mut queue, x-n, z-n);
+                    insert(&mut queue, x+n, z+0);
+                    insert(&mut queue, x+0, z+n);
+                    insert(&mut queue, x-n, z+0);
+                    insert(&mut queue, x+0, z-n);
                 }
 
                 // Update coordinates
@@ -132,14 +137,6 @@ impl World {
                 lith.maxx = lith.maxx.max(x);
                 lith.minz = lith.minz.min(z);
                 lith.maxz = lith.maxz.max(z);
-            }
-
-            for (dx, dz) in neighbors {
-                let next = (x+dx, z+dz);
-
-                if visited.insert(next) {
-                    queue.push_back(next);
-                }
             }
         }
 
