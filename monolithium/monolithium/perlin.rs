@@ -247,8 +247,9 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     #[inline(always)]
     pub fn is_hill_monolith(&self, x: i32, z: i32) -> bool {
-        let x = (x/4) as f64;
-        let z = (z/4) as f64;
+        const TARGET: f64 = -512.0;
+        let x = (x >> 2) as f64;
+        let z = (z >> 2) as f64;
         let mut sum = 0.0;
 
         // Start from most influential octaves
@@ -258,23 +259,24 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;
 
             // Next octaves cannot possibly reach target
-            if sum - mul > -512.0 {
+            if sum - mul > TARGET {
                 return false;
             }
 
             // Next octaves will definitely reach target
-            if sum + mul < -512.0 {
+            if sum + mul < TARGET {
                 return true;
             }
         }
 
-        sum < -512.0
+        sum < TARGET
     }
 
     #[inline(always)]
     pub fn is_depth_monolith(&self, x: i32, z: i32) -> bool {
-        let x = (x/4) as f64 * 100.0;
-        let z = (z/4) as f64 * 100.0;
+        const TARGET: f64 = 8000.0;
+        let x = (25 * x) as f64;
+        let z = (25 * z) as f64;
         let mut sum = 0.0;
 
         // Start from most influential octaves
@@ -284,16 +286,16 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;
 
             // Next octaves cannot possibly reach target
-            if (sum.abs() + mul) < 8000.0 {
+            if (sum.abs() + mul) < TARGET {
                 return false;
             }
 
             // Next octaves will definitely reach target
-            if (sum.abs() - mul) > 8000.0 {
+            else if (sum.abs() - mul) > TARGET {
                 return true;
             }
         }
 
-        sum.abs() > 8000.0
+        sum.abs() > TARGET
     }
 }
