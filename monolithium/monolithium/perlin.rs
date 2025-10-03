@@ -80,9 +80,9 @@ impl Perlin {
         let z: f64 = z + self.zoff;
 
         // Convert to grid coordinates (256 length)
-        let xi: usize = (x.floor() as usize) & 0xFF;
-        let yi: usize = (y.floor() as usize) & 0xFF;
-        let zi: usize = (z.floor() as usize) & 0xFF;
+        let xi: usize = (x.floor() as i32 & 0xFF) as usize;
+        let yi: usize = (y.floor() as i32 & 0xFF) as usize;
+        let zi: usize = (z.floor() as i32 & 0xFF) as usize;
 
         // Get the fractional parts
         let xf: f64 = x - x.floor();
