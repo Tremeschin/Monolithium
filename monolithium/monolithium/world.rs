@@ -62,7 +62,6 @@ impl World {
     }
 
     /// Get a Monolith at a given coordinate, compute properties
-    /// Todo: Arc Mutex HashMap (x, y) => Monolith struct?
     #[inline(always)]
     pub fn get_monolith(&self, x: i32, z: i32) -> Option<Monolith> {
 
@@ -89,22 +88,18 @@ impl World {
         let mut visited = AHashSet::from([(x, z)]);
         let mut queue   = VecDeque::from([(x, z)]);
 
-        // Auxiliary closure for DRYness
-        let mut insert = |queue: &mut VecDeque<(i32, i32)>, x: i32, z: i32| {
-            if visited.insert((x, z)) {
-                queue.push_back((x, z));
-            }
-        };
-
         // Search around the block
         let far: i32 = 128;
         for dx in (-far..=far).step_by(32) {
             for dz in (-far..=far).step_by(32) {
-                insert(&mut queue, x+dx, z+dz);
+                queue.push_back((x+dx, z+dz));
             }
         }
 
         while let Some((x, z)) = queue.pop_front() {
+            if !visited.insert((x, z)) {
+                continue;
+            }
             if !self.is_monolith(x, z) {
                 continue;
             }
@@ -112,24 +107,24 @@ impl World {
             lith.area += (s*s) as u64;
 
             // Check connected neighbors
-            insert(&mut queue, x+0, z+s);
-            insert(&mut queue, x+s, z+0);
-            insert(&mut queue, x+0, z-s);
-            insert(&mut queue, x-s, z+0);
+            queue.push_back((x+0, z+s));
+            queue.push_back((x+s, z+0));
+            queue.push_back((x+0, z-s));
+            queue.push_back((x-s, z+0));
 
             // Occasional more expensive stuff
             if (x % o == 0) && (z % o == 0) {
 
                 // Check for nearby satellites
                 for n in [64, 128] {
-                    insert(&mut queue, x+n, z+n);
-                    insert(&mut queue, x+n, z-n);
-                    insert(&mut queue, x-n, z+n);
-                    insert(&mut queue, x-n, z-n);
-                    insert(&mut queue, x+n, z+0);
-                    insert(&mut queue, x+0, z+n);
-                    insert(&mut queue, x-n, z+0);
-                    insert(&mut queue, x+0, z-n);
+                    queue.push_back((x+n, z+n));
+                    queue.push_back((x+n, z-n));
+                    queue.push_back((x-n, z+n));
+                    queue.push_back((x-n, z-n));
+                    queue.push_back((x+n, z+0));
+                    queue.push_back((x+0, z+n));
+                    queue.push_back((x-n, z+0));
+                    queue.push_back((x+0, z-n));
                 }
 
                 // Update coordinates
