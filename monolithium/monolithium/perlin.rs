@@ -152,6 +152,9 @@ pub struct FractalPerlin<const OCTAVES: usize> {
     pub noise: [Perlin; OCTAVES],
 }
 
+/// Ignored count of lower octaves, as they contribute very little
+const OCTAVES_START: usize = if cfg!(feature="most-octaves") {3} else {0};
+
 /// Lookup table for octave amplitudes
 static OCTAVE_SCALE_MUL: [f64; 32] = {
     let mut array = [0.0; 32];
@@ -193,7 +196,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     /// Sample the fractal noise at a given coordinate
     #[inline(always)]
     pub fn sample(&self, x: f64, z: f64) -> f64 {
-        (0..OCTAVES).map(|i| {
+        (OCTAVES_START..OCTAVES).map(|i| {
             let mul = Self::octave_scale_mul_f64(i);
             let div = Self::octave_scale_div_f64(i);
             self.noise[i].sample(x*div, 0.0, z*div) * mul
@@ -249,7 +252,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
         let mut sum = 0.0;
 
         // Start from most influential octaves
-        for octave in (0..OCTAVES).rev() {
+        for octave in (OCTAVES_START..OCTAVES).rev() {
             let mul = Self::octave_scale_mul_f64(octave);
             let div = Self::octave_scale_div_f64(octave);
             sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;
@@ -275,7 +278,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
         let mut sum = 0.0;
 
         // Start from most influential octaves
-        for octave in (0..OCTAVES).rev() {
+        for octave in (OCTAVES_START..OCTAVES).rev() {
             let mul = Self::octave_scale_mul_f64(octave);
             let div = Self::octave_scale_div_f64(octave);
             sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;

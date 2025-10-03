@@ -60,6 +60,10 @@ grad-lookup = []
 # interpolation, but the average of over/under-shoots gives at most 1% error
 fast-area = []
 
+# Ignores the last few octaves in noises, as they contribute very little. Causes
+# minor errors in the hill noise, as values for monoliths are relatively tight
+most-octaves = []
+
 # Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
 # three math operations check per call (low error for perlin values)
 # • Monte Carlo says 0.03474% error rates for minecraft values
