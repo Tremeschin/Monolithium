@@ -26,7 +26,7 @@ path = "monolithium/main.rs"
 # ---------------------------------------------------------------------------- #
 
 [dependencies]
-ahash         = "0.8.12"
+ahash         = {version="0.8.12", features=["compile-time-rng", "std"], default-features=false}
 clap          = {version="4.5.48", features=["derive"]}
 fastrand      = "2.3.0"
 indicatif     = {version="0.18.0", features=["rayon"]}
@@ -34,7 +34,7 @@ microbench    = "0.5.0"
 png           = "0.18.0"
 rand          = "0.9.2"
 rayon         = "1.11.0"
-serde         = {version="1.0.225", features=["derive"]}
+serde         = {version="1.0.228", features=["derive"]}
 serde_json    = "1.0.145"
 smart-default = "0.7.1"
 

@@ -194,8 +194,9 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     #[inline(always)]
     pub fn sample(&self, x: f64, z: f64) -> f64 {
         (0..OCTAVES).map(|i| {
-            let s = Self::octave_scale_mul_f64(i);
-            self.noise[i].sample(x/s, 0.0, z/s) * s
+            let mul = Self::octave_scale_mul_f64(i);
+            let div = Self::octave_scale_div_f64(i);
+            self.noise[i].sample(x*div, 0.0, z*div) * mul
         }).sum()
     }
 
@@ -257,6 +258,11 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             if sum - mul > -512.0 {
                 return false;
             }
+
+            // Next octaves will definitely reach target
+            if sum + mul < -512.0 {
+                return true;
+            }
         }
 
         sum < -512.0
@@ -277,6 +283,11 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
             // Next octaves cannot possibly reach target
             if (sum.abs() + mul) < 8000.0 {
                 return false;
+            }
+
+            // Next octaves will definitely reach target
+            if (sum.abs() - mul) > 8000.0 {
+                return true;
             }
         }
 

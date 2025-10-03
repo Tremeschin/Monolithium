@@ -26,6 +26,7 @@ class Tools:
 def rustlith(
     *args: list[str],
     Popen: bool=False,
+    toolchain: str="stable",
     **kwargs
 ) -> Union[CompletedProcess, Popen]:
     """Run the Rust version of Monolithium"""
@@ -33,12 +34,12 @@ def rustlith(
 
     # Have a rust toolchain
     if subprocess.run(
-        (*Tools.RUSTUP, "run", "stable", "rustc", "--version"),
+        (*Tools.RUSTUP, "run", toolchain, "rustc", "--version"),
         stdout=PIPE, stderr=PIPE
     ).returncode != 0:
         subprocess.check_call((
             *Tools.RUSTUP,
-            "default", "stable"
+            "default", toolchain
         ))
 
     # Simple features handling via anywhere in args flags
