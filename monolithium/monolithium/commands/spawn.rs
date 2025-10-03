@@ -14,7 +14,7 @@ pub struct SpawnCommand {
     #[arg(short='r', long, default_value_t=100)]
     radius: i32,
 
-    #[arg(short='l', long, default_value_t=1)]
+    #[arg(short='l', long, default_value_t=999999)]
     limit: u64,
 
     /// Spacing between each check, in blocks

@@ -152,6 +152,28 @@ pub struct FractalPerlin<const OCTAVES: usize> {
     pub noise: [Perlin; OCTAVES],
 }
 
+/// Lookup table for octave amplitudes
+static OCTAVE_SCALE_MUL: [f64; 32] = {
+    let mut array = [0.0; 32];
+    let mut i = 0;
+    while i < 32 {
+        array[i] = (1 << i) as f64;
+        i += 1;
+    }
+    array
+};
+
+/// Lookup table for octave amplitudes (inverse)
+static OCTAVE_SCALE_DIV: [f64; 32] = {
+    let mut array = [0.0; 32];
+    let mut i = 0;
+    while i < 32 {
+        array[i] = 1.0 / (1 << i) as f64;
+        i += 1;
+    }
+    array
+};
+
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     #[inline(always)]
@@ -172,7 +194,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     #[inline(always)]
     pub fn sample(&self, x: f64, z: f64) -> f64 {
         (0..OCTAVES).map(|i| {
-            let s = Self::octave_scale(i);
+            let s = Self::octave_scale_mul_f64(i);
             self.noise[i].sample(x/s, 0.0, z/s) * s
         }).sum()
     }
@@ -187,14 +209,20 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     /// The maximum value a given octave can produce
     #[inline(always)]
-    pub fn octave_scale(octave: usize) -> f64 {
-        (1 << octave) as f64
+    pub fn octave_scale_mul_f64(octave: usize) -> f64 {
+        unsafe {*OCTAVE_SCALE_MUL.get_unchecked(octave)}
+    }
+
+    /// The maximum value a given octave can produce (inverse)
+    #[inline(always)]
+    pub fn octave_scale_div_f64(octave: usize) -> f64 {
+        unsafe {*OCTAVE_SCALE_DIV.get_unchecked(octave)}
     }
 
     // Usual maximum value of the noise
     #[inline(always)]
     pub fn maxval(&self) -> f64 {
-       Self::octave_scale(OCTAVES)
+       Self::octave_scale_mul_f64(OCTAVES)
     }
 
     // When all stars align, you get a girlfriend
@@ -202,7 +230,7 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
     #[inline(always)]
     pub fn tmaxval(&self) -> f64 {
         (0..=OCTAVES).map(|n| {
-            Self::octave_scale(n)
+            Self::octave_scale_mul_f64(n)
         }).sum()
     }
 }
@@ -221,11 +249,12 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
         // Start from most influential octaves
         for octave in (0..OCTAVES).rev() {
-            let s = Self::octave_scale(octave);
-            sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
+            let mul = Self::octave_scale_mul_f64(octave);
+            let div = Self::octave_scale_div_f64(octave);
+            sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;
 
-            // Next octave cannot possibly reach target
-            if sum - 0.5*s > -512.0 {
+            // Next octaves cannot possibly reach target
+            if sum - mul > -512.0 {
                 return false;
             }
         }
@@ -241,11 +270,12 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
         // Start from most influential octaves
         for octave in (0..OCTAVES).rev() {
-            let s = Self::octave_scale(octave);
-            sum += self.noise[octave].sample(x/s, 0.0, z/s) * s;
+            let mul = Self::octave_scale_mul_f64(octave);
+            let div = Self::octave_scale_div_f64(octave);
+            sum += self.noise[octave].sample(x*div, 0.0, z*div) * mul;
 
-            // Next octave cannot possibly reach target
-            if (sum.abs() + 0.5*s) < 8000.0 {
+            // Next octaves cannot possibly reach target
+            if (sum.abs() + mul) < 8000.0 {
                 return false;
             }
         }

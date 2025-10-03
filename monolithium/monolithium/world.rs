@@ -152,9 +152,9 @@ impl World {
         if !query.threaded {
             let mut monoliths = AHashSet::new();
 
-            'a: for x in xrange.clone() {
-                for z in zrange.clone() {
-                    if let Some(mono) = self.get_monolith(x, z) {
+            'a: for x in &xrange {
+                for z in &zrange {
+                    if let Some(mono) = self.get_monolith(*x, *z) {
                         monoliths.insert(mono);
 
                         // Early break if limit is reached
@@ -256,7 +256,7 @@ impl World {
             for _octave in 0..(*part) {
 
                 #[cfg(feature="scaled-deviation")]
-                let scale = FractalPerlin::<0>::octave_scale(_octave);
+                let scale = FractalPerlin::<0>::octave_scale_mul_f64(_octave);
 
                 for _ in 0..3 {
                     let next = rng.next_f64() * 256.0;
