@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 import sys
@@ -49,6 +50,8 @@ def rustlith(
             features.append("--features")
             features.append(feature)
             args.remove(flag)
+
+    os.environ.update(RUSTFLAGS="-C target-cpu=native")
 
     return (subprocess.Popen if Popen else subprocess.run)((
         *Tools.CARGO, "run",
