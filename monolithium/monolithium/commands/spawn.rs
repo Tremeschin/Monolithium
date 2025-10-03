@@ -17,6 +17,10 @@ pub struct SpawnCommand {
     #[arg(short='l', long, default_value_t=999999)]
     limit: u64,
 
+    /// Minimum area of the monoliths to find
+    #[arg(short='a', long, default_value_t=0)]
+    area: u64,
+
     /// Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]
     step: usize,
@@ -34,6 +38,7 @@ impl SpawnCommand {
         let options = FindOptions::default()
             .spawn(self.radius)
             .limit(self.limit)
+            .area(self.area)
             .step(self.step);
 
         let mut monoliths: Vec<Monolith> =

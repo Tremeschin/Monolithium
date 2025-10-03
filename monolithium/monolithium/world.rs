@@ -108,8 +108,8 @@ impl World {
 
             // Check connected neighbors
             queue.push_back((x+0, z+s));
-            queue.push_back((x+s, z+0));
             queue.push_back((x+0, z-s));
+            queue.push_back((x+s, z+0));
             queue.push_back((x-s, z+0));
 
             // Occasional more expensive stuff
@@ -150,12 +150,14 @@ impl World {
             'a: for x in &xrange {
                 for z in &zrange {
                     if let Some(mono) = self.get_monolith(*x, *z) {
-                        monoliths.insert(mono);
+                        if mono.area > query.area {
+                            monoliths.insert(mono);
 
-                        // Early break if limit is reached
-                        if let Some(many) = query.limit {
-                            if monoliths.len() >= many as usize {
-                                break 'a;
+                            // Early break if limit is reached
+                            if let Some(many) = query.limit {
+                                if monoliths.len() >= many as usize {
+                                    break 'a;
+                                }
                             }
                         }
                     }
@@ -290,6 +292,9 @@ pub struct FindOptions {
     /// How many monoliths to find
     pub limit: Option<u64>,
 
+    /// Minimum area of the monoliths to find
+    pub area: u64,
+
     /// Whether to use multithreading
     pub threaded: bool,
 }
@@ -303,6 +308,11 @@ impl FindOptions {
 
     pub fn limit(mut self, many: u64) -> Self {
         self.limit = Some(many);
+        return self;
+    }
+
+    pub fn area(mut self, area: u64) -> Self {
+        self.area = area;
         return self;
     }
 
@@ -336,11 +346,21 @@ impl FindOptions {
         return self;
     }
 
-    pub fn wraps(mut self) -> Self {
+    /// Search all blocks within hill noise wrap distance
+    pub fn hill_wraps(mut self) -> Self {
         self.minx = 0;
-        self.maxx = MONOLITHS_REPEAT;
+        self.maxx = HILL_WRAPS;
         self.minz = 0;
-        self.maxz = MONOLITHS_REPEAT;
+        self.maxz = HILL_WRAPS;
+        return self;
+    }
+
+    /// Search all blocks within depth noise wrap distance
+    pub fn depth_wraps(mut self) -> Self {
+        self.minx = 0;
+        self.maxx = DEPTH_WRAPS;
+        self.minz = 0;
+        self.maxz = DEPTH_WRAPS;
         return self;
     }
 }

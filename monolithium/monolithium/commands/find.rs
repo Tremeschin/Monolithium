@@ -10,6 +10,10 @@ pub struct FindCommand {
     /// Probe the world every N blocks
     #[arg(short='x', long, default_value_t=128)]
     step: usize,
+
+    /// Minimum area of the monoliths to find
+    #[arg(short='a', long, default_value_t=0)]
+    area: u64,
 }
 
 impl FindCommand {
@@ -20,8 +24,8 @@ impl FindCommand {
         let mut monoliths = world.find_monoliths(
             &FindOptions::default()
                 .step(self.step)
+                .depth_wraps()
                 .threaded()
-                .wraps()
         );
 
         monoliths.sort();

@@ -111,6 +111,7 @@ candidates = [
 ]
 
 fast = [
+    "most-octaves",
     "skip-rejection",
     "skip-table",
 ]

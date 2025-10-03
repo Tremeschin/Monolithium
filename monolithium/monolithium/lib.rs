@@ -42,15 +42,15 @@ pub const FARLANDS: i32 = 12_550_824;
 pub const WORLD_SIZE: i32 = 2*FARLANDS + 1;
 
 /// Distance in which the hill noise wraps around
-pub const HILL_REPEAT: i32 = 2_i32.pow(19);
+pub const HILL_WRAPS: i32 = 2_i32.pow(19);
 
 /// Distance in which the depth noise wraps around
-pub const DEPTH_REPEAT: i32 = 2_i32.pow(23);
+pub const DEPTH_WRAPS: i32 = 2_i32.pow(23);
 
 /// It was found experimentally that the perlin noise and
 /// monoliths wraps around every 2**23 blocks, drastically
 /// reducing the practical search space!
-pub const MONOLITHS_REPEAT: i32 = DEPTH_REPEAT;
+pub const MONOLITHS_REPEAT: i32 = DEPTH_WRAPS;
 
 /// Java uses a 48-bit Linear Congruential Generator for its RNG,
 /// which continuously masks the state's (1 << 48) - 1 lower bits,
