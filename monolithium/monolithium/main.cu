@@ -121,6 +121,22 @@ struct JavaRNG {
         int64_t low  =  (int64_t) this->next(27);
         return (double)(high | low) / F64_DIV;
     }
+
+    // Lossy step the state as if a perlin noise was created
+    Gpu inline void step_perlin() {
+        // SKIP_TABLE[256 + 3*2]
+        this->state *= 253119540505593LL;
+        this->state += 184089911826014LL;
+        this->state &= M;
+    }
+
+    // Lossy step the state as if 48 perlin noises were created
+    Gpu inline void step_48_perlin() {
+        // SKIP_TABLE[48*(256 + 3*2)]
+        this->state *= 249870891710593LL;
+        this->state += 44331453843488LL;
+        this->state &= M;
+    }
 };
 
 /* -------------------------------------------------------------------------- */
@@ -259,10 +275,7 @@ struct World {
 
         // Skip 48 generators priorly used elsewhere
         #if SKIP_TABLE
-            // Gotta love magic numbers!
-            rng.state *= 249870891710593LL;
-            rng.state += 44331453843488LL;
-            rng.state &= M;
+            rng.step_48_perlin();
         #else
             PerlinNoise::discard(&rng, 48);
         #endif

@@ -185,9 +185,60 @@ class Distribution:
 
         return chart
 
+    # -------------------------------- #
+
+    def heatmap(self,
+
+    ) -> altair.Chart:
+        self.smart_rustlith(
+            "spawn",
+            # "--chunks", 1,
+            # "--radius", 262144*2,
+            "--radius", 2**19,
+            "--step", 256,
+            "linear",
+            "--total", 1000,
+            # "--candidates",
+            # "--only-hill",
+            # "--fast"
+        )
+
+        # Plot the (X, Z) positions of monoliths, with circle size based on area
+        chart = altair.Chart(altair.Data(values=[
+            dict(x=mono.minx, z=mono.minz, a=mono.area) for mono in self.monoliths
+        ])).mark_circle().encode(
+            x=altair.X("x:Q", title="X"),
+            y=altair.Y("z:Q", title="Z"),
+            size=altair.Size("a:Q", title="Area", scale=altair.Scale(range=[1, 100]))
+        ).properties(
+            title="Monolith Positions",
+            width=1920/2,
+            height=1080/2,
+        )
+
+        # Write a red bounding box
+        for v, c in ((2**18, "red"), (2**19, "green")):
+            chart += altair.Chart(altair.Data(values=[
+                dict(x= v, z= v),
+                dict(x= v, z=-v),
+                dict(x=-v, z=-v),
+                dict(x=-v, z= v),
+                dict(x= v, z= v),
+                dict(x= v, z=-v),
+            ])).mark_line(color=c).encode(
+                x=altair.X("x:Q"),
+                y=altair.Y("z:Q"),
+            )
+
+        return chart
+
 # ---------------------------------------------------------------------------- #
 
 def main() -> None:
     stats = Distribution()
-    stats.multi()
+    # stats.multi()
     # stats.world()
+    stats.heatmap().save(
+        fp="/tmp/heatmap.png",
+        scale_factor=3.0
+    )
