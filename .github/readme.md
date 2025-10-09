@@ -35,20 +35,17 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 
 ## 📦 Installation
 
-> [!WARNING]
-> - The code _will_ shred your cpu, make sure you have a good cooling solution!
-> - Large directories are created where you run it - any of `target`, `build`, `release`.
-
-Install [git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
-- `git clone https://github.com/Tremeschin/Monolithium`
-- `cd Monolithium` • `uv run rustlith (commands)`
+Install [Git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
+- `git clone https://github.com/Tremeschin/Monolithium && cd Monolithium`
+- Rust part: `uv run rustlith (commands)`
 
 You can pass any `--<feature>` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups, like `--fast`!
 
-For the pure Rust part without Python, `cd monolithium` and run:
-- `cargo run --release --features (...) -- (commands)`
-
 ## 🔥 Commands
+
+> [!WARNING]
+> - The code _will_ shred your cpu, make sure you have a good cooling solution!
+> - Large directories are created where you run it - any of `target`, `build`, `release`.
 
 You can run any of `rustlith (command) --help` for options and information!
 
@@ -90,18 +87,6 @@ $ rustlith \
 ```
 
 Manually checking the best ones almost guarantees a record, or write a quick script for it all :)
-
-## 🚀 Speeds
-
-Monolithium is written in heavily parallelized [Rust](https://www.rust-lang.org/) with the help of crates like [Rayon](https://crates.io/crates/rayon) for fearless concurrency and [Ahash](https://crates.io/crates/ahash) fast hashing, fully utilizing all available CPU resources one throws at it.
-
-🦀 For a Ryzen 9 5900X 12c/24t, 2x3200 MT/s DDR4 CL16 2Rx8 system, one might expect:
-
-- **3.75 minutes** to find all monoliths in a seed, probing every 128 blocks.
-- **Search 1,150,000** seeds per second for spawn monoliths (approximated)
-- **Search 440,000** seeds per second for spawn monoliths (accurate)
-
-Such speeds scales about linearly with your hardware - for better or worse!
 
 ## ⭐️ Showcase
 
@@ -184,6 +169,18 @@ Sadly, the Far Lands override the monoliths, there's no such thing as a Far Mono
 ### 🔵 How rare are they?
 
 _Spoiler: Not much_, certain seeds are more likely to generate monoliths (anthropic principle confirmed?), but most contains at least half a million monolith _complexes_ within the Far Lands (12,550,824 blocks squared).
+
+## 🚀 Speeds
+
+Monolithium is written in heavily parallelized [Rust](https://www.rust-lang.org/) with the help of crates like [Rayon](https://crates.io/crates/rayon) for fearless concurrency and [Ahash](https://crates.io/crates/ahash) fast hashing, fully utilizing all available CPU resources one throws at it.
+
+🦀 For a Ryzen 9 5900X 12c/24t, 2x3200 MT/s DDR4 CL16 2Rx8 system, one might expect:
+
+- **3.75 minutes** to find all monoliths in a seed, probing every 128 blocks.
+- **Search 1,150,000** seeds per second for spawn monoliths (approximated)
+- **Search 440,000** seeds per second for spawn monoliths (accurate)
+
+Such speeds scales about linearly with your hardware - for better or worse!
 
 ## 🔎 Future work
 
