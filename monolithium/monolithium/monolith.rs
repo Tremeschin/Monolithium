@@ -1,6 +1,6 @@
 use crate::*;
 
-#[derive(Clone, Debug, Eq, Serialize)]
+#[derive(Clone, Debug, Eq, Serialize, Deserialize)]
 pub struct Monolith {
     pub area: u64,
     pub seed: u64,

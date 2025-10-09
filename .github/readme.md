@@ -39,19 +39,18 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 > - The code _will_ shred your cpu, make sure you have a good cooling solution!
 > - Large directories are created where you run it - any of `target`, `build`, `release`.
 
-### • Stable releases
-
-Install [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
-- **Rust code**: `uvx --from monolithium rustlith (commands)`
-- **Cuda code**: `uvx --from monolithium cudalith (commands)`
-
-### • Latest Git
-
 Install [git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
 - `git clone https://github.com/Tremeschin/Monolithium`
 - `cd Monolithium` • `uv run rustlith (commands)`
 
 You can pass any `--<feature>` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups, like `--fast`!
+
+For the pure Rust part without Python, `cd monolithium` and run:
+- `cargo run --release --features (...) -- (commands)`
+
+## 🔥 Commands
+
+You can run any of `rustlith (command) --help` for options and information!
 
 ### 🔴 Find all Monoliths in a world
 
@@ -63,8 +62,34 @@ This will search a 8,388,608 blocks square in both positive X and Z directions. 
 
 This will search for seeds that contains monoliths close to spawn.
 
-- Search 0 through 100k seeds: `rustlith spawn linear -c 100000`
-- Search 50k random seeds: `rustlith spawn random -n 50000`
+- Search 0 through 100k seeds: `rustlith spawn linear -t 100000`
+- Search 50k random seeds: `rustlith spawn random -t 50000`
+
+### 🟢 2Pass heuristic method
+
+This heuristic finds seeds with _great potential_ for large monoliths, by only looking at the much rarer `hill` noise values, and discarding most seeds with poor `x, y, z` fractional parts offsets.
+
+- `rustlith spawn --radius 8192 random -t 5000000 --candidates --fast` (potential)
+- For each output, run `rustlith find --step 512 --seed <n>` (real area)
+
+There's a couple improvements to this method:
+
+- Since this discards millions seeds a second, rayon work-stealing parallelism becomes an overhead. Passing `--chunks 1000` to `spawn` makes each work block process multiple seeds instead of one.
+- The `hill` wraps around `2**19` blocks, so `--radius 262144` searches _"the whole world"'s_ potential.
+- For long searches, filter out candidates with at least `--area n` to ignore bad shuffling seeds.
+- Largest monoliths are basically guaranteed to hit a lattice point multiple of `1024` or even `2048`
+- At [`world::good_perlin_fracts`](../monolithium/monolithium/world.rs), one can tweak the treshholds for a "good" seed.
+
+Full command that broke many records:
+
+```sh
+$ rustlith \
+  spawn --chunks 1000 --radius 262144 --step 2048 --area 2200000 \
+  random --total 100000000 --candidates --fast \
+> candidates.txt
+```
+
+Manually checking the best ones almost guarantees a record, or write a quick script for it all :)
 
 ## 🚀 Speeds
 
@@ -94,6 +119,7 @@ Methodology:
 - (2025/08/13): (rustlith spawn --radius 200 --step 100 linear --total 5000000000)
 -->
 
+<!-- Note: All runs with any '--fast' optimizations are considered lossy -->
 | Date       | Hardware | Time | Seeds               |  Total (%) | Type        | User                        |
 | :--------: | :------: | :--: | ------------------: | ---------: | :---------: | :-------------------------: |
 | 2025/09/20 | i7 12700 | 14h  |   1,000,000,000,000 |   0.35527% | Lossy/2Pass | [**akatz-ai**](https://github.com/akatz-ai/) |

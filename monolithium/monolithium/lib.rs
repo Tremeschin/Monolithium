@@ -18,6 +18,7 @@ pub use indicatif::ParallelProgressIterator;
 pub use indicatif::ProgressBar;
 pub use indicatif::ProgressStyle;
 pub use rayon::prelude::*;
+pub use serde::Deserialize;
 pub use serde::Serialize;
 pub use smart_default::SmartDefault;
 
