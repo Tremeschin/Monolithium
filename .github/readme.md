@@ -35,6 +35,9 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 
 ## 📦 Installation
 
+> [!NOTE]
+> Windows users will need to install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for linkers, or alternatively [MSYS2](https://www.msys2.org/) environment with the package `mingw-w64-ucrt-x86_64-gcc` and compile in a UCRT64 shell.
+
 Install [Git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
 - `git clone https://github.com/Tremeschin/Monolithium && cd Monolithium`
 - Rust part: `uv run rustlith (commands)`
@@ -77,16 +80,17 @@ There's a couple improvements to this method:
 - Largest monoliths are basically guaranteed to hit a lattice point multiple of `1024` or even `2048`
 - At [`world::good_perlin_fracts`](../monolithium/monolithium/world.rs), one can tweak the treshholds for a "good" seed.
 
-Full command that broke many records:
+Full command idea that broke many records:
 
 ```sh
-$ rustlith \
+# or 'cargo run --release --features candidates --features fast \' in monolithium dir
+$ rustlith --candidates --fast \
   spawn --chunks 1000 --radius 262144 --step 2048 --area 2200000 \
-  random --total 100000000 --candidates --fast \
+  random --total 100000000 \
 > candidates.txt
 ```
 
-Manually checking the best ones almost guarantees a record, or write a quick script for it all :)
+With enough `--total` seeeds, checking the best ones almost guarantees a record :)
 
 ## ⭐️ Showcase
 
