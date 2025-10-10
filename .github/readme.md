@@ -36,7 +36,7 @@ _**Warn**: This is a side project, I may have time to port the readme to a mkdoc
 ## 📦 Installation
 
 > [!NOTE]
-> Windows users will need to install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for linkers, or alternatively [MSYS2](https://www.msys2.org/) environment with the package `mingw-w64-ucrt-x86_64-gcc` and compile in a UCRT64 shell.
+> Windows users will need to install [Visual Studio Build Tools](https://visualstudio.microsoft.com/visual-cpp-build-tools/) for linkers, or alternatively a [MSYS2](https://www.msys2.org/) environment with the package `mingw-w64-ucrt-x86_64-gcc` and compile in a UCRT64 shell.
 
 Install [Git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.astral.sh/uv/), open a terminal in some directory and run:
 - `git clone https://github.com/Tremeschin/Monolithium && cd Monolithium`
@@ -123,12 +123,12 @@ Methodology:
 
 | Area      | Seed               | X       | Z       | Date       | Found by   |
 | :-------: | :----------------: | ------: | ------: | :--------: | :--------: |
-| 3,119,151 | 94116384388573     | 3185395 | 1401244 | 2025/10/06 | Tremeschin |
-| 2,890,848 | 143779371652733    |  265920 | 5994240 | 2025/09/20 | akatz-ai   |
-| 2,649,984 | 130449915832690    |  786608 | 4163520 | 2025/09/20 | akatz-ai   |
-| 2,316,064 | 19907909658842     | 1572070 | 3668360 | 2025/09/18 | Tremeschin |
-| 2,033,040 | 250673273362854    | 7337600 | 5768320 | 2025/09/18 | Tremeschin |
-| 1,992,096 | 281351900698438    | 4716910 | 4718668 | 2025/09/18 | Tremeschin |
+| 3,119,151 |     94116384388573 | 3185395 | 1401244 | 2025/10/06 | Tremeschin |
+| 2,890,848 |    143779371652733 |  265920 | 5994240 | 2025/09/20 | akatz-ai   |
+| 2,649,984 |    130449915832690 |  786608 | 4163520 | 2025/09/20 | akatz-ai   |
+| 2,316,064 |     19907909658842 | 1572070 | 3668360 | 2025/09/18 | Tremeschin |
+| 2,033,040 |    250673273362854 | 7337600 | 5768320 | 2025/09/18 | Tremeschin |
+| 1,992,096 |    281351900698438 | 4716910 | 4718668 | 2025/09/18 | Tremeschin |
 
 </div>
 
@@ -136,15 +136,16 @@ Methodology:
 
 <div align="center">
 
-| Area      | Seed       | Date       | Found by   |
-| :-------: | :--------: | :--------: | :--------: |
-| 1,745,664 | 4609608251 | 2025/08/13 | Tremeschin |
-| 1,584,112 | 1847066092 | 2025/08/13 | Tremeschin |
-| 1,420,816 | 2045872561 | 2025/08/13 | Tremeschin |
-| 1,371,824 | 3847304212 | 2025/08/13 | Tremeschin |
-| 1,369,360 | 1593912439 | 2025/08/13 | Tremeschin |
-| 1,345,520 | 4563197188 | 2025/08/13 | Tremeschin |
-| 1,305,472 | 4432659853 | 2025/08/13 | Tremeschin |
+| Area      | Seed           | Date       | Found by   |
+| :-------: | :------------: | :--------: | :--------: |
+| 1,975,712 | 35668441367715 | 2025/10/08 | NathanVH8  |
+| 1,745,664 |     4609608251 | 2025/08/13 | Tremeschin |
+| 1,584,112 |     1847066092 | 2025/08/13 | Tremeschin |
+| 1,420,816 |     2045872561 | 2025/08/13 | Tremeschin |
+| 1,371,824 |     3847304212 | 2025/08/13 | Tremeschin |
+| 1,369,360 |     1593912439 | 2025/08/13 | Tremeschin |
+| 1,345,520 |     4563197188 | 2025/08/13 | Tremeschin |
+| 1,305,472 |     4432659853 | 2025/08/13 | Tremeschin |
 
 </div>
 
