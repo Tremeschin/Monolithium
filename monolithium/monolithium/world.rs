@@ -327,8 +327,8 @@ impl FindOptions {
         return self;
     }
 
-    pub fn threaded(mut self) -> Self {
-        self.threaded = true;
+    pub fn threaded(mut self, value: bool) -> Self {
+        self.threaded = value;
         return self;
     }
 

@@ -5,7 +5,7 @@ pub enum SeedFactory {
 
     /// Search in a specific given seed
     Seed {
-        #[arg(short='s', long, default_value_t=0)]
+        #[arg(short='v', long, default_value_t=0)]
         value: u64,
     },
 
@@ -29,17 +29,54 @@ pub enum SeedFactory {
         /// Percentage of all seeds to search (0.0-1.0)
         #[arg(short='r', long, default_value_t=1.0)]
         ratio: f64,
+    },
+
+    /// Use an input file with a list of seeds to search
+    File {
+        #[arg(short='i', long)]
+        input: String,
+
+        // Internal
+        values: Vec<u64>,
     }
 }
 
 
 impl SeedFactory {
+    pub fn initialize(&mut self) {
+        match self {
+            Self::File{input, values} => {
+                let content = std::fs::read_to_string(input)
+                    .expect("Could not read input file");
+
+                for line in content.lines() {
+                    let line = line.trim();
+
+                    // From a piped monoliths json
+                    if line.starts_with('{') {
+                        let monolith = serde_json::from_str::<Monolith>(line)
+                            .expect("Could not parse Monolith from JSON");
+                        values.push(monolith.seed);
+
+                    // Try parsing as number
+                    } else if let Ok(seed) = line.parse::<u64>() {
+                        values.push(seed);
+                    }
+                }
+            },
+
+            // Procedural, nothing to do
+            _ => ()
+        }
+    }
+
     pub fn total(&self) -> u64 {
         match self {
             Self::Seed{..} => 1,
             Self::Linear{total, ..} => *total,
             Self::Random{total, ..} => *total,
             Self::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as u64,
+            Self::File{values, ..} => values.len() as u64,
         }
     }
 
@@ -57,6 +94,9 @@ impl SeedFactory {
 
             Self::Ratio{ratio} =>
                 (n as f64 / *ratio) as u64,
+
+            Self::File{values, ..} =>
+                values[n as usize],
         }
     }
 }

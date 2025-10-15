@@ -24,12 +24,12 @@ impl FindCommand {
         let mut monoliths = world.find_monoliths(
             &FindOptions::default()
                 .step(self.step)
+                .threaded(true)
                 .depth_wraps()
-                .threaded()
         );
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("json {}", serde_json::to_string(&x).unwrap()));
+        monoliths.iter().for_each(|x| println!("{}", serde_json::to_string(&x).unwrap()));
         println!("Found {} Monoliths, remember they repeat every {} blocks on any direction!",
             monoliths.len(), MONOLITHS_REPEAT);
     }

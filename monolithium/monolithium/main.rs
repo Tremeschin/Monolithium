@@ -17,7 +17,7 @@ enum Commands {
 }
 
 impl Commands {
-    fn run(&self) {
+    fn run(&mut self) {
         match self {
             Commands::Mask(cmd)   => cmd.run(),
             Commands::Spawn(cmd)  => cmd.run(),

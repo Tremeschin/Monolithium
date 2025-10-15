@@ -24,10 +24,15 @@ pub struct SpawnCommand {
     /// Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]
     step: usize,
+
+    /// Use multithreading to search within a seed
+    #[arg(short='t', long, default_value_t=false)]
+    threaded: bool,
 }
 
 impl SpawnCommand {
-    pub fn run(&self) {
+    pub fn run(&mut self) {
+        self.seeds.initialize();
 
         // Standard math to split a work into many blocks
         let chunks = (self.seeds.total() + self.chunks - 1) / self.chunks;
@@ -36,6 +41,7 @@ impl SpawnCommand {
             .with_style(utils::progress("Searching"));
 
         let options = FindOptions::default()
+            .threaded(self.threaded)
             .spawn(self.radius)
             .limit(self.limit)
             .area(self.area)
@@ -66,7 +72,7 @@ impl SpawnCommand {
             .collect();
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("json {}", serde_json::to_string(&x).unwrap()));
+        monoliths.iter().for_each(|x| println!("{}", serde_json::to_string(&x).unwrap()));
         println!("Found {} Monoliths", monoliths.len());
     }
 }
