@@ -83,8 +83,8 @@ There's a couple improvements to this method:
 Full command idea that broke many records:
 
 ```sh
-# or 'cargo run --release --features candidates --features fast \' in monolithium dir
-$ rustlith --candidates --fast \
+# or 'cargo run --release --features candidates --features fast' in monolithium dir
+$ QUALITY=250.0 rustlith --candidates --fast \
   search --chunks 1000 --hill --step 1024 --area 2200000 \
   random --total 100000000 \
 > candidates.txt

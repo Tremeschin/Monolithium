@@ -38,11 +38,11 @@ pub struct SearchCommand {
     #[arg(short='a', long, default_value_t=0)]
     area: u64,
 
-    /// (Special) Set radius to the value hill noise wraps
+    /// (Special) Set radius to the value hill noise wraps (262144)
     #[arg(short='h', long, default_value_t=false)]
     hill: bool,
 
-    /// (Special) Set radius to the value depth noise wraps
+    /// (Special) Set radius to the value depth noise wraps (4194304)
     #[arg(short='d', long, default_value_t=false)]
     depth: bool,
 }
