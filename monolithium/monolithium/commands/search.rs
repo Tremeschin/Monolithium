@@ -70,7 +70,7 @@ impl SearchCommand {
 
         // Infer threading if too few inputs
         if self.seeds.total() < 4 {
-            options = options.threaded(false);
+            options = options.threaded(true);
         }
 
         let mut monoliths: Vec<Monolith> =
