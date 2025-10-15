@@ -211,7 +211,7 @@ impl World {
     /// semi-surprisingly, generating enormous ones at 0.5 decimals.
     ///
     /// For a normal curve P(x) = exp(-((x-u)/2s)^2), the coefficients for
-    /// rolling 'good'  fractional perlin noises seeds are, for (A=10, B=16):
+    /// rolling 'good' fractional perlin noises seeds are, for (A=10, B=16):
     ///
     /// 1. Unscaled deviations for all octaves:
     ///    - [Hill+Depth](https://www.desmos.com/calculator/w1wwgd3cli)
@@ -229,6 +229,8 @@ impl World {
     ///      - u =   3*(2**A - 1)/4    =~ 767.25
     ///      - s = sqrt((4**A - 1)/48) =~ 147.80
     ///
+    /// Such cutoffs can be tweaked with the QUALITY=x compile time variable.
+    ///
     #[inline(always)]
     pub fn good_perlin_fracts(seed: u64) -> bool {
         let mut rng = JavaRNG::new(seed);
@@ -240,12 +242,21 @@ impl World {
         // Heuristic numbers to filter out 'bad' seeds
         let (quality, noises): (f64, &[usize]);
 
+        // Shorthand to get quality var or default
+        let kwa = |default: f64| -> f64 {
+            option_env!("QUALITY")
+                .and_then(|v| v.parse().ok())
+                .unwrap_or(default)
+        };
+
         if cfg!(feature="depth-fracts") {
-            quality = if cfg!(feature="scaled-deviation") {28000.0} else {16.0};
             noises  = &[HILL_OCTAVES, DEPTH_OCTAVES];
+            quality = if cfg!(feature="scaled-deviation")
+                {kwa(28000.0)} else {kwa(16.0)};
         } else {
-            quality = if cfg!(feature="scaled-deviation") {  280.0} else { 5.4};
             noises  = &[HILL_OCTAVES];
+            quality = if cfg!(feature="scaled-deviation")
+                {kwa(280.0)} else {kwa(5.4)};
         };
 
         // Simulate parts of perlin initialization

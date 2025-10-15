@@ -87,12 +87,14 @@ skip-table = []
 only-hill = []
 
 # Filter out seeds in which the fractional part of perlin noises offsets aren't
-# close to a half in the 'spawn' command (edit cutoffs in world.rs). Such seeds
-# generally generates larger monoliths at spawn. By default, only the hill noise
+# close to a half in the 'spawn' command (see graphs in world.rs). Such seeds
+# generally generates larger monoliths overall. By default, only the hill noise
 # coefficients are checked, you can enable 'depth-fracts' to include depth.
 #
 # Reason being the lattices of perlin noises are zero-valued, with the highest
 # values often found at halfway points between grid coordinates.
+#
+# Such cutoffs can be tweaked with the QUALITY=x compile time variable.
 filter-fracts = []
 
 # With the 'filter-fracts' feature, include the depth noise deviations.
