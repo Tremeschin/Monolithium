@@ -10,6 +10,14 @@ pub struct SpawnCommand {
     #[arg(short='c', long, default_value_t=1)]
     chunks: u64,
 
+    /// Center X value to search for monoliths
+    #[arg(short='x', long, default_value_t=0)]
+    center_x: i32,
+
+    /// Center Z value to search for monoliths
+    #[arg(short='z', long, default_value_t=0)]
+    center_z: i32,
+
     /// How far from spawn to search in a square radius
     #[arg(short='r', long, default_value_t=100)]
     radius: i32,
@@ -28,6 +36,14 @@ pub struct SpawnCommand {
     /// Use multithreading to search within a seed
     #[arg(short='t', long, default_value_t=false)]
     threaded: bool,
+
+    /// Set radius to the value hill noise wraps
+    #[arg(long, default_value_t=false)]
+    hill: bool,
+
+    /// Set radius to the value depth noise wraps
+    #[arg(long, default_value_t=false)]
+    depth: bool,
 }
 
 impl SpawnCommand {
@@ -40,12 +56,16 @@ impl SpawnCommand {
         let progress = ProgressBar::new(chunks)
             .with_style(utils::progress("Searching"));
 
-        let options = FindOptions::default()
+        let mut options = FindOptions::default()
+            .around(self.center_x, self.center_z, self.radius)
             .threaded(self.threaded)
-            .spawn(self.radius)
             .limit(self.limit)
             .area(self.area)
             .step(self.step);
+
+        // Apply sugar options
+        if self.hill  {options = options.hill_wraps(); }
+        if self.depth {options = options.depth_wraps();}
 
         let mut monoliths: Vec<Monolith> =
             (0..chunks)

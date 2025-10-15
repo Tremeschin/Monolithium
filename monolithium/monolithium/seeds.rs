@@ -6,13 +6,13 @@ pub enum SeedFactory {
     /// Search in a specific given seed
     Seed {
         #[arg(short='v', long, default_value_t=0)]
-        value: u64,
+        value: Seed,
     },
 
     /// Search in N sequential seeds from a starting point
     Linear {
         #[arg(short='s', long, default_value_t=0)]
-        start: u64,
+        start: Seed,
 
         #[arg(short='t', long, default_value_t=1_000_000)]
         total: u64,
@@ -31,13 +31,11 @@ pub enum SeedFactory {
         ratio: f64,
     },
 
-    /// Use an input file with a list of seeds to search
+    /// Search in a file from a list of seeds or monoliths
     File {
         #[arg(short='i', long)]
         input: String,
-
-        // Internal
-        values: Vec<u64>,
+        values: Vec<Seed>,
     }
 }
 
@@ -80,20 +78,20 @@ impl SeedFactory {
         }
     }
 
-    pub fn get(&self, n: u64) -> u64 {
+    pub fn get(&self, n: u64) -> Seed {
         match self {
             Self::Seed{value} =>
                 *value,
 
             Self::Linear{start, ..} =>
-                (*start + n) as u64,
+                (*start + n) as Seed,
 
             // Fixme: Birthday paradox N = 2**48
             Self::Random{..} =>
                 fastrand::u64(0..TOTAL_SEEDS),
 
             Self::Ratio{ratio} =>
-                (n as f64 / *ratio) as u64,
+                (n as f64 / *ratio) as Seed,
 
             Self::File{values, ..} =>
                 values[n as usize],

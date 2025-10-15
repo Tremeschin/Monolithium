@@ -36,6 +36,8 @@ pub use seeds::*;
 pub use utils::*;
 pub use world::*;
 
+pub type Seed = u64;
+
 /// Coordinate at which the Far Lands start
 pub const FARLANDS: i32 = 12_550_824;
 

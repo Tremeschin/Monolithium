@@ -3,7 +3,7 @@ use crate::*;
 #[derive(Clone, Debug, Eq, Serialize, Deserialize)]
 pub struct Monolith {
     pub area: u64,
-    pub seed: u64,
+    pub seed: Seed,
 
     // Position in the world
     pub minx: i32, pub maxx: i32,

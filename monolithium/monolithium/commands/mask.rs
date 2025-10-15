@@ -3,7 +3,7 @@ use crate::*;
 #[derive(clap::Args)]
 pub struct Mask {
     #[arg(long, default_value_t=617)]
-    seed: u64,
+    seed: Seed,
 
     #[arg(long, default_value_t=-2000)]
     minx: i32,

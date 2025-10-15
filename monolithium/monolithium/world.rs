@@ -5,7 +5,7 @@ pub const DEPTH_OCTAVES: usize = 16;
 
 #[derive(Debug)]
 pub struct World {
-    pub seed: u64,
+    pub seed: Seed,
 
     /// Noise which determines how 'flat' the terrain is via elevation, with
     /// values below -512.0 being required to form a monolith.
@@ -35,7 +35,7 @@ impl World {
     }
 
     #[inline(always)]
-    pub fn init(&mut self, seed: u64) {
+    pub fn init(&mut self, seed: Seed) {
         let mut rng = JavaRNG::new(seed);
         self.seed = seed;
 
@@ -232,7 +232,7 @@ impl World {
     /// Such cutoffs can be tweaked with the QUALITY=x compile time variable.
     ///
     #[inline(always)]
-    pub fn good_perlin_fracts(seed: u64) -> bool {
+    pub fn good_perlin_fracts(seed: Seed) -> bool {
         let mut rng = JavaRNG::new(seed);
         Perlin::discard(&mut rng, 48);
 

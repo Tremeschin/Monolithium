@@ -5,7 +5,7 @@ pub struct FindCommand {
 
     /// World seed to search monoliths
     #[arg(short='s', long, default_value_t=0)]
-    seed: u64,
+    seed: Seed,
 
     /// Probe the world every N blocks
     #[arg(short='x', long, default_value_t=128)]
