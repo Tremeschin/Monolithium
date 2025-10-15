@@ -42,7 +42,7 @@ impl SpawnCommand {
             .step(self.step);
 
         let mut monoliths: Vec<Monolith> =
-            (0..=chunks)
+            (0..chunks)
             .into_par_iter()
             .progress_with(progress)
             .map_init(|| World::new(), |world, chunk| {
