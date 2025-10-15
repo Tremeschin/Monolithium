@@ -4,7 +4,7 @@
 name        = "monolithium"
 version     = "1.3.0"
 authors     = ["Tremeschin"]
-description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
+description = "Finding the Largest Minecraft Alpha Monoliths"
 repository  = "https://github.com/Tremeschin/Monolithium"
 readme      = "../.github/readme.md"
 license     = "MIT"
@@ -87,7 +87,7 @@ skip-table = []
 only-hill = []
 
 # Filter out seeds in which the fractional part of perlin noises offsets aren't
-# close to a half in the 'spawn' command (see graphs in world.rs). Such seeds
+# close to a half in the 'search' command (see graphs in world.rs). Such seeds
 # generally generates larger monoliths overall. By default, only the hill noise
 # coefficients are checked, you can enable 'depth-fracts' to include depth.
 #

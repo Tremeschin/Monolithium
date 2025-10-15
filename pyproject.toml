@@ -3,7 +3,7 @@ GitHub = "https://github.com/Tremeschin/Monolithium"
 
 [project]
 name        = "monolithium"
-description = "Finding the Largest Minecraft Infdev/Alpha Monoliths"
+description = "Finding the Largest Minecraft Alpha Monoliths"
 authors     = [{name="Tremeschin"}]
 version     = "1.1.0"
 readme      = ".github/readme.md"

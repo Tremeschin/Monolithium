@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/Tremeschin/Monolithium/main/monolithium/resources/images/logo.png" width="210">
   <h1 style="margin-top: 0">Monolithium</h1>
-  <span>🗿 Finding the Largest Minecraft Infdev/Alpha Monoliths 🗿</span>
+  <span>🗿 Finding the Largest Minecraft Alpha Monoliths 🗿</span>
   <br>
   <br>
     <a href="https://crates.io/crates/monolithium/"><img src="https://img.shields.io/crates/v/monolithium?label=Crates.io&color=orange"></a>
@@ -56,28 +56,28 @@ You can run any of `rustlith (command) --help` for options and information!
 
 This will search a 8,388,608 blocks square in both positive X and Z directions. Note that all monoliths repeats every such value on any coordinate - there are 9 copies of each within the Far Lands on any given world!
 
-- `rustlith find --seed 617`
+- `rustlith search --depth seed --value 617`
 
 ### 🟡 Find seeds with spawn monoliths
 
 This will search for seeds that contains monoliths close to spawn.
 
-- Search 0 through 100k seeds: `rustlith spawn linear -t 100000`
-- Search 50k random seeds: `rustlith spawn random -t 50000`
+- Search 0 through 100k seeds: `rustlith search linear -t 100000`
+- Search 50k random seeds: `rustlith search random -t 50000`
 
 ### 🟢 2Pass heuristic method
 
 This heuristic finds seeds with _great potential_ for large monoliths, by only looking at the much rarer `hill` noise values, and discarding most seeds with poor `x, y, z` fractional parts offsets.
 
-- `rustlith spawn --radius 8192 random -t 5000000 --candidates --fast` (potential)
-- For each output, run `rustlith find --step 512 --seed <n>` (real area)
+- `rustlith search --radius 8192 random -t 5000000 --candidates --fast` (potential)
+- For each output, run `rustlith search --step 512 seed -v <n>` (real area)
 
 There's a couple improvements to this method:
 
-- Since this discards millions seeds a second, rayon work-stealing parallelism becomes an overhead. Passing `--chunks 1000` to `spawn` makes each work block process multiple seeds instead of one.
+- Since this discards millions seeds a second, rayon work-stealing parallelism becomes an overhead. Passing `--chunks 1000` to `search` makes each work block process multiple seeds instead of one.
 - The `hill` wraps around `2**19` blocks, so `--radius 262144` searches _"the whole world"'s_ potential.
 - For long searches, filter out candidates with at least `--area n` to ignore bad shuffling seeds.
-- Largest monoliths are basically guaranteed to hit a lattice point multiple of `1024` or even `2048`
+- Largest monoliths are basically guaranteed to hit a lattice point multiple of `1024`
 - At [`world::good_perlin_fracts`](../monolithium/monolithium/world.rs), one can tweak the treshholds for a "good" seed.
 
 Full command idea that broke many records:
@@ -85,9 +85,14 @@ Full command idea that broke many records:
 ```sh
 # or 'cargo run --release --features candidates --features fast \' in monolithium dir
 $ rustlith --candidates --fast \
-  spawn --chunks 1000 --radius 262144 --step 2048 --area 2200000 \
+  search --chunks 1000 --hill --step 1024 --area 2200000 \
   random --total 100000000 \
 > candidates.txt
+
+# Many minutes/hours later..
+$ rustlith search --depth --step 512 --threaded \
+  file -i candidates.txt \
+> final.txt
 ```
 
 With enough `--total` seeeds, checking the best ones almost guarantees a record :)
@@ -103,8 +108,8 @@ Hall of fame for the timeline of computations:
 
 <!--
 Methodology:
-- (2025/09/20): (rustlith spawn --chunks 1000 --radius 262144 --step 1024 random --total 1000000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 280.0) • (find --step 512 --seed <best>)
-- (2025/09/18): (rustlith spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 380.0) • (find --step 512 --seed <best>)
+- (2025/09/20): (rustlith spawn --chunks 1000 --radius 262144 --step 1024 random --total 1000000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 280.0) • (search --step 512 --seed <best>)
+- (2025/09/18): (rustlith spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 380.0) • (search --step 512 --seed <best>)
 - (2025/08/13): (rustlith spawn --radius 200 --step 100 linear --total 5000000000)
 -->
 

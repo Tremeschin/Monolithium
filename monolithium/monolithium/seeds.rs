@@ -3,7 +3,7 @@ use crate::*;
 #[derive(clap::Subcommand)]
 pub enum SeedFactory {
 
-    /// Search in a specific given seed
+    /// Search in a specific seed value
     Seed {
         #[arg(short='v', long, default_value_t=0)]
         value: Seed,
@@ -31,7 +31,7 @@ pub enum SeedFactory {
         ratio: f64,
     },
 
-    /// Search in a file from a list of seeds or monoliths
+    /// Search in a file with a list of seeds or monoliths
     File {
         #[arg(short='i', long)]
         input: String,
@@ -57,7 +57,7 @@ impl SeedFactory {
                         values.push(monolith.seed);
 
                     // Try parsing as number
-                    } else if let Ok(seed) = line.parse::<u64>() {
+                    } else if let Ok(seed) = line.parse::<Seed>() {
                         values.push(seed);
                     }
                 }

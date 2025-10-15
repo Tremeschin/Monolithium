@@ -1,52 +1,53 @@
 use crate::*;
 
 #[derive(clap::Args)]
-pub struct SpawnCommand {
+pub struct SearchCommand {
 
     #[command(subcommand)]
     seeds: SeedFactory,
 
-    /// How many seeds each work block should process
+    /// (Worker ) How many seeds each work block should process
     #[arg(short='c', long, default_value_t=1)]
     chunks: u64,
 
-    /// Center X value to search for monoliths
-    #[arg(short='x', long, default_value_t=0)]
-    center_x: i32,
-
-    /// Center Z value to search for monoliths
-    #[arg(short='z', long, default_value_t=0)]
-    center_z: i32,
-
-    /// How far from spawn to search in a square radius
-    #[arg(short='r', long, default_value_t=100)]
-    radius: i32,
-
-    #[arg(short='l', long, default_value_t=999999)]
-    limit: u64,
-
-    /// Minimum area of the monoliths to find
-    #[arg(short='a', long, default_value_t=0)]
-    area: u64,
-
-    /// Spacing between each check, in blocks
-    #[arg(short='s', long, default_value_t=200)]
-    step: usize,
-
-    /// Use multithreading to search within a seed
+    /// (Worker ) Use multithreading to search within a seed
     #[arg(short='t', long, default_value_t=false)]
     threaded: bool,
 
-    /// Set radius to the value hill noise wraps
-    #[arg(long, default_value_t=false)]
+    /// (Where  ) Center X value to search for monoliths
+    #[arg(short='x', long, default_value_t=0)]
+    center_x: i32,
+
+    /// (Where  ) Center Z value to search for monoliths
+    #[arg(short='z', long, default_value_t=0)]
+    center_z: i32,
+
+    /// (Where  ) How far from spawn to search in a square radius
+    #[arg(short='r', long, default_value_t=100)]
+    radius: i32,
+
+    /// (Where  ) Spacing between each check, in blocks
+    #[arg(short='s', long, default_value_t=200)]
+    step: usize,
+
+    /// (Limits ) Maximum number of monoliths to find in a seed
+    #[arg(short='l', long, default_value_t=999999)]
+    limit: u64,
+
+    /// (Limits ) Minimum area of the monoliths to find
+    #[arg(short='a', long, default_value_t=0)]
+    area: u64,
+
+    /// (Special) Set radius to the value hill noise wraps
+    #[arg(short='h', long, default_value_t=false)]
     hill: bool,
 
-    /// Set radius to the value depth noise wraps
-    #[arg(long, default_value_t=false)]
+    /// (Special) Set radius to the value depth noise wraps
+    #[arg(short='d', long, default_value_t=false)]
     depth: bool,
 }
 
-impl SpawnCommand {
+impl SearchCommand {
     pub fn run(&mut self) {
         self.seeds.initialize();
 
@@ -66,6 +67,11 @@ impl SpawnCommand {
         // Apply sugar options
         if self.hill  {options = options.hill_wraps(); }
         if self.depth {options = options.depth_wraps();}
+
+        // Infer threading if too few inputs
+        if self.seeds.total() < 4 {
+            options = options.threaded(false);
+        }
 
         let mut monoliths: Vec<Monolith> =
             (0..chunks)
