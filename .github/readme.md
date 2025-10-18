@@ -102,26 +102,6 @@ With enough `--total` seeeds, checking the best ones almost guarantees a record 
 > [!NOTE]
 > Area calculations are within 1% error, nearby monoliths are part of the same complex.
 
-Hall of fame for the timeline of computations:
-
-<div align="center">
-
-<!--
-Methodology:
-- (2025/09/20): (rustlith spawn --chunks 1000 --radius 262144 --step 1024 random --total 1000000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 280.0) • (search --step 512 --seed <best>)
-- (2025/09/18): (rustlith spawn --chunks 1000 --radius 3000 --step 500 random --total 75000000000) • (skip-rejection, skip-table, only-hill, filter-fracts, scaled-deviation) • (Hill quality: 380.0) • (search --step 512 --seed <best>)
-- (2025/08/13): (rustlith spawn --radius 200 --step 100 linear --total 5000000000)
--->
-
-<!-- Note: All runs with any '--fast' optimizations are considered lossy -->
-| Date       | Hardware | Time | Seeds               |  Total (%) | Type        | User                        |
-| :--------: | :------: | :--: | ------------------: | ---------: | :---------: | :-------------------------: |
-| 2025/09/20 | i7 12700 | 14h  |   1,000,000,000,000 |   0.35527% | Lossy/2Pass | [**akatz-ai**](https://github.com/akatz-ai/) |
-| 2025/09/18 | R9 5900x | 45m  |      75,000,000,000 |   0.02664% | Lossy/2Pass | [**Tremeschin**](https://github.com/Tremeschin/) |
-| 2025/08/13 | R9 5900x | 8h   |       5,000,000,000 |   0.00177% | Accurate    | [**Tremeschin**](https://github.com/Tremeschin/) |
-
-</div>
-
 ### 🔵 Largest monoliths anywhere
 
 <div align="center">
@@ -129,6 +109,12 @@ Methodology:
 | Area      | Seed               | X       | Z       | Date       | Found by   |
 | :-------: | :----------------: | ------: | ------: | :--------: | :--------: |
 | 3,119,151 |     94116384388573 | 3185395 | 1401244 | 2025/10/06 | Tremeschin |
+| 3,099,536 |      1184681998931 | 7361728 | 4530048 | 2025/10/18 | Ferra      |
+| 3,047,088 |        24388692462 | 2942560 | 4232256 | 2025/10/18 | Ferra      |
+| 3,012,432 |      1102581481210 | 6025536 | 4676000 | 2025/10/18 | Ferra      |
+| 2,987,360 |        34786730572 | 4236288 | 5081952 | 2025/10/18 | Ferra      |
+| 2,950,096 |       530268432158 | 1384896 | 8037440 | 2025/10/18 | Ferra      |
+| 2,892,928 |       873667255313 | 5711040 | 1334432 | 2025/10/18 | Ferra      |
 | 2,890,848 |    143779371652733 |  265920 | 5994240 | 2025/09/20 | akatz-ai   |
 | 2,649,984 |    130449915832690 |  786608 | 4163520 | 2025/09/20 | akatz-ai   |
 | 2,316,064 |     19907909658842 | 1572070 | 3668360 | 2025/09/18 | Tremeschin |
@@ -141,16 +127,17 @@ Methodology:
 
 <div align="center">
 
-| Area      | Seed           | Date       | Found by   |
-| :-------: | :------------: | :--------: | :--------: |
-| 1,975,712 | 35668441367715 | 2025/10/08 | NathanVH8  |
-| 1,745,664 |     4609608251 | 2025/08/13 | Tremeschin |
-| 1,584,112 |     1847066092 | 2025/08/13 | Tremeschin |
-| 1,420,816 |     2045872561 | 2025/08/13 | Tremeschin |
-| 1,371,824 |     3847304212 | 2025/08/13 | Tremeschin |
-| 1,369,360 |     1593912439 | 2025/08/13 | Tremeschin |
-| 1,345,520 |     4563197188 | 2025/08/13 | Tremeschin |
-| 1,305,472 |     4432659853 | 2025/08/13 | Tremeschin |
+| Area      | Seed            | Date       | Found by   |
+| :-------: | :-------------: | :--------: | :--------: |
+| 1,993,040 | 269943915147763 | 2025/10/18 | NathanVH8  |
+| 1,975,712 |  35668441367715 | 2025/10/08 | NathanVH8  |
+| 1,745,664 |      4609608251 | 2025/08/13 | Tremeschin |
+| 1,584,112 |      1847066092 | 2025/08/13 | Tremeschin |
+| 1,420,816 |      2045872561 | 2025/08/13 | Tremeschin |
+| 1,371,824 |      3847304212 | 2025/08/13 | Tremeschin |
+| 1,369,360 |      1593912439 | 2025/08/13 | Tremeschin |
+| 1,345,520 |      4563197188 | 2025/08/13 | Tremeschin |
+| 1,305,472 |      4432659853 | 2025/08/13 | Tremeschin |
 
 </div>
 

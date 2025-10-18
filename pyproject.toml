@@ -10,10 +10,10 @@ readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
 dependencies = [
-    "meson~=1.9.0",
-    "ninja~=1.13.0",
-    "rustup~=1.28.2.1",
-    "tomli~=2.2.1",
+    "meson",
+    "ninja",
+    "rustup",
+    "tomli",
 ]
 
 [project.optional-dependencies]
@@ -25,7 +25,7 @@ statistics = [
     "vl-convert-python",
 ]
 website = [
-    "mkdocs-material~=9.6.20",
+    "mkdocs-material~=9.6.22",
     "mkdocs~=1.6.1",
 ]
 all = [

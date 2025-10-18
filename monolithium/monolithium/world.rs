@@ -122,8 +122,8 @@ impl World {
                     queue.push_back((x-n, z+n));
                     queue.push_back((x-n, z-n));
                     queue.push_back((x+n, z+0));
-                    queue.push_back((x+0, z+n));
                     queue.push_back((x-n, z+0));
+                    queue.push_back((x+0, z+n));
                     queue.push_back((x+0, z-n));
                 }
 
