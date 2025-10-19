@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 dependencies = [
     "meson",
     "ninja",
-    "rustup",
+    "rustbin",
     "tomli",
 ]
 

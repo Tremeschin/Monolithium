@@ -1,4 +1,5 @@
 *.json
+*.lock
 *.pyc
 build
 output
