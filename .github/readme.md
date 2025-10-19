@@ -129,6 +129,7 @@ With enough `--total` seeeds, checking the best ones almost guarantees a record 
 
 | Area      | Seed            | Date       | Found by   |
 | :-------: | :-------------: | :--------: | :--------: |
+| 2,240,624 |  38078992166078 | 2025/10/19 | NathanVH8  |
 | 1,993,040 | 269943915147763 | 2025/10/18 | NathanVH8  |
 | 1,975,712 |  35668441367715 | 2025/10/08 | NathanVH8  |
 | 1,745,664 |      4609608251 | 2025/08/13 | Tremeschin |

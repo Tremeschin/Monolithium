@@ -5,7 +5,7 @@ GitHub = "https://github.com/Tremeschin/Monolithium"
 name        = "monolithium"
 description = "Finding the Largest Minecraft Alpha Monoliths"
 authors     = [{name="Tremeschin"}]
-version     = "1.1.0"
+version     = "1.2.0"
 readme      = ".github/readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
@@ -37,7 +37,6 @@ all = [
 dev = ["monolithium[all]"]
 
 [project.scripts]
-# Common
 cudalith = "monolithium.__main__:_cudalith"
 rustlith = "monolithium.__main__:_rustlith"
 statlith = "monolithium.statistics:main"
