@@ -256,42 +256,32 @@ impl World {
             Perlin::discard(&mut rng, SKIP_OCTAVES);
         };
 
-        // How good the seed is/should be
-        let mut deviate = 0.0;
-
-        // Heuristic numbers to filter out 'bad' seeds
-        let (quality, noises): (f64, &[usize]);
-
         // Shorthand to get quality var or default
-        let kwa = |default: f64| -> f64 {
+        let kwality = |default: f64| {
             option_env!("QUALITY")
                 .and_then(|v| v.parse().ok())
                 .unwrap_or(default)
         };
 
+        // Heuristic numbers to filter out 'bad' seeds
+        let (quality, noises): (f64, &[usize]);
         if cfg!(feature="depth-fracts") {
             noises  = &[HILL_OCTAVES, DEPTH_OCTAVES];
-            quality = if cfg!(feature="scaled-deviation")
-                {kwa(28000.0)} else {kwa(16.0)};
+            quality = kwality(28000.0);
         } else {
             noises  = &[HILL_OCTAVES];
-            quality = if cfg!(feature="scaled-deviation")
-                {kwa(280.0)} else {kwa(5.4)};
+            quality = kwality(280.0);
         };
 
-        // Simulate parts of perlin initialization
+        // Simulate offsets rng
+        let mut deviate = 0.0;
         for part in noises {
-            for _octave in 0..(*part) {
-
-                #[cfg(feature="scaled-deviation")]
-                let scale = FractalPerlin::<0>::octave_scale_mul_f64(_octave);
+            for octave in 0..(*part) {
+                let scale = FractalPerlin::<0>::octave_scale_mul_f64(octave);
 
                 for _ in 0..3 {
                     let next = rng.next_f64() * 256.0;
-                    let next = (0.5 - (next - next.floor())).abs();
-                    #[cfg(feature="scaled-deviation")]
-                    let next = next * scale;
-                    deviate += next;
+                    deviate += scale * (0.5 - (next - next.floor())).abs();
                 }
 
                 // Early exit past treshold
@@ -304,11 +294,6 @@ impl World {
         }
 
         return true;
-    }
-
-    /// Same as `good_perlin_fracts()` but for the current values
-    pub fn perlin_fracts_score(&self) -> bool {
-        unimplemented!();
     }
 }
 

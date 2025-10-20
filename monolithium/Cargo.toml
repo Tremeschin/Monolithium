@@ -2,7 +2,7 @@
 
 [package]
 name        = "monolithium"
-version     = "1.2.0"
+version     = "1.3.0"
 authors     = ["Tremeschin"]
 description = "Finding the Largest Minecraft Alpha Monoliths"
 repository  = "https://github.com/Tremeschin/Monolithium"
@@ -107,9 +107,6 @@ filter-fracts = []
 # With the 'filter-fracts' feature, include the depth noise deviations.
 depth-fracts = []
 
-# Scale seed probing deviations with their octave.
-scaled-deviation = []
-
 # Copy the seed to the internal LCG state, instead of going through math.
 # Minor performance improvements, get a seed with World::seed_from_state()
 state-seed = []
@@ -121,6 +118,8 @@ state-seed = []
 # Effectively, this gets a world where the LCG state "started" after the first
 # perlin initialization, avoiding recomputing and shuffling.
 #
+# This is not worth it nor implemented with 'filter-fracts' active.
+#
 # Major speed improvements on initialization
 sister-perlin = []
 
@@ -130,7 +129,6 @@ sister-perlin = []
 candidates = [
     "only-hill",
     "filter-fracts",
-    "scaled-deviation",
 ]
 
 fast = [

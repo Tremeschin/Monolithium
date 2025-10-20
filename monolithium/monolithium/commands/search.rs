@@ -88,7 +88,6 @@ impl SearchCommand {
 
                 (min..max).map(|seed| {
                     if cfg!(feature="sister-perlin") {
-                        // Todo: Fracts filtering on sister worlds
                         world.sister_perlin();
                         world.find_monoliths(&options)
                     } else {
