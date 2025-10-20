@@ -95,7 +95,19 @@ $ rustlith search --depth --step 512 --threaded \
 > final.txt
 ```
 
-With enough `--total` seeeds, checking the best ones almost guarantees a record :)
+With enough `--total` seeds, checking the best ones almost guarantees a record :)
+
+### 🟠 Fast spawn search
+
+Instead of initializing a world from zero per work `chunks` loop, this method reutilizes most perlin noises data in a incremental way, rolling down all octaves and appending a new one with the current RNG state.
+
+As such, `--chunks` plays more than one role here, theoretical max performance at `total_seeds/cpu_threads`:
+
+```sh
+$ AREA_STEP=8 rustlith --fast --sister-perlin --deque-octaves \
+  search --chunks 1000 --area 500000 \
+  random -t 50000000
+```
 
 ## ⭐️ Showcase
 
