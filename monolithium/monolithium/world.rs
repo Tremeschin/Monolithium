@@ -36,7 +36,7 @@ impl World {
 
     #[inline(always)]
     pub fn init(&mut self, seed: Seed) {
-        let mut rng = JavaRNG::new(seed);
+        let mut rng = JavaRNG::from_seed(seed);
         self.seed = seed;
 
         // Skip 48 generators priorly used elsewhere
@@ -233,7 +233,7 @@ impl World {
     ///
     #[inline(always)]
     pub fn good_perlin_fracts(seed: Seed) -> bool {
-        let mut rng = JavaRNG::new(seed);
+        let mut rng = JavaRNG::from_seed(seed);
         Perlin::discard(&mut rng, 48);
 
         // How good the seed is/should be

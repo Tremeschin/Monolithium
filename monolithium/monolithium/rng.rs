@@ -5,6 +5,7 @@
 
 const F: f64 = (1u64 << 53) as f64;
 const M: u64 = (1 << 48) - 1;
+const B: u64 = 0xDFE05BCB1365;
 const A: u64 = 0x5DEECE66D;
 const C: u64 = 11;
 
@@ -15,14 +16,31 @@ pub struct JavaRNG {
 impl JavaRNG {
 
     #[inline(always)]
-    pub fn new(seed: u64) -> Self {
+    pub fn from_seed(seed: u64) -> Self {
         Self {state: (seed ^ A) & M}
+    }
+
+    #[inline(always)]
+    pub fn from_state(state: u64) -> Self {
+        Self {state: state & M}
+    }
+
+    /// Find a seed that starts off at the current state
+    #[inline(always)]
+    pub fn reverse_seed(&self) -> u64 {
+        self.state ^ A
     }
 
     /// Roll the state, same effect as ignoring a `.next()` call
     #[inline(always)]
     pub fn step(&mut self) {
         self.state = self.state.wrapping_mul(A).wrapping_add(C) & M
+    }
+
+    /// Roll the state backwards, undoing a `.next()` call
+    #[inline(always)]
+    pub fn back(&mut self) {
+        self.state = B.wrapping_mul(self.state.wrapping_sub(C)) & M;
     }
 
     /// Rolls the state and returns N<=32 low bits
@@ -84,7 +102,7 @@ static SKIP_TABLE: [(u64, u64); SKIP_TABLE_SIZE] = {
 
 impl JavaRNG {
 
-    /// Roll the state N times, fast
+    /// Roll the state N times fast (lossy)
     #[inline(always)]
     pub fn step_n(&mut self, n: usize) {
         if cfg!(feature="skip-table") {
@@ -94,6 +112,20 @@ impl JavaRNG {
         } else {
             for _ in 0..n {
                 self.step();
+            }
+        }
+    }
+
+    /// Roll the state backwards N times fast (lossy)
+    #[inline(always)]
+    pub fn back_n(&mut self, n: usize) {
+        if cfg!(feature="skip-table") {
+            debug_assert!(n < SKIP_TABLE_SIZE);
+            let (a_n, c_n) = unsafe {SKIP_TABLE.get_unchecked(n)};
+            self.state = (B.wrapping_mul(self.state.wrapping_sub(*c_n))).wrapping_mul(*a_n) & M;
+        } else {
+            for _ in 0..n {
+                self.back();
             }
         }
     }

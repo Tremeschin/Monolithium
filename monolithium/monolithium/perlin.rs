@@ -120,7 +120,6 @@ impl Perlin {
     }
 
     /// Roll the generator state that would have created a PerlinNoise
-    /// - Fast way around without as many memory operations
     pub fn discard(rng: &mut JavaRNG, many: usize) {
 
         // Super fast but slightly lossy
@@ -140,6 +139,30 @@ impl Perlin {
             // Permutations swapping
             for max in (1..=256).rev() {
                 rng.next_i32_bound(max);
+            }
+        }
+    }
+
+    /// Roll back the generator state that would have created a PerlinNoise (lossy)
+    pub fn undiscard(rng: &mut JavaRNG, many: usize) {
+
+        // Super fast but slightly lossy
+        if cfg!(feature="skip-table") {
+            rng.back_n(many*(3*2 + 256));
+            return;
+        }
+
+        for _ in 0..many {
+
+            // Coordinates f64 offsets
+            for _ in 0..3 {
+                rng.back();
+                rng.back();
+            }
+
+            // Permutations swapping
+            for _ in (1..=256).rev() {
+                rng.back();
             }
         }
     }
