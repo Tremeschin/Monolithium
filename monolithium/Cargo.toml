@@ -62,7 +62,9 @@ deque-octaves = []
 
 # Step by 4 blocks when calculating areas, as each noise coordinate is the world
 # position divided by 4. This causes a small error in area calculation due to
-# interpolation, but the average of over/under-shoots gives at most 1% error
+# interpolation, but the average of over/under-shoots gives at most 1% error.
+#
+# Configurable via AREA_STEP=4 variable at compile time.
 fast-area = []
 
 # Ignores the last few octaves in noises, as they contribute very little. Causes

@@ -79,7 +79,9 @@ impl World {
         }
 
         // How accurate the area calculation is
-        let s = if cfg!(feature="fast-area") {4} else {1};
+        let s = option_env!("AREA_STEP")
+            .and_then(|v| v.parse().ok())
+            .unwrap_or(if cfg!(feature="fast-area") {4} else {1});
         let x = utils::nearest(x, s);
         let z = utils::nearest(z, s);
         let o = 32; // "Occasionally"

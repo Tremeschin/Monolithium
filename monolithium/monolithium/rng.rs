@@ -8,7 +8,7 @@ const M: u64 = (1 << 48) - 1;
 const A: u64 = 0x5DEECE66D;
 const C: u64 = 11;
 
-// Modular multiplicative inverse constants
+// Inverse constants
 const AI: u64 = 0xDFE05BCB1365;
 const CI: u64 = (M + 1).wrapping_sub(C).wrapping_mul(AI) & M;
 
