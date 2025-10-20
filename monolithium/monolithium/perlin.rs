@@ -12,6 +12,8 @@ pub struct Perlin {
 /* -------------------------------------------------------------------------- */
 
 impl Perlin {
+
+    /// Get an empty structure
     pub fn new() -> Self {
         Perlin {
             map: [0; 256],
@@ -19,6 +21,13 @@ impl Perlin {
             yoff: 0.0,
             zoff: 0.0,
         }
+    }
+
+    /// Get a filled structure from rng
+    pub fn from_rng(rng: &mut JavaRNG) -> Self {
+        let mut perlin = Perlin::new();
+        perlin.init(rng);
+        perlin
     }
 
     #[inline(always)]

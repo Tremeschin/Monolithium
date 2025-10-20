@@ -1,11 +1,15 @@
 use crate::*;
 
+pub const SKIP_OCTAVES:  usize = 48;
 pub const HILL_OCTAVES:  usize = 10;
 pub const DEPTH_OCTAVES: usize = 16;
 
 #[derive(Debug)]
 pub struct World {
     pub seed: Seed,
+
+    /// The internal pseudo random number generator
+    pub rng: JavaRNG,
 
     /// Noise which determines how 'flat' the terrain is via elevation, with
     /// values below -512.0 being required to form a monolith.
@@ -27,6 +31,7 @@ impl World {
     pub fn new() -> Self {
         World {
             seed: 0,
+            rng: JavaRNG::from_state(0),
             hill: FractalPerlin::new(),
 
             #[cfg(not(feature="only-hill"))]
@@ -36,16 +41,15 @@ impl World {
 
     #[inline(always)]
     pub fn init(&mut self, seed: Seed) {
-        let mut rng = JavaRNG::from_seed(seed);
+        self.rng = JavaRNG::from_seed(seed);
         self.seed = seed;
 
-        // Skip 48 generators priorly used elsewhere
-        Perlin::discard(&mut rng, 48);
-
-        self.hill.init(&mut rng);
+        // Skip generators priorly used elsewhere
+        Perlin::discard(&mut self.rng, SKIP_OCTAVES);
+        self.hill.init(&mut self.rng);
 
         #[cfg(not(feature="only-hill"))]
-        self.depth.init(&mut rng);
+        self.depth.init(&mut self.rng);
     }
 
     // Check if a given coordinate is part of a monolith
@@ -234,7 +238,7 @@ impl World {
     #[inline(always)]
     pub fn good_perlin_fracts(seed: Seed) -> bool {
         let mut rng = JavaRNG::from_seed(seed);
-        Perlin::discard(&mut rng, 48);
+        Perlin::discard(&mut rng, SKIP_OCTAVES);
 
         // How good the seed is/should be
         let mut deviate = 0.0;
@@ -284,6 +288,44 @@ impl World {
         }
 
         return true;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+// Sister perlins
+
+impl World {
+
+    /// Generate a sister-world where the LCG state "started" at the end of ours
+    /// first perlin noise generation. Effectively, roll down all the current
+    /// noise octaves, generate and append a new one at the end.
+    #[cfg(feature="only-hill")]
+    pub fn sister_perlin(&mut self) {
+        // Hill: 0123456789 -> into 123456789(New)
+        self.hill.noise.rotate_left(1);
+        self.hill.noise[HILL_OCTAVES - 1] = Perlin::from_rng(&mut self.rng);
+    }
+
+    /// Generate a sister-world where the LCG state "started" at the end of ours
+    /// first perlin noise generation. Effectively, roll down all the current
+    /// noise octaves, generate and append a new one at the end.
+    #[cfg(not(feature="only-hill"))]
+    pub fn sister_perlin(&mut self) {
+        // Hill: 0123456789 Depth: ABCD... -> into
+        // Hill: 123456789A Depth: BCDE...(New)
+        self.hill.noise.rotate_left(1);
+        self.hill.noise[HILL_OCTAVES - 1] = self.depth.noise[0].clone();
+        self.depth.noise.rotate_left(1);
+        self.depth.noise[DEPTH_OCTAVES - 1] = Perlin::from_rng(&mut self.rng);
+    }
+
+    /// Get a seed from the current RNG state
+    pub fn seed_from_state(&self) -> Seed {
+        let mut rev = self.rng.clone();
+        Perlin::undiscard(&mut rev, DEPTH_OCTAVES);
+        Perlin::undiscard(&mut rev, HILL_OCTAVES);
+        Perlin::undiscard(&mut rev, SKIP_OCTAVES);
+        return rev.reverse_seed();
     }
 }
 

@@ -9,6 +9,7 @@ const B: u64 = 0xDFE05BCB1365;
 const A: u64 = 0x5DEECE66D;
 const C: u64 = 11;
 
+#[derive(Clone, Debug)]
 pub struct JavaRNG {
     state: u64,
 }
