@@ -52,6 +52,11 @@ default = [
 # Use a lookup table for `utils::grad()`
 grad-lookup = []
 
+# Use a VecDeque instead of array for FractalPerlin struct, improves performance
+# for sister perlin calls as it rotates faster. Might cause minor to no speed
+# regression otherwise and elsewhere, situationally useful.
+fractal-deque = []
+
 # ------------------------------------ #
 # Lossy optimizations
 

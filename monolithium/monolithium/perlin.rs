@@ -181,6 +181,11 @@ impl Perlin {
 
 #[derive(Clone, Debug)]
 pub struct FractalPerlin<const OCTAVES: usize> {
+
+    #[cfg(feature="fractal-deque")]
+    pub noise: VecDeque<Perlin>,
+
+    #[cfg(not(feature="fractal-deque"))]
     pub noise: [Perlin; OCTAVES],
 }
 
@@ -212,9 +217,19 @@ static OCTAVE_SCALE_DIV: [f64; 32] = {
 impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     #[inline(always)]
+    #[cfg(feature="fractal-deque")]
+    pub fn new() -> Self {
+        // Important: Start with a capacity, to win amortized complexity game
+        let mut noise: VecDeque<Perlin> = VecDeque::with_capacity(OCTAVES);
+        for _ in 0..OCTAVES {noise.push_back(Perlin::new());}
+        FractalPerlin {noise}
+    }
+
+    #[inline(always)]
+    #[cfg(not(feature="fractal-deque"))]
     pub fn new() -> Self {
         FractalPerlin {
-            noise: std::array::from_fn(|_| Perlin::new())
+            noise: std::array::from_fn(|_| Perlin::new()),
         }
     }
 
