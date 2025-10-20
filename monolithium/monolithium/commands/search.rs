@@ -81,16 +81,27 @@ impl SearchCommand {
                 let min = (chunk + 0) * self.chunks;
                 let max = (chunk + 1) * self.chunks;
 
-                (min..max).map(|seed| {
-                    let seed = self.seeds.get(seed);
-
-                    #[cfg(feature="filter-fracts")]
-                    if !World::good_perlin_fracts(seed) {
-                        return Vec::new();
-                    }
-
+                if cfg!(feature="sister-perlin") {
+                    let seed = self.seeds.get(min);
                     world.init(seed);
-                    world.find_monoliths(&options)
+                }
+
+                (min..max).map(|seed| {
+                    if cfg!(feature="sister-perlin") {
+                        // Todo: Fracts filtering on sister worlds
+                        world.sister_perlin();
+                        world.find_monoliths(&options)
+                    } else {
+                        let seed = self.seeds.get(seed);
+
+                        #[cfg(feature="filter-fracts")]
+                        if !World::good_perlin_fracts(seed) {
+                            return Vec::new();
+                        }
+
+                        world.init(seed);
+                        world.find_monoliths(&options)
+                    }
                 }).flatten()
                   .collect::<Vec<Monolith>>()
             })

@@ -5,9 +5,14 @@
 
 const F: f64 = (1u64 << 53) as f64;
 const M: u64 = (1 << 48) - 1;
-const B: u64 = 0xDFE05BCB1365;
 const A: u64 = 0x5DEECE66D;
 const C: u64 = 11;
+
+// Modular multiplicative inverse constants
+const AI: u64 = 0xDFE05BCB1365;
+const CI: u64 = (M + 1).wrapping_sub(C).wrapping_mul(AI) & M;
+
+/* -------------------------------------------------------------------------- */
 
 #[derive(Clone, Debug)]
 pub struct JavaRNG {
@@ -41,7 +46,7 @@ impl JavaRNG {
     /// Roll the state backwards, undoing a `.next()` call
     #[inline(always)]
     pub fn back(&mut self) {
-        self.state = B.wrapping_mul(self.state.wrapping_sub(C)) & M;
+        self.state = AI.wrapping_mul(self.state.wrapping_sub(C)) & M;
     }
 
     /// Rolls the state and returns N<=32 low bits
@@ -83,19 +88,31 @@ impl JavaRNG {
 
 /* -------------------------------------------------------------------------- */
 
-static SKIP_TABLE_SIZE: usize = 16_384;
-static SKIP_TABLE: [(u64, u64); SKIP_TABLE_SIZE] = {
+static SKIP_TABLE_SIZE: usize = 2_usize.pow(15);
+
+/// Forward modular multiplication table
+static SKIP_TABLE_NEXT: [(u64, u64); SKIP_TABLE_SIZE] = {
     let mut table = [(0u64, 0u64); SKIP_TABLE_SIZE];
-
-    // Start with the identity
     let (mut mul, mut add) = (1, 0);
-
-    // Precompute N steps of the LCG
     let mut n = 0;
     while n < SKIP_TABLE_SIZE {
         table[n] = (mul, add);
         mul = (mul.wrapping_mul(A)) & M;
         add = (add.wrapping_mul(A).wrapping_add(C)) & M;
+        n += 1;
+    }
+    table
+};
+
+/// Modular multiplicative inverse table
+static SKIP_TABLE_BACK: [(u64, u64); SKIP_TABLE_SIZE] = {
+    let mut table = [(0u64, 0u64); SKIP_TABLE_SIZE];
+    let (mut mul, mut add) = (1, 0);
+    let mut n = 0;
+    while n < SKIP_TABLE_SIZE {
+        table[n] = (mul, add);
+        mul = (mul.wrapping_mul(AI)) & M;
+        add = (add.wrapping_mul(AI).wrapping_add(CI)) & M;
         n += 1;
     }
     table
@@ -108,7 +125,7 @@ impl JavaRNG {
     pub fn step_n(&mut self, n: usize) {
         if cfg!(feature="skip-table") {
             debug_assert!(n < SKIP_TABLE_SIZE);
-            let (a_n, c_n) = unsafe {SKIP_TABLE.get_unchecked(n)};
+            let (a_n, c_n) = unsafe {SKIP_TABLE_NEXT.get_unchecked(n)};
             self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
         } else {
             for _ in 0..n {
@@ -122,8 +139,8 @@ impl JavaRNG {
     pub fn back_n(&mut self, n: usize) {
         if cfg!(feature="skip-table") {
             debug_assert!(n < SKIP_TABLE_SIZE);
-            let (a_n, c_n) = unsafe {SKIP_TABLE.get_unchecked(n)};
-            self.state = (B.wrapping_mul(self.state.wrapping_sub(*c_n))).wrapping_mul(*a_n) & M;
+            let (a_n, c_n) = unsafe {SKIP_TABLE_BACK.get_unchecked(n)};
+            self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
         } else {
             for _ in 0..n {
                 self.back();

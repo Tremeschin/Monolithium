@@ -55,7 +55,7 @@ grad-lookup = []
 # Use a VecDeque instead of array for FractalPerlin struct, improves performance
 # for sister perlin calls as it rotates faster. Might cause minor to no speed
 # regression otherwise and elsewhere, situationally useful.
-fractal-deque = []
+deque-octaves = []
 
 # ------------------------------------ #
 # Lossy optimizations
@@ -111,6 +111,16 @@ scaled-deviation = []
 # Copy the seed to the internal LCG state, instead of going through math.
 # Minor performance improvements, get a seed with World::seed_from_state()
 state-seed = []
+
+# For each iteration of a work block in --chunks, generate a sister-world by
+# rolling down all perlin octaves indices, generating and appending a new one
+# with the current world state, instead of initializing a completely new seed.
+#
+# Effectively, this gets a world where the LCG state "started" after the first
+# perlin initialization, avoiding recomputing and shuffling.
+#
+# Major speed improvements on initialization
+sister-perlin = []
 
 # ------------------------------------ #
 # Groups

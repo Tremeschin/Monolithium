@@ -43,11 +43,11 @@ impl World {
     pub fn init(&mut self, seed: Seed) {
         self.seed = seed;
 
-        if cfg!(not(feature="state-seed")) {
+        if cfg!(feature="state-seed") {
             self.rng = JavaRNG::from_state(seed);
-            Perlin::discard(&mut self.rng, SKIP_OCTAVES);
         } else {
             self.rng = JavaRNG::from_seed(seed);
+            Perlin::discard(&mut self.rng, SKIP_OCTAVES);
         };
 
         self.hill.init(&mut self.rng);
@@ -247,11 +247,11 @@ impl World {
     pub fn good_perlin_fracts(seed: Seed) -> bool {
         let mut rng: JavaRNG;
 
-        if cfg!(not(feature="state-seed")) {
+        if cfg!(feature="state-seed") {
             rng = JavaRNG::from_state(seed);
-            Perlin::discard(&mut rng, SKIP_OCTAVES);
         } else {
             rng = JavaRNG::from_seed(seed);
+            Perlin::discard(&mut rng, SKIP_OCTAVES);
         };
 
         // How good the seed is/should be
@@ -323,6 +323,7 @@ impl World {
         // Hill: 0123456789 -> into 123456789(New)
         self.hill.noise.rotate_left(1);
         self.hill.noise[HILL_OCTAVES - 1] = Perlin::from_rng(&mut self.rng);
+        self.seed = self.seed_from_state();
     }
 
     /// Generate a sister-world where the LCG state "started" at the end of ours
@@ -336,14 +337,28 @@ impl World {
         self.hill.noise[HILL_OCTAVES - 1] = self.depth.noise[0].clone();
         self.depth.noise.rotate_left(1);
         self.depth.noise[DEPTH_OCTAVES - 1] = Perlin::from_rng(&mut self.rng);
+        self.seed = self.seed_from_state();
     }
 
     /// Get a seed from the current RNG state
+    #[cfg(feature="only-hill")]
     pub fn seed_from_state(&self) -> Seed {
         let mut rev = self.rng.clone();
-        Perlin::undiscard(&mut rev, DEPTH_OCTAVES);
-        Perlin::undiscard(&mut rev, HILL_OCTAVES);
-        Perlin::undiscard(&mut rev, SKIP_OCTAVES);
+        Perlin::undiscard(&mut rev,
+            HILL_OCTAVES
+          + SKIP_OCTAVES
+        );
+        return rev.reverse_seed();
+    }
+
+    #[cfg(not(feature="only-hill"))]
+    pub fn seed_from_state(&self) -> Seed {
+        let mut rev = self.rng.clone();
+        Perlin::undiscard(&mut rev,
+            DEPTH_OCTAVES
+          + HILL_OCTAVES
+          + SKIP_OCTAVES
+        );
         return rev.reverse_seed();
     }
 }
