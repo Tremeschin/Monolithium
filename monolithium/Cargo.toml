@@ -108,6 +108,10 @@ depth-fracts = []
 # Scale seed probing deviations with their octave.
 scaled-deviation = []
 
+# Copy the seed to the internal LCG state, instead of going through math.
+# Minor performance improvements, get a seed with World::seed_from_state()
+state-seed = []
+
 # ------------------------------------ #
 # Groups
 

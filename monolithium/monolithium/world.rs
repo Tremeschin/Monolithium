@@ -41,11 +41,15 @@ impl World {
 
     #[inline(always)]
     pub fn init(&mut self, seed: Seed) {
-        self.rng = JavaRNG::from_seed(seed);
         self.seed = seed;
 
-        // Skip generators priorly used elsewhere
-        Perlin::discard(&mut self.rng, SKIP_OCTAVES);
+        if cfg!(not(feature="state-seed")) {
+            self.rng = JavaRNG::from_state(seed);
+            Perlin::discard(&mut self.rng, SKIP_OCTAVES);
+        } else {
+            self.rng = JavaRNG::from_seed(seed);
+        };
+
         self.hill.init(&mut self.rng);
 
         #[cfg(not(feature="only-hill"))]
@@ -209,7 +213,11 @@ impl World {
         }
         return None;
     }
+}
 
+/* -------------------------------------------------------------------------- */
+
+impl World {
     /// Heuristic on the discovered correlation between forcing the fractional
     /// part of the perlin noise to zero yielding no monoliths at spawn, and
     /// semi-surprisingly, generating enormous ones at 0.5 decimals.
@@ -237,8 +245,14 @@ impl World {
     ///
     #[inline(always)]
     pub fn good_perlin_fracts(seed: Seed) -> bool {
-        let mut rng = JavaRNG::from_seed(seed);
-        Perlin::discard(&mut rng, SKIP_OCTAVES);
+        let mut rng: JavaRNG;
+
+        if cfg!(not(feature="state-seed")) {
+            rng = JavaRNG::from_state(seed);
+            Perlin::discard(&mut rng, SKIP_OCTAVES);
+        } else {
+            rng = JavaRNG::from_seed(seed);
+        };
 
         // How good the seed is/should be
         let mut deviate = 0.0;
@@ -288,6 +302,11 @@ impl World {
         }
 
         return true;
+    }
+
+    /// Same as `good_perlin_fracts()` but for the current values
+    pub fn perlin_fracts_score(&self) -> bool {
+        unimplemented!();
     }
 }
 
