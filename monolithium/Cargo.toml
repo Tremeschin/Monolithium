@@ -79,6 +79,12 @@ skip-rejection = []
 # Use a Skip Table for fast LCG stepping, same loss as `skip-rejection`
 skip-table = []
 
+# Return the value as-is in utils::fade(), skipping the smoothing curve.
+#
+# While all areas will be blatantly wrong, computation is much faster and sizes
+# are still somewhat correlated to true areas. Roughly a 2x speed improvement.
+linear-fade = []
+
 # ------------------------------------ #
 # Behavioral changes
 

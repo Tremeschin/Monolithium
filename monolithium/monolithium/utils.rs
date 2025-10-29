@@ -9,7 +9,11 @@ pub fn nearest(num: i32, mul: i32) -> i32 {
 /// - https://en.wikipedia.org/wiki/Smoothstep
 #[inline(always)]
 pub fn fade(t: f64) -> f64 {
-    t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+    if cfg!(feature="linear-fade") {
+        return t;
+    } else {
+        t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+    }
 }
 
 /// Standard linear interpolation function
