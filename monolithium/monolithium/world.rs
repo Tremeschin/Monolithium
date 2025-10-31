@@ -280,7 +280,7 @@ impl World {
                 let scale = FractalPerlin::<0>::octave_scale_mul_f64(octave);
 
                 for _ in 0..3 {
-                    let next = rng.next_f64() * 256.0;
+                    let next = rng.next_f64_256();
                     deviate += scale * (0.5 - (next - next.floor())).abs();
                 }
 

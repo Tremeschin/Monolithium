@@ -9,6 +9,7 @@ const A: u64 = 0x5DEECE66D;
 const C: u64 = 11;
 
 // Inverse constants
+const FI: f64 = 1.0 / F;
 const AI: u64 = 0xDFE05BCB1365;
 const CI: u64 = (M + 1).wrapping_sub(C).wrapping_mul(AI) & M;
 
@@ -82,7 +83,15 @@ impl JavaRNG {
     pub fn next_f64(&mut self) -> f64 {
         let high = (self.next::<26>() as i64) << 27;
         let low  =  self.next::<27>() as i64;
-        (high | low) as f64 / F
+        (high | low) as f64 * FI
+    }
+
+    /// Returns a pseudo-random f64 in the range [0, 256)
+    #[inline(always)]
+    pub fn next_f64_256(&mut self) -> f64 {
+        let high = (self.next::<26>() as i64) << 27;
+        let low  =  self.next::<27>() as i64;
+        (high | low) as f64 * (256.0 * FI)
     }
 }
 

@@ -43,20 +43,15 @@ impl Perlin {
 
     #[inline(always)]
     pub fn init(&mut self, rng: &mut JavaRNG) {
-        self.xoff = rng.next_f64() * 256.0;
-        self.yoff = rng.next_f64() * 256.0;
-        self.zoff = rng.next_f64() * 256.0;
+        self.xoff = rng.next_f64_256();
+        self.yoff = rng.next_f64_256();
+        self.zoff = rng.next_f64_256();
         self.map = NEW_MAP;
 
         // Shuffle the array
-        unsafe {
-            let ptr = self.map.as_mut_ptr();
-
-            for a in 0..256 {
-                let max = (256 - a) as i32;
-                let b = rng.next_i32_bound(max) as usize;
-                std::ptr::swap(ptr.add(a), ptr.add(a + b));
-            }
+        for a in 0..256 {
+            let b = rng.next_i32_bound((256 - a) as i32) as usize;
+            self.map.swap(a, a + b);
         }
     }
 
