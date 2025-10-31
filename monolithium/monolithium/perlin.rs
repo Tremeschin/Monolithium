@@ -11,6 +11,17 @@ pub struct Perlin {
 
 /* -------------------------------------------------------------------------- */
 
+/// A new 'arange' array to copy from
+static NEW_MAP: [u8; 256] = {
+    let mut array = [0u8; 256];
+    let mut i = 0;
+    while i < 256 {
+        array[i] = i as u8;
+        i += 1;
+    }
+    array
+};
+
 impl Perlin {
 
     /// Get an empty structure
@@ -35,13 +46,7 @@ impl Perlin {
         self.xoff = rng.next_f64() * 256.0;
         self.yoff = rng.next_f64() * 256.0;
         self.zoff = rng.next_f64() * 256.0;
-
-        // Start a new 'arange' array
-        unsafe {
-            for i in 0..256 {
-                *self.map.get_unchecked_mut(i) = i as u8;
-            }
-        }
+        self.map = NEW_MAP;
 
         // Shuffle the array
         unsafe {
