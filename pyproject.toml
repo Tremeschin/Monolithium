@@ -24,17 +24,9 @@ statistics = [
     "scipy",
     "vl-convert-python",
 ]
-website = [
-    "mkdocs-material~=9.6.22",
-    "mkdocs~=1.6.1",
-]
-all = [
-    "monolithium[statistics]",
-    "monolithium[website]",
-]
 
 [dependency-groups]
-dev = ["monolithium[all]"]
+dev = ["monolithium[statistics]"]
 
 [project.scripts]
 cudalith = "monolithium.__main__:_cudalith"

@@ -58,6 +58,10 @@ impl JavaRNG {
         return (self.state >> (48 - BITS)) as i32;
     }
 
+    pub fn get_state(&self) -> u64 {
+        self.state
+    }
+
     /// Returns a pseudo-random i32 in the range [0, max)
     #[inline(always)]
     pub fn next_i32_bound(&mut self, max: i32) -> i32 {
