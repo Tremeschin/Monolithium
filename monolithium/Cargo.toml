@@ -6,7 +6,7 @@ version     = "1.3.0"
 authors     = ["Tremeschin"]
 description = "Finding the Largest Minecraft Alpha Monoliths"
 repository  = "https://github.com/Tremeschin/Monolithium"
-readme      = "../.github/readme.md"
+readme      = "../readme.md"
 license     = "MIT"
 edition     = "2024"
 

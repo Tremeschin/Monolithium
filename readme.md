@@ -42,7 +42,7 @@ Install [Git](https://git-scm.com/downloads) and [astral-sh/uv](https://docs.ast
 - `git clone https://github.com/Tremeschin/Monolithium && cd Monolithium`
 - Rust part: `uv run rustlith (commands)`
 
-You can pass any `--<feature>` explained in [`Cargo.toml`](../monolithium/Cargo.toml) for speedups, like `--fast`!
+You can pass any `--<feature>` explained in [`Cargo.toml`](./monolithium/Cargo.toml) for speedups, like `--fast`!
 
 ## 🔥 Commands
 
@@ -78,7 +78,7 @@ There's a couple improvements to this method:
 - The `hill` wraps around `2**19` blocks, so `--radius 262144` searches _"the whole world"'s_ potential.
 - For long searches, filter out candidates with at least `--area n` to ignore bad shuffling seeds.
 - Largest monoliths are basically guaranteed to hit a lattice point multiple of `1024`
-- At [`world::good_perlin_fracts`](../monolithium/monolithium/world.rs), one can tweak the treshholds for a "good" seed.
+- At [`world::good_perlin_fracts`](./monolithium/monolithium/world.rs), one can tweak the treshholds for a "good" seed.
 
 Full command idea that broke many records:
 

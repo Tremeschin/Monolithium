@@ -6,14 +6,13 @@ name        = "monolithium"
 description = "Finding the Largest Minecraft Alpha Monoliths"
 authors     = [{name="Tremeschin"}]
 version     = "1.3.0"
-readme      = ".github/readme.md"
+readme      = "readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
 dependencies = [
     "meson",
     "ninja",
     "rustbin",
-    "tomli",
 ]
 
 [project.optional-dependencies]

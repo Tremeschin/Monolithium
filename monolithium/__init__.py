@@ -6,7 +6,7 @@ from pathlib import Path
 from subprocess import PIPE, CompletedProcess, Popen
 from typing import Union
 
-import tomli
+import tomllib
 
 
 class Paths:
@@ -43,7 +43,7 @@ def rustlith(
         ))
 
     # Simple features handling via anywhere in args flags
-    cargo = tomli.loads((Paths.PACKAGE/"Cargo.toml").read_text(encoding="utf-8"))
+    cargo = tomllib.loads((Paths.PACKAGE/"Cargo.toml").read_text(encoding="utf-8"))
     features = list()
 
     for feature in cargo["features"]:

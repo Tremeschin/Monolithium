@@ -1,3 +1,4 @@
+import contextlib
 import json
 import sys
 from abc import ABC, abstractmethod
@@ -36,6 +37,14 @@ class Monolith:
             self.minx, self.maxx,
             self.minz, self.maxz,
         ))
+
+    @property
+    def cenx(self) -> int:
+        return int((self.minx + self.maxx) / 2)
+
+    @property
+    def cenz(self) -> int:
+        return int((self.minz + self.maxz) / 2)
 
 # ---------------------------------------------------------------------------- #
 
@@ -82,18 +91,18 @@ class Distribution:
 
         for line in process.stdout.readlines():
             line = line.decode("utf-8").strip()
-            if not line.startswith("json"):
-                continue
-            line = line.removeprefix("json")
-            mono = Monolith(**json.loads(line))
-            self.monoliths.append(mono)
+            with contextlib.suppress(json.JSONDecodeError):
+                mono = Monolith(**json.loads(line))
+                self.monoliths.append(mono)
 
     # -------------------------------- #
 
     def multi(self) -> None:
         self.smart_rustlith(
-            "spawn", "--radius", 200, "--step", 50,
-            "random", "--total", int(50e6),
+            "search",
+                "--radius", 200, "--step", 50,
+            "random",
+                "--total", int(50e6),
             "--fast",
         )
 
@@ -120,9 +129,11 @@ class Distribution:
         seed: int=617,
         step: int=512,
     ) -> None:
-        self.smart_rustlith("find",
-            "--step", step,
-            "--seed", seed,
+        self.smart_rustlith(
+            "search",
+                "--step", step,
+            "seed",
+                "--value", seed,
         )
         self.filter_unique()
 
@@ -187,17 +198,15 @@ class Distribution:
 
     # -------------------------------- #
 
-    def heatmap(self,
-
-    ) -> altair.Chart:
+    def heatmap(self) -> altair.Chart:
         self.smart_rustlith(
             "spawn",
-            # "--chunks", 1,
-            # "--radius", 262144*2,
-            "--radius", 2**19,
-            "--step", 256,
+                # "--chunks", 1,
+                # "--radius", 262144*2,
+                "--radius", 2**19,
+                "--step", 256,
             "linear",
-            "--total", 1000,
+                "--total", 1000,
             # "--candidates",
             # "--only-hill",
             # "--fast"
@@ -232,13 +241,56 @@ class Distribution:
 
         return chart
 
+    # -------------------------------- #
+
+    def number_origin_distance_graph(self,
+        max_distance: int=20000,
+        seeds: int=50000,
+        step: int=64,
+    ) -> altair.Chart:
+        """Plots the number of monoliths found within a certain distance from origin"""
+        self.smart_rustlith(
+            "search",
+                "--step", str(step),
+                "--radius", str(max_distance),
+            "random",
+                "--total", str(seeds),
+            "--fast",
+        )
+
+        monoliths: dict[int, int] = {}
+
+        for mono in self.monoliths:
+            distance = int((mono.cenx**2 + mono.cenz**2)**0.5)
+            if distance < max_distance:
+                monoliths.setdefault(distance, 0)
+                monoliths[distance] += 1
+
+        def points() -> Iterable[tuple[float, float]]:
+            cumulative = 0
+            for distance in range(0, max_distance):
+                cumulative += monoliths.get(distance, 0)
+                yield (distance, cumulative/seeds)
+
+        self.simple_chart(
+            points=points(),
+            title=f"Monoliths distribution ({seeds} seeds, {step} step)",
+            xname="Distance from origin (blocks)",
+            yname="Number of monoliths",
+        ).save(
+            fp="/tmp/distance.png",
+            scale_factor=3.0
+        )
+
 # ---------------------------------------------------------------------------- #
 
 def main() -> None:
     stats = Distribution()
     # stats.multi()
     # stats.world()
-    stats.heatmap().save(
-        fp="/tmp/heatmap.png",
-        scale_factor=3.0
-    )
+    # stats.heatmap().save(
+    #     fp="/tmp/heatmap.png",
+    #     scale_factor=3.0
+    # )
+    stats.number_origin_distance_graph()
+
