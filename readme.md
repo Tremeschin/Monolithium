@@ -1,6 +1,6 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/Tremeschin/Monolithium/main/monolithium/resources/images/logo.png" width="210">
-  <h1 style="margin-top: 0">Monolithium</h1>
+  <h1>Monolithium</h1>
   <span>🗿 Finding the Largest Minecraft Alpha Monoliths 🗿</span>
   <br>
   <br>
