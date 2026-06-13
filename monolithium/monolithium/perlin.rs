@@ -1,15 +1,24 @@
 use crate::*;
 
-#[derive(Clone, Debug)]
-pub struct Perlin {
-    /// Permutations map (Vector -> Grid)
-    pub map: [u8; 256],
-    pub xoff: f64,
-    pub yoff: f64,
-    pub zoff: f64,
-}
-
-/* -------------------------------------------------------------------------- */
+/// Accurate optimization for Perlin::grad
+pub const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
+    ( 1.0,  1.0,  0.0), //  0:  x + y
+    (-1.0,  1.0,  0.0), //  1: -x + y
+    ( 1.0, -1.0,  0.0), //  2:  x - y
+    (-1.0, -1.0,  0.0), //  3: -x - y
+    ( 1.0,  0.0,  1.0), //  4:  x + z
+    (-1.0,  0.0,  1.0), //  5: -x + z
+    ( 1.0,  0.0, -1.0), //  6:  x - z
+    (-1.0,  0.0, -1.0), //  7: -x - z
+    ( 0.0,  1.0,  1.0), //  8:  y + z
+    ( 0.0, -1.0,  1.0), //  9: -y + z
+    ( 0.0,  1.0, -1.0), // 10:  y - z
+    ( 0.0, -1.0, -1.0), // 11: -y - z
+    ( 1.0,  1.0,  0.0), // 12:  y + x
+    ( 0.0, -1.0,  1.0), // 13: -y + z
+    (-1.0,  1.0,  0.0), // 14:  y - x
+    ( 0.0, -1.0, -1.0), // 15: -y - z
+];
 
 /// A new 'arange' array to copy from
 static NEW_MAP: [u8; 256] = {
@@ -22,12 +31,23 @@ static NEW_MAP: [u8; 256] = {
     array
 };
 
+/* -------------------------------------------------------------------------- */
+
+#[derive(Clone, Debug)]
+pub struct Perlin {
+    /// Permutations map (Vector -> Grid)
+    pub map: [u8; 256],
+    pub xoff: f64,
+    pub yoff: f64,
+    pub zoff: f64,
+}
+
 impl Perlin {
 
     /// Get an empty structure
     pub fn new() -> Self {
         Perlin {
-            map: [0; 256],
+            map: NEW_MAP,
             xoff: 0.0,
             yoff: 0.0,
             zoff: 0.0,
@@ -55,32 +75,44 @@ impl Perlin {
         }
     }
 
+    /// Similar function to a smoothstep, specific for perlin
+    /// - https://en.wikipedia.org/wiki/Smoothstep
+    #[inline(always)]
+    pub fn fade(t: f64) -> f64 {
+        if cfg!(feature="linear-fade") {
+            return t;
+        } else {
+            t * t * t * (t * (t * 6.0 - 15.0) + 10.0)
+        }
+    }
+
+    /// Computes the dot product between a pseudorandom
+    /// gradient vector and the distance vector
+    #[inline(always)]
+    pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
+        if cfg!(feature="grad-lookup") {
+            unsafe {
+                let (cx, cy, cz) = GRAD_LOOKUP.get_unchecked(hash as usize & 0x0F);
+                return (cx * x) + (cy * y) + (cz * z);
+            }
+        } else {
+            let h = hash & 0x0F;
+            let u = if h < 8 {x} else {y};
+            let v = if h < 4 {y} else if h == 12 || h == 14 {x} else {z};
+            let u = if h & 1 == 0 {u} else {-u};
+            let v = if h & 2 == 0 {v} else {-v};
+            return u + v;
+        }
+    }
+
     #[inline(always)]
     fn get_map(&self, index: usize) -> u8 {
         unsafe {*self.map.get_unchecked(index & 0xFF)}
     }
 
-    /// Get the gradient vector at a given grid coordinate
-    #[inline(always)]
-    pub fn grid_gradient(&self,
-        grid_x: usize,
-        grid_y: usize,
-        grid_z: usize,
-    ) -> (f64, f64, f64) {
-        let xi = grid_x & 0xFF;
-        let yi = grid_y & 0xFF;
-        let zi = grid_z & 0xFF;
-        let a  = self.get_map(xi +  0) as usize;
-        let aa = self.get_map(yi +  a) as usize;
-        let sh = self.get_map(aa + zi) as usize;
-        unsafe {*GRAD_LOOKUP.get_unchecked(sh & 0x0F)}
-    }
-
     /// Sample the noise at a given coordinate
     /// - Note: For monoliths, y is often 0.0
     pub fn sample(&self, x: f64, y: f64, z: f64) -> f64 {
-        use utils::fade;
-        use utils::grad;
         use utils::lerp;
 
         // Apply offsets
@@ -99,9 +131,9 @@ impl Perlin {
         let zf: f64 = z - z.floor();
 
         // Smoothstep-like factors
-        let u: f64 = fade(xf);
-        let v: f64 = fade(yf);
-        let w: f64 = fade(zf);
+        let u: f64 = Self::fade(xf);
+        let v: f64 = Self::fade(yf);
+        let w: f64 = Self::fade(zf);
 
         // Get the hash values for the corners
         let a  = self.get_map(xi + 0 + 0) as usize;
@@ -114,16 +146,16 @@ impl Perlin {
         // Interpolate corner values relative to sample point
         return lerp(w,
             lerp(v,
-                lerp(u, grad(self.get_map(aa + zi), xf,       yf, zf),
-                        grad(self.get_map(ba + zi), xf - 1.0, yf, zf)),
-                lerp(u, grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
-                        grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf))
+                lerp(u, Self::grad(self.get_map(aa + zi), xf,       yf, zf),
+                        Self::grad(self.get_map(ba + zi), xf - 1.0, yf, zf)),
+                lerp(u, Self::grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
+                        Self::grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf))
             ),
             lerp(v,
-                lerp(u, grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
-                        grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
-                lerp(u, grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
-                        grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))
+                lerp(u, Self::grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
+                        Self::grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
+                lerp(u, Self::grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
+                        Self::grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))
             ),
         );
     }
