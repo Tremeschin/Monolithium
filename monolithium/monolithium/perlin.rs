@@ -14,9 +14,9 @@ pub const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
     ( 0.0, -1.0,  1.0), //  9: -y + z
     ( 0.0,  1.0, -1.0), // 10:  y - z
     ( 0.0, -1.0, -1.0), // 11: -y - z
-    ( 1.0,  1.0,  0.0), // 12:  y + x
+    ( 1.0,  1.0,  0.0), // 12:  x + y 
     ( 0.0, -1.0,  1.0), // 13: -y + z
-    (-1.0,  1.0,  0.0), // 14:  y - x
+    (-1.0,  1.0,  0.0), // 14: -x + y
     ( 0.0, -1.0, -1.0), // 15: -y - z
 ];
 
@@ -121,9 +121,9 @@ impl Perlin {
         let z: f64 = z + self.zoff;
 
         // Convert to grid coordinates (256 length)
-        let xi: usize = (x.floor() as i32 & 0xFF) as usize;
-        let yi: usize = (y.floor() as i32 & 0xFF) as usize;
-        let zi: usize = (z.floor() as i32 & 0xFF) as usize;
+        let xi: usize = (x.floor() as usize) & 0xFF;
+        let yi: usize = (y.floor() as usize) & 0xFF;
+        let zi: usize = (z.floor() as usize) & 0xFF;
 
         // Get the fractional parts
         let xf: f64 = x - x.floor();
