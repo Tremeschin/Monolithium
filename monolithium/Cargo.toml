@@ -10,9 +10,6 @@ readme      = "../readme.md"
 license     = "MIT"
 edition     = "2024"
 
-[workspace]
-resolver = "3"
-
 # ---------------------------------------------------------------------------- #
 
 [lib]
@@ -73,11 +70,8 @@ most-octaves = []
 
 # Assumes `JavaRNG::next_i32_bound()` never rejects values, skipping
 # three math operations check per call (low error for perlin values)
-# • Monte Carlo says 0.03474% error rates for minecraft values
+# • Monte Carlo says 0.03474% error rates for all related noises
 skip-rejection = []
-
-# Use a Skip Table for fast LCG stepping, same loss as `skip-rejection`
-skip-table = []
 
 # Return the value as-is in utils::fade(), skipping the smoothing curve.
 #
@@ -140,7 +134,6 @@ candidates = [
 fast = [
     "most-octaves",
     "skip-rejection",
-    "skip-table",
 ]
 
 # ---------------------------------------------------------------------------- #

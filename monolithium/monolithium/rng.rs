@@ -101,6 +101,7 @@ impl JavaRNG {
 
 /* -------------------------------------------------------------------------- */
 
+/// Maximum value in step_n and back_n
 static SKIP_TABLE_SIZE: usize = 2_usize.pow(15);
 
 /// Forward modular multiplication table
@@ -133,31 +134,17 @@ static SKIP_TABLE_BACK: [(u64, u64); SKIP_TABLE_SIZE] = {
 
 impl JavaRNG {
 
-    /// Roll the state N times fast (lossy)
+    /// Roll the state N times fast
     #[inline(always)]
     pub fn step_n(&mut self, n: usize) {
-        if cfg!(feature="skip-table") {
-            debug_assert!(n < SKIP_TABLE_SIZE);
-            let (a_n, c_n) = unsafe {SKIP_TABLE_NEXT.get_unchecked(n)};
-            self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
-        } else {
-            for _ in 0..n {
-                self.step();
-            }
-        }
+        let (a_n, c_n) = unsafe {SKIP_TABLE_NEXT.get_unchecked(n)};
+        self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
     }
 
-    /// Roll the state backwards N times fast (lossy)
+    /// Roll the state backwards N times fast
     #[inline(always)]
     pub fn back_n(&mut self, n: usize) {
-        if cfg!(feature="skip-table") {
-            debug_assert!(n < SKIP_TABLE_SIZE);
-            let (a_n, c_n) = unsafe {SKIP_TABLE_BACK.get_unchecked(n)};
-            self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
-        } else {
-            for _ in 0..n {
-                self.back();
-            }
-        }
+        let (a_n, c_n) = unsafe {SKIP_TABLE_BACK.get_unchecked(n)};
+        self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
     }
 }
