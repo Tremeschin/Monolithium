@@ -1,25 +1,5 @@
 use crate::*;
 
-/// Accurate optimization for Perlin::grad
-pub const GRAD_LOOKUP: [(f64, f64, f64); 16] = [
-    ( 1.0,  1.0,  0.0), //  0:  x + y
-    (-1.0,  1.0,  0.0), //  1: -x + y
-    ( 1.0, -1.0,  0.0), //  2:  x - y
-    (-1.0, -1.0,  0.0), //  3: -x - y
-    ( 1.0,  0.0,  1.0), //  4:  x + z
-    (-1.0,  0.0,  1.0), //  5: -x + z
-    ( 1.0,  0.0, -1.0), //  6:  x - z
-    (-1.0,  0.0, -1.0), //  7: -x - z
-    ( 0.0,  1.0,  1.0), //  8:  y + z
-    ( 0.0, -1.0,  1.0), //  9: -y + z
-    ( 0.0,  1.0, -1.0), // 10:  y - z
-    ( 0.0, -1.0, -1.0), // 11: -y - z
-    ( 1.0,  1.0,  0.0), // 12:  x + y 
-    ( 0.0, -1.0,  1.0), // 13: -y + z
-    (-1.0,  1.0,  0.0), // 14: -x + y
-    ( 0.0, -1.0, -1.0), // 15: -y - z
-];
-
 /// A new 'arange' array to copy from
 static NEW_MAP: [u8; 256] = {
     let mut array = [0u8; 256];
@@ -88,20 +68,36 @@ impl Perlin {
 
     /// Computes the dot product between a pseudorandom
     /// gradient vector and the distance vector
+    ///
+    /// Original code:
+    ///   ```rust
+    ///   let h = hash & 0x0F;
+    ///   let u = if h < 8 {x} else {y};
+    ///   let v = if h < 4 {y} else if h == 12 || h == 14 {x} else {z};
+    ///   let u = if h & 1 == 0 {u} else {-u};
+    ///   let v = if h & 2 == 0 {v} else {-v};
+    ///   return u + v;
+    ///   ```
     #[inline(always)]
     pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
-        if cfg!(feature="grad-lookup") {
-            unsafe {
-                let (cx, cy, cz) = GRAD_LOOKUP.get_unchecked(hash as usize & 0x0F);
-                return (cx * x) + (cy * y) + (cz * z);
-            }
-        } else {
-            let h = hash & 0x0F;
-            let u = if h < 8 {x} else {y};
-            let v = if h < 4 {y} else if h == 12 || h == 14 {x} else {z};
-            let u = if h & 1 == 0 {u} else {-u};
-            let v = if h & 2 == 0 {v} else {-v};
-            return u + v;
+        match hash & 0x0F {
+            0  =>  x + y,
+            1  => -x + y,
+            2  =>  x - y,
+            3  => -x - y,
+            4  =>  x + z,
+            5  => -x + z,
+            6  =>  x - z,
+            7  => -x - z,
+            8  =>  y + z,
+            9  => -y + z,
+            10 =>  y - z,
+            11 => -y - z,
+            12 =>  x + y,
+            13 => -y + z,
+            14 => -x + y,
+            15 => -y - z,
+            _ => unreachable!(),
         }
     }
 

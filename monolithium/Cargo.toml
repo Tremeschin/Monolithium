@@ -39,15 +39,11 @@ smart-default = "0.7.1"
 
 [features]
 default = [
-    "grad-lookup",
     "fast-area",
 ]
 
 # ------------------------------------ #
 # Accurate optimizations
-
-# Use a lookup table for `Perlin::grad()`
-grad-lookup = []
 
 # Use a VecDeque instead of array for FractalPerlin struct, improves performance
 # for sister perlin calls as it rotates faster. Might cause minor to no speed
