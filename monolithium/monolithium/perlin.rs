@@ -241,8 +241,16 @@ impl<const OCTAVES: usize> FractalPerlin<OCTAVES> {
 
     #[inline(always)]
     pub fn init(&mut self, rng: &mut JavaRNG) {
-        for i in 0..OCTAVES {
-            self.noise[i].init(rng);
+        if cfg!(feature="skip-rejection") {
+            Perlin::discard(rng, OCTAVES_START);
+
+            for i in OCTAVES_START..OCTAVES {
+                self.noise[i].init(rng);
+            }
+        } else {
+            for i in 0..OCTAVES {
+                self.noise[i].init(rng);
+            }
         }
     }
 
