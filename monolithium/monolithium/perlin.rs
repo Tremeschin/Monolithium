@@ -93,9 +93,9 @@ impl Perlin {
             9  => -y + z,
             10 =>  y - z,
             11 => -y - z,
-            12 =>  x + y,
+            12 =>  y + x,
             13 => -y + z,
-            14 => -x + y,
+            14 =>  y - x,
             15 => -y - z,
             _ => unreachable!(),
         }
