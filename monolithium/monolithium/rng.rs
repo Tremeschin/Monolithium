@@ -65,20 +65,23 @@ impl JavaRNG {
     /// Returns a pseudo-random i32 in the range [0, max)
     #[inline(always)]
     pub fn next_i32_bound(&mut self, max: i32) -> i32 {
-        if (max as u32).is_power_of_two() {
-            (((max as i64).wrapping_mul(self.next::<31>() as i64)) >> 31) as i32
-        } else {
-            let mut next = self.next::<31>();
-            let mut take = next % max;
+        let next = self.next::<31>();
 
-            if cfg!(not(feature="skip-rejection")) {
-                while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                    next = self.next::<31>();
-                    take = next % max;
+        if (max as u32).is_power_of_two() {
+            let take = ((max as i64).wrapping_mul(next as i64)) >> 31;
+            take as i32
+        } else {
+            let take = next % max;
+
+            if cfg!(not(feature = "skip-rejection")) {
+                if next > i32::MAX - max + 1 {
+                    if next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
+                        return self.next_i32_bound(max);
+                    }
                 }
             }
 
-            return take;
+            take
         }
     }
 
