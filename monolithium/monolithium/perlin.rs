@@ -173,9 +173,9 @@ impl Perlin {
             rng.step_n(3*2);
 
             // Permutations swapping
-            for max in (1..=256).rev() {
-                rng.next_i32_bound(max);
-            }
+            seq!(N in 0..256 {
+                rng.next_i32_bound(256 - N);
+            });
         }
     }
 
