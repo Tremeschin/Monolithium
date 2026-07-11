@@ -4,47 +4,52 @@ use crate::*;
 pub struct SearchCommand {
 
     #[command(subcommand)]
-    seeds: SeedFactory,
+    pub seeds: SeedFactory,
 
     /// (Worker ) How many seeds each work block should process
     #[arg(short='c', long, default_value_t=1)]
-    chunks: u64,
+    pub chunks: u64,
 
     /// (Worker ) Use multithreading to search within a seed
     #[arg(short='t', long, default_value_t=false)]
-    threaded: bool,
+    pub threaded: bool,
+
+    /// (Worker ) Completely disable log messages while running. Meant for
+    /// benchmarking
+    #[arg(long, default_value_t = false)]
+    pub silent: bool,
 
     /// (Where  ) Center X value to search for monoliths
     #[arg(short='x', long, default_value_t=0)]
-    center_x: i32,
+    pub center_x: i32,
 
     /// (Where  ) Center Z value to search for monoliths
     #[arg(short='z', long, default_value_t=0)]
-    center_z: i32,
+    pub center_z: i32,
 
     /// (Where  ) How far from spawn to search in a square radius
     #[arg(short='r', long, default_value_t=100)]
-    radius: i32,
+    pub radius: i32,
 
     /// (Where  ) Spacing between each check, in blocks
     #[arg(short='s', long, default_value_t=200)]
-    step: usize,
+    pub step: usize,
 
     /// (Limits ) Maximum number of monoliths to find in a seed
     #[arg(short='l', long, default_value_t=999999)]
-    limit: u64,
+    pub limit: u64,
 
     /// (Limits ) Minimum area of the monoliths to find
     #[arg(short='a', long, default_value_t=0)]
-    area: u64,
+    pub area: u64,
 
     /// (Special) Set radius to the value hill noise wraps (262144)
     #[arg(short='h', long, default_value_t=false)]
-    hill: bool,
+    pub hill: bool,
 
     /// (Special) Set radius to the value depth noise wraps (4194304)
     #[arg(short='d', long, default_value_t=false)]
-    depth: bool,
+    pub depth: bool,
 }
 
 impl SearchCommand {
@@ -54,8 +59,11 @@ impl SearchCommand {
         // Standard math to split a work into many blocks
         let chunks = (self.seeds.total() + self.chunks - 1) / self.chunks;
 
-        let progress = ProgressBar::new(chunks)
-            .with_style(utils::progress("Searching"));
+        let progress = if !self.silent {
+            ProgressBar::new(chunks).with_style(utils::progress("Searching"))
+        } else {
+            ProgressBar::hidden()
+        };
 
         let mut options = FindOptions::default()
             .around(self.center_x, self.center_z, self.radius)
@@ -108,7 +116,9 @@ impl SearchCommand {
             .collect();
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("{}", serde_json::to_string(&x).unwrap()));
-        println!("Found {} Monoliths", monoliths.len());
+        if !self.silent {
+            monoliths.iter().for_each(|x| println!("{}", serde_json::to_string(&x).unwrap()));
+            println!("Found {} Monoliths", monoliths.len());
+        }
     }
 }
