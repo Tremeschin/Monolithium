@@ -188,8 +188,8 @@ Monolithium is written in heavily parallelized [Rust](https://www.rust-lang.org/
 🦀 For a Ryzen 9 5900X 12c/24t, 2x3200 MT/s DDR4 CL16 2Rx8 system, one might expect:
 
 - **3.75 minutes** to find all monoliths in a seed, probing every 128 blocks.
-- **Search 1,150,000** seeds per second for spawn monoliths (approximated)
-- **Search 440,000** seeds per second for spawn monoliths (accurate)
+- **Search 2,028,000** seeds per second for spawn monoliths (approximated)
+- **Search 634,000** seeds per second for spawn monoliths (accurate)
 
 Such speeds scales about linearly with your hardware - for better or worse!
 
@@ -198,8 +198,9 @@ Such speeds scales about linearly with your hardware - for better or worse!
 - Investigate the correlation of Perlin coefficients to the likeliness and size of Monoliths.
 - Is it more efficient for CUDA to stream perlin coefficients than inline JavaRNG on CPU?
 - Make statistical analysis (Average size, Distribution) of Monoliths in seeds.
-- Make a `HashMap<(int, int), Monolith>` to avoid recomputing areas
+- Make a `HashMap<(int, int), Monolith>` to avoid recomputing areas.
 - Throw 2x Epyc 9965 at the code. I have a spare one for sure iirc.
+- Does perimeter correlate with area for faster area ranking?
 
 ## ♻️ Credits
 

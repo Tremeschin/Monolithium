@@ -49,10 +49,10 @@ impl Perlin {
         self.map = NEW_MAP;
 
         // Shuffle the array
-        for a in 0..256 {
+        seq!(a in 0..256 {
             let b = rng.next_i32_bound((256 - a) as i32) as usize;
             self.map.swap(a, a + b);
-        }
+        });
     }
 
     /// Similar function to a smoothstep, specific for perlin
@@ -171,9 +171,9 @@ impl Perlin {
             rng.step_n(3*2);
 
             // Permutations swapping
-            for max in (1..=256).rev() {
-                rng.next_i32_bound(max);
-            }
+            seq!(N in 0..256 {
+                rng.next_i32_bound(256 - N);
+            });
         }
     }
 
