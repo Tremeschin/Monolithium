@@ -68,13 +68,13 @@ impl SeedFactory {
         }
     }
 
-    pub fn total(&self) -> u64 {
+    pub fn total(&self) -> Seed {
         match self {
             Self::Seed{..} => 1,
             Self::Linear{total, ..} => *total,
             Self::Random{total, ..} => *total,
-            Self::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as u64,
-            Self::File{values, ..} => values.len() as u64,
+            Self::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as Seed,
+            Self::File{values, ..} => values.len() as Seed,
         }
     }
 

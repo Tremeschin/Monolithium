@@ -71,12 +71,14 @@ impl Perlin {
     ///
     /// Original code:
     ///   ```rust
-    ///   let h = hash & 0x0F;
-    ///   let u = if h < 8 {x} else {y};
-    ///   let v = if h < 4 {y} else if h == 12 || h == 14 {x} else {z};
-    ///   let u = if h & 1 == 0 {u} else {-u};
-    ///   let v = if h & 2 == 0 {v} else {-v};
-    ///   return u + v;
+    ///   fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {
+    ///       let h = hash & 0x0F;
+    ///       let u = if h < 8 {x} else {y};
+    ///       let v = if h < 4 {y} else if h == 12 || h == 14 {x} else {z};
+    ///       let u = if h & 1 == 0 {u} else {-u};
+    ///       let v = if h & 2 == 0 {v} else {-v};
+    ///       return u + v;
+    ///   }
     ///   ```
     #[inline(always)]
     pub fn grad(hash: u8, x: f64, y: f64, z: f64) -> f64 {

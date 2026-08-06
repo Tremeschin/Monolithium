@@ -24,9 +24,6 @@ statistics = [
     "vl-convert-python",
 ]
 
-[dependency-groups]
-dev = ["monolithium[statistics]"]
-
 [project.scripts]
 cudalith = "monolithium.__main__:_cudalith"
 rustlith = "monolithium.__main__:_rustlith"
@@ -38,4 +35,3 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["monolithium"]
-
