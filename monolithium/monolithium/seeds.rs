@@ -18,10 +18,25 @@ pub enum SeedFactory {
         total: u64,
     },
 
-    /// Search in N random seeds
-    Random {
+    /// Search in N random seeds (fast, duplicates allowed)
+    #[command(name="random")]
+    FastRandom {
         #[arg(short='t', long, default_value_t=1_000_000)]
         total: u64,
+    },
+
+    /// Search in N random seeds (unique, fast enough)
+    #[command(name="urandom")]
+    UniqueRandom {
+        #[arg(short='t', long, default_value_t=1_000_000)]
+        total: u64,
+
+        /// Seed for the shared random generator
+        #[arg(short='s', long, default_value_t=0)]
+        master: Seed,
+
+        #[arg(skip)]
+        rng: Arc<Mutex<JavaRNG>>,
     },
 
     /// Search in a fraction of all possible seeds
@@ -63,6 +78,10 @@ impl SeedFactory {
                 }
             },
 
+            Self::UniqueRandom { master, rng, .. } => {
+                *rng = Arc::new(Mutex::new(JavaRNG::from_state(*master)));
+            },
+
             // Procedural, nothing to do
             _ => ()
         }
@@ -72,7 +91,8 @@ impl SeedFactory {
         match self {
             Self::Seed{..} => 1,
             Self::Linear{total, ..} => *total,
-            Self::Random{total, ..} => *total,
+            Self::FastRandom{total, ..} => *total,
+            Self::UniqueRandom{total, ..} => *total,
             Self::Ratio{ratio} => (ratio * TOTAL_SEEDS as f64) as Seed,
             Self::File{values, ..} => values.len() as Seed,
         }
@@ -86,9 +106,14 @@ impl SeedFactory {
             Self::Linear{start, ..} =>
                 (*start + n) as Seed,
 
-            // Fixme: Birthday paradox N = 2**48
-            Self::Random{..} =>
+            Self::FastRandom{..} =>
                 fastrand::u64(0..TOTAL_SEEDS),
+
+            Self::UniqueRandom { rng, .. } => {
+                let mut rng = rng.lock().unwrap();
+                rng.step();
+                rng.state as Seed
+            }
 
             Self::Ratio{ratio} =>
                 (n as f64 / *ratio) as Seed,

@@ -15,6 +15,7 @@ const CI: u64 = (M + 1).wrapping_sub(C).wrapping_mul(AI) & M;
 
 /* -------------------------------------------------------------------------- */
 
+#[derive(Default)]
 #[derive(Clone, Debug)]
 #[derive(PartialEq, Eq)]
 pub struct JavaRNG {
@@ -57,10 +58,6 @@ impl JavaRNG {
         debug_assert!(BITS <= 32);
         self.step();
         return (self.state >> (48 - BITS)) as i32;
-    }
-
-    pub fn get_state(&self) -> u64 {
-        self.state
     }
 
     /// Returns a pseudo-random i32 in the range [0, max)
