@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://raw.githubusercontent.com/Tremeschin/Monolithium/main/monolithium/resources/images/logo.png" width="210">
   <h1>Monolithium</h1>
-  <span>🗿 Finding the Largest Minecraft Alpha Monoliths 🗿</span>
+  <span>🗿 Minecraft Alpha Monoliths Seed Cruncher 🗿</span>
   <br>
   <br>
     <a href="https://crates.io/crates/monolithium/"><img src="https://img.shields.io/crates/v/monolithium?label=Crates.io&color=orange"></a>
