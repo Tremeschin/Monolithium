@@ -1,6 +1,3 @@
-[project.urls]
-GitHub = "https://github.com/Tremeschin/Monolithium"
-
 [project]
 name        = "monolithium"
 description = "Finding the Largest Minecraft Alpha Monoliths"
@@ -14,6 +11,9 @@ dependencies = [
     "ninja",
     "rustbin",
 ]
+
+[project.urls]
+GitHub = "https://github.com/Tremeschin/Monolithium"
 
 [project.optional-dependencies]
 statistics = [

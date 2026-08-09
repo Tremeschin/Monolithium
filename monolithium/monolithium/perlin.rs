@@ -202,7 +202,7 @@ pub struct FractalPerlin<const OCTAVES: usize> {
 }
 
 /// Ignored count of lower octaves, as they contribute very little
-pub const OCTAVES_START: usize = if cfg!(feature="most-octaves") {8} else {0};
+pub const OCTAVES_START: usize = if cfg!(feature="most-octaves") {3} else {0};
 
 /// Lookup table for octave amplitudes
 pub static OCTAVE_SCALE_MUL: [f64; 32] = {

@@ -54,4 +54,4 @@ pub const MONOLITHS_REPEAT: i32 = DEPTH_WRAPS;
 /// Java uses a 48-bit Linear Congruential Generator for its RNG,
 /// which continuously masks the state's (1 << 48) - 1 lower bits,
 /// meaning there's effectively only 2**48 unique seeds!
-pub const TOTAL_SEEDS: u64 = 2_u64.pow(48);
+pub const TOTAL_SEEDS: u64 = 2_u64.pow(48) - 1;
