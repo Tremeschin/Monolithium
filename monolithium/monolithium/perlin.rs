@@ -47,11 +47,10 @@ impl Perlin {
         self.xoff = rng.next_f64_256();
         self.yoff = rng.next_f64_256();
         self.zoff = rng.next_f64_256();
-        self.map = NEW_MAP;
 
         // Shuffle the array
         seq!(a in 0..256 {
-            let b = rng.next_i32_bound((256 - a) as i32) as usize;
+            let b = rng.next_i32_bound(256 - a) as usize;
             self.map.swap(a, a + b);
         });
     }

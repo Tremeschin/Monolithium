@@ -55,29 +55,29 @@ impl JavaRNG {
 
     /// Rolls the state and returns N<=32 low bits
     #[inline(always)]
-    pub fn next<const BITS: u8>(&mut self) -> i32 {
+    pub fn next<const BITS: u8>(&mut self) -> u64 {
         self.step();
-        return (self.state >> (48 - BITS)) as i32;
+        return (self.state >> (48 - BITS)) as u64;
     }
 
     /// Returns a pseudo-random i32 in the range [0, max)
     #[inline(always)]
-    pub fn next_i32_bound(&mut self, max: i32) -> i32 {
-        if (max as u32).is_power_of_two() {
-            (((max as i64).wrapping_mul(self.next::<31>() as i64)) >> 31) as i32
-        } else {
-            let mut next = self.next::<31>();
-            let mut take = next % max;
+    pub fn next_i32_bound(&mut self, max: u64) -> u64 {
+        let mut take = self.next::<31>();
 
-            if cfg!(not(feature="skip-rejection")) {
-                while next.wrapping_sub(take).wrapping_add(max - 1) < 0 {
-                    next = self.next::<31>();
-                    take = next % max;
-                }
-            }
-
-            return take;
+        if max.is_power_of_two() {
+            return (max * take) >> 31;
         }
+
+        if cfg!(not(feature = "skip-rejection")) {
+            let limit = (1u64 << 31) - ((1u64 << 31) % max);
+
+            while take >= limit {
+                take = self.next::<31>();
+            }
+        }
+
+        return take % max;
     }
 
     /// Returns a pseudo-random f64 in the range [0, 1)
@@ -202,11 +202,11 @@ mod tests {
         assert_eq!(sequential, start);
     }
 
-    fn test_next_i32_bound_seed_perlin(seed: u64, known: [i32; 256]) {
+    fn test_next_i32_bound_seed_perlin(seed: u64, known: [u64; 256]) {
         let mut rng = JavaRNG::from_seed(seed);
 
         let generate = std::array::from_fn(|a| {
-            rng.next_i32_bound((256 - a) as i32)
+            rng.next_i32_bound((256 - a) as u64)
         });
 
         assert_eq!(generate, known);
