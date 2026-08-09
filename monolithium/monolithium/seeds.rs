@@ -32,8 +32,8 @@ pub enum SeedFactory {
         total: u64,
 
         /// Seed for the shared random generator
-        #[arg(short='s', long, default_value_t=0)]
-        master: Seed,
+        #[arg(short='s', long)]
+        seed: Option<Seed>,
 
         #[arg(skip)]
         rng: Arc<Mutex<JavaRNG>>,
@@ -78,11 +78,11 @@ impl SeedFactory {
                 }
             },
 
-            Self::UniqueRandom { master, rng, .. } => {
-                *rng = Arc::new(Mutex::new(JavaRNG::from_state(*master)));
+            Self::UniqueRandom { seed, rng, .. } => {
+                let seed = seed.unwrap_or_else(|| fastrand::u64(0..TOTAL_SEEDS));
+                *rng = Arc::new(Mutex::new(JavaRNG::from_state(seed)));
             },
 
-            // Procedural, nothing to do
             _ => ()
         }
     }
@@ -98,6 +98,7 @@ impl SeedFactory {
         }
     }
 
+    #[inline(always)]
     pub fn get(&self, n: u64) -> Seed {
         match self {
             Self::Seed{value} =>

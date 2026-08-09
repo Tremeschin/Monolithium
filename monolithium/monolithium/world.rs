@@ -305,6 +305,7 @@ impl World {
     /// Generate a sister-world where the LCG state "started" at the end of ours
     /// first perlin noise generation. Effectively, roll down all the current
     /// noise octaves, generate and append a new one at the end.
+    #[inline(always)]
     #[cfg(feature="only-hill")]
     pub fn sister_perlin(&mut self) {
         // Hill: 0123456789 -> into 123456789(New)
@@ -316,6 +317,7 @@ impl World {
     /// Generate a sister-world where the LCG state "started" at the end of ours
     /// first perlin noise generation. Effectively, roll down all the current
     /// noise octaves, generate and append a new one at the end.
+    #[inline(always)]
     #[cfg(not(feature="only-hill"))]
     pub fn sister_perlin(&mut self) {
         // Hill: 0123456789 Depth: ABCD... -> into
@@ -328,6 +330,7 @@ impl World {
     }
 
     /// Get a seed from the current RNG state
+    #[inline(always)]
     #[cfg(feature="only-hill")]
     pub fn seed_from_state(&self) -> Seed {
         let mut rev = self.rng.clone();
@@ -338,6 +341,7 @@ impl World {
         return rev.reverse_seed();
     }
 
+    #[inline(always)]
     #[cfg(not(feature="only-hill"))]
     pub fn seed_from_state(&self) -> Seed {
         let mut rev = self.rng.clone();

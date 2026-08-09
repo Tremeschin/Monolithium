@@ -35,6 +35,7 @@ impl Perlin {
     }
 
     /// Get a filled structure from rng
+    #[inline(always)]
     pub fn from_rng(rng: &mut JavaRNG) -> Self {
         let mut perlin = Perlin::new();
         perlin.init(rng);
@@ -104,12 +105,13 @@ impl Perlin {
     }
 
     #[inline(always)]
-    fn get_map(&self, index: usize) -> u8 {
+    pub fn get_map(&self, index: usize) -> u8 {
         unsafe {*self.map.get_unchecked(index & 0xFF)}
     }
 
     /// Sample the noise at a given coordinate
     /// - Note: For monoliths, y is often 0.0
+    #[inline(always)]
     pub fn sample(&self, x: f64, y: f64, z: f64) -> f64 {
         use utils::lerp;
 
@@ -144,14 +146,14 @@ impl Perlin {
         // Interpolate corner values relative to sample point
         return lerp(w,
             lerp(v,
-                lerp(u, Self::grad(self.get_map(aa + zi), xf,       yf, zf),
-                        Self::grad(self.get_map(ba + zi), xf - 1.0, yf, zf)),
+                lerp(u, Self::grad(self.get_map(aa + zi), xf,       yf,       zf),
+                        Self::grad(self.get_map(ba + zi), xf - 1.0, yf,       zf)),
                 lerp(u, Self::grad(self.get_map(ab + zi), xf,       yf - 1.0, zf),
                         Self::grad(self.get_map(bb + zi), xf - 1.0, yf - 1.0, zf))
             ),
             lerp(v,
-                lerp(u, Self::grad(self.get_map(aa + zi + 1), xf,       yf, zf - 1.0),
-                        Self::grad(self.get_map(ba + zi + 1), xf - 1.0, yf, zf - 1.0)),
+                lerp(u, Self::grad(self.get_map(aa + zi + 1), xf,       yf,       zf - 1.0),
+                        Self::grad(self.get_map(ba + zi + 1), xf - 1.0, yf,       zf - 1.0)),
                 lerp(u, Self::grad(self.get_map(ab + zi + 1), xf,       yf - 1.0, zf - 1.0),
                         Self::grad(self.get_map(bb + zi + 1), xf - 1.0, yf - 1.0, zf - 1.0))
             ),
@@ -159,6 +161,7 @@ impl Perlin {
     }
 
     /// Roll the generator state that would have created a PerlinNoise
+    #[inline(always)]
     pub fn discard(rng: &mut JavaRNG, many: usize) {
 
         // Super fast but slightly lossy
@@ -180,6 +183,7 @@ impl Perlin {
     }
 
     /// Roll back the generator state that would have created a PerlinNoise (lossy)
+    #[inline(always)]
     pub fn undiscard(rng: &mut JavaRNG, many: usize) {
         rng.back_n(many*(3*2 + 256));
     }
@@ -198,10 +202,10 @@ pub struct FractalPerlin<const OCTAVES: usize> {
 }
 
 /// Ignored count of lower octaves, as they contribute very little
-const OCTAVES_START: usize = if cfg!(feature="most-octaves") {3} else {0};
+pub const OCTAVES_START: usize = if cfg!(feature="most-octaves") {8} else {0};
 
 /// Lookup table for octave amplitudes
-static OCTAVE_SCALE_MUL: [f64; 32] = {
+pub static OCTAVE_SCALE_MUL: [f64; 32] = {
     let mut array = [0.0; 32];
     let mut i = 0;
     while i < 32 {
@@ -212,7 +216,7 @@ static OCTAVE_SCALE_MUL: [f64; 32] = {
 };
 
 /// Lookup table for octave amplitudes (inverse)
-static OCTAVE_SCALE_DIV: [f64; 32] = {
+pub static OCTAVE_SCALE_DIV: [f64; 32] = {
     let mut array = [0.0; 32];
     let mut i = 0;
     while i < 32 {

@@ -15,8 +15,9 @@ const CI: u64 = (M + 1).wrapping_sub(C).wrapping_mul(AI) & M;
 
 /* -------------------------------------------------------------------------- */
 
+#[derive(Debug)]
 #[derive(Default)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy)]
 #[derive(PartialEq, Eq)]
 pub struct JavaRNG {
     pub state: u64,
@@ -145,6 +146,18 @@ impl JavaRNG {
         let (a_n, c_n) = unsafe {SKIP_TABLE_BACK.get_unchecked(n)};
         self.state = (self.state.wrapping_mul(*a_n).wrapping_add(*c_n)) & M;
     }
+
+    #[inline(always)]
+    pub fn step_const_n<const N: usize>(&mut self) {
+        let (a_n, c_n) = SKIP_TABLE_NEXT[N];
+        self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+    }
+
+    #[inline(always)]
+    pub fn back_const_n<const N: usize>(&mut self) {
+        let (a_n, c_n) = SKIP_TABLE_BACK[N];
+        self.state = (self.state.wrapping_mul(a_n).wrapping_add(c_n)) & M;
+    }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -156,9 +169,9 @@ mod tests {
 
     #[test]
     fn skip_tables() {
-        const SEED: u64 = 0;
+        const SEED: u64 = 0xC0FFEE;
 
-        //
+        // Divergent approaches must be equal
         let mut sequential = JavaRNG::from_seed(SEED);
         let mut skip_table = JavaRNG::from_seed(SEED);
 
