@@ -108,7 +108,12 @@ impl SearchCommand {
             .collect();
 
         monoliths.sort();
-        monoliths.iter().for_each(|x| println!("{}", serde_json::to_string(&x).unwrap()));
+
+        for stone in monoliths.iter() {
+            println!("{}", serde_json::to_string(&stone).unwrap());
+            // println!(" • {}\n", stone.kahomayo_url());
+        }
+
         println!("Found {} Monoliths", monoliths.len());
     }
 }

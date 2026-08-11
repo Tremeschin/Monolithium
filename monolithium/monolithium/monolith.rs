@@ -20,6 +20,14 @@ impl Monolith {
     pub fn center_z(&self) -> i32 {
         (self.minz + self.maxz) / 2
     }
+
+    /// Get a permalink for https://kahomayo.github.io/monolith-renderer
+    pub fn kahomayo_url(&self) -> String {
+        format!(
+            "https://kahomayo.github.io/monolith-renderer/?seed={}&x={}&z={}&zoom=-2",
+            self.seed, self.center_x(), self.center_z()
+        )
+    }
 }
 
 /* -------------------------------------------------------------------------- */
