@@ -17,25 +17,21 @@ name = "monolithium"
 path = "monolithium/main.rs"
 
 [dependencies]
-ahash         = {version="0.8.12", features=["compile-time-rng", "std"], default-features=false}
-clap          = {version="4.6.1", features=["derive"]}
-fastrand      = "2.4.1"
-indicatif     = {version="0.18.4", features=["rayon"]}
-microbench    = "0.5.0"
-png           = "0.18.1"
-rand          = "0.10.1"
-rayon         = "1.12.0"
-seq-macro     = "0.3.6"
-serde         = {version="1.0.228", features=["derive"]}
-serde_json    = "1.0.150"
-smart-default = "0.7.1"
+ahash         = {version="0.8", features=["compile-time-rng", "std"], default-features=false}
+clap          = {version="4.6", features=["derive"]}
+fastrand      = "2.4"
+indicatif     = {version="0.18", features=["rayon"]}
+png           = "0.18"
+rayon         = "1.12"
+seq-macro     = "0.3"
+serde         = {version="1.0", features=["derive"]}
+serde_json    = "1.0"
+smart-default = "0.7"
 
 # ---------------------------------------------------------------------------- #
 
 [features]
-default = [
-    "fast-area",
-]
+default = []
 
 # ------------------------------------ #
 # Accurate optimizations
@@ -47,13 +43,6 @@ deque-octaves = []
 
 # ------------------------------------ #
 # Lossy optimizations
-
-# Step by 4 blocks when calculating areas, as each noise coordinate is the world
-# position divided by 4. This causes a small error in area calculation due to
-# interpolation, but the average of over/under-shoots gives at most 1% error.
-#
-# Configurable via AREA_STEP=4 variable at compile time.
-fast-area = []
 
 # Ignores the last few octaves in noises, as they contribute very little. Causes
 # minor errors in the hill noise, as values for monoliths are relatively tight
@@ -72,6 +61,10 @@ linear-fade = []
 
 # ------------------------------------ #
 # Behavioral changes
+
+# Use a 'linear flood-fill' algorithm that searches on the boundaries of an
+# ever growing rectangular region. Minor waste computation, alloc-free.
+linear-fill = [] # experimental, highly accurate
 
 # About 40% of all blocks have valid |depth| > 8000 for monoliths, which makes
 # the hill noise almost always (~85% Monte Carlo) an accurate source of truth

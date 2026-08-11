@@ -4,6 +4,15 @@ pub const SKIP_OCTAVES:  usize = 48;
 pub const HILL_OCTAVES:  usize = 10;
 pub const DEPTH_OCTAVES: usize = 16;
 
+/// Step by 4 blocks when calculating areas, as each noise coordinate is the world
+/// position divided by 4. This causes a small error in area calculation due to
+/// interpolation, but the average of over/under-shoots gives at most 1% error.
+static AREA_STEP: LazyLock<i32> = LazyLock::new(|| {
+    option_env!("AREA_STEP")
+        .and_then(|v| v.parse().ok())
+        .unwrap_or(4)
+});
+
 #[derive(Debug)]
 pub struct World {
     pub seed: Seed,
@@ -71,6 +80,7 @@ impl World {
 
     /// Get a Monolith at a given coordinate, compute properties
     #[inline(always)]
+    #[cfg(not(feature="linear-fill"))]
     pub fn get_monolith(&self, x: i32, z: i32) -> Option<Monolith> {
 
         // Most blocks are not monoliths
@@ -78,12 +88,10 @@ impl World {
             return None;
         }
 
-        // How accurate the area calculation is
-        let s = option_env!("AREA_STEP")
-            .and_then(|v| v.parse().ok())
-            .unwrap_or(if cfg!(feature="fast-area") {4} else {1});
-        let x = utils::nearest(x, s);
-        let z = utils::nearest(z, s);
+        let step = *AREA_STEP;
+        let cell = (step * step) as u64;
+        let x = utils::nearest(x, step);
+        let z = utils::nearest(z, step);
         let o = 32; // "Occasionally"
 
         // Start with current block
@@ -114,13 +122,13 @@ impl World {
                 continue;
             }
 
-            lith.area += (s*s) as u64;
+            lith.area += cell;
 
             // Check connected neighbors
-            queue.push_back((x+0, z+s));
-            queue.push_back((x+0, z-s));
-            queue.push_back((x+s, z+0));
-            queue.push_back((x-s, z+0));
+            queue.push_back((x+0, z+step));
+            queue.push_back((x+0, z-step));
+            queue.push_back((x+step, z+0));
+            queue.push_back((x-step, z+0));
 
             // Occasional more expensive stuff
             if (x % o == 0) && (z % o == 0) {
@@ -144,6 +152,90 @@ impl World {
                 lith.maxz = lith.maxz.max(z);
             }
         }
+
+        Some(lith)
+    }
+
+    /// Get a Monolith at a given coordinate, compute properties
+    #[inline(always)]
+    #[cfg(feature="linear-fill")]
+    pub fn get_monolith(&self, x: i32, z: i32) -> Option<Monolith> {
+
+        // Most blocks are not monoliths
+        if !self.is_monolith(x, z) {
+            return None;
+        }
+
+        let step = *AREA_STEP;
+        let cell = (step * step) as u64;
+        let x = utils::nearest(x, step);
+        let z = utils::nearest(z, step);
+
+        let mut lith = Monolith {
+            minx: x, maxx: x,
+            minz: z, maxz: z,
+            seed: self.seed,
+            area: cell,
+        };
+
+        // Current search edge and how far to check
+        let mut upto = [x-step, x+step, z-step, z+step];
+        let mut edge = [x, x, z, z];
+
+        'search: loop {
+            let mut stalled = true;
+
+            for (side, axis, dir) in [
+                (0,  0, -1),
+                (1,  0,  1),
+                (2,  1, -1),
+                (3,  1,  1),
+            ] {
+                // Dynamic loop upper bound
+                while edge[side] != upto[side] {
+                    edge[side] += step * dir;
+
+                    let count = match axis {
+                        0 => (edge[2]..=edge[3]).step_by(step as usize)
+                            .filter(|&z| self.is_monolith(edge[side], z))
+                            .count(),
+
+                        1 => (edge[0]..=edge[1]).step_by(step as usize)
+                            .filter(|&x| self.is_monolith(x, edge[side]))
+                            .count(),
+
+                        _ => unreachable!(),
+                    };
+
+                    if count == 0 {
+                        break;
+                    } else {
+                        stalled = false;
+
+                        // Speed: Single area operation
+                        lith.area += cell * (count as u64);
+
+                        // Update search ranges
+                        let next = edge[side] + (step * dir);
+
+                        upto[side] = match dir {
+                            1 => upto[side].max(next),
+                            _ => upto[side].min(next),
+                        }
+                    }
+                }
+            }
+
+            if stalled {
+                break 'search;
+            }
+        }
+
+        // Copy ranges
+        lith.minx = edge[0];
+        lith.maxx = edge[1];
+        lith.minz = edge[2];
+        lith.maxz = edge[3];
 
         Some(lith)
     }

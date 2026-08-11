@@ -49,7 +49,6 @@ def rustlith(
     return (subprocess.Popen if Popen else subprocess.run)((
         "cargo", "run",
         "--manifest-path", (Paths.PACKAGE/"Cargo.toml"),
-        "--target-dir", str(Path.cwd()/"target"),
         "--release", *features,
         "--", *args,
     ), **kwargs)
