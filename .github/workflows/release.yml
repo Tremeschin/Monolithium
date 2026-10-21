@@ -19,7 +19,7 @@ jobs:
 
       # PyPI release
       - run: uv build --wheel
-      - run: uv publish
+      - uses: pypa/gh-action-pypi-publish@release/v1
 
       # Crate release
       - uses: rust-lang/crates-io-auth-action@v1
