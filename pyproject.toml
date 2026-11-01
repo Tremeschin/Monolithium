@@ -1,7 +1,7 @@
 [project]
 name        = "monolithium"
 description = "🗿 Minecraft alpha monoliths seed cruncher"
-version     = "1.3.1"
+version     = "1.4.0"
 readme      = "readme.md"
 license     = "MIT"
 requires-python = ">=3.10"
