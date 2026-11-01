@@ -44,6 +44,7 @@ impl Perlin {
 
     #[inline(always)]
     pub fn init(&mut self, rng: &mut JavaRNG) {
+        self.map = NEW_MAP;
         self.xoff = rng.next_f64_256();
         self.yoff = rng.next_f64_256();
         self.zoff = rng.next_f64_256();
