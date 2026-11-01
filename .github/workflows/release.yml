@@ -24,7 +24,7 @@ jobs:
       # Crate release
       - uses: rust-lang/crates-io-auth-action@v1
         id: auth
-      - run: cargo publish
+      - run: cargo publish --allow-dirty
         working-directory: monolithium
         env:
           CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
